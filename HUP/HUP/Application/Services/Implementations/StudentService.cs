@@ -1,4 +1,3 @@
-using AutoMapper;
 using HUP.Application.DTOs.AcademicDtos;
 using HUP.Application.DTOs.AcademicDtos.Student;
 using HUP.Application.Mappers;
@@ -14,15 +13,13 @@ public class StudentService : IStudentService
 {
     private readonly IStudentRepository _studentRepository;
     private readonly IUserRepository _userRepository;
-    private readonly IMapper _mapper;
     private readonly IPasswordHasher<User> _hasher;
 
-    public StudentService(IStudentRepository studentRepository, IUserRepository userRepository, IPasswordHasher<User> hasher, IMapper mapper)
+    public StudentService(IStudentRepository studentRepository, IUserRepository userRepository, IPasswordHasher<User> hasher)
     {
         _studentRepository = studentRepository;
         _userRepository = userRepository;
         _hasher = hasher;
-        _mapper = mapper;
     }
     
     public async Task<StudentProfileDto> GetStudentProfile(Guid userId)
@@ -33,31 +30,7 @@ public class StudentService : IStudentService
         var profile = StudentMapper.ToStudentProfile(student);
         return profile;
     }
-
-    public async Task<StudentResponseDto> GetStudentByIdAsync(Guid id)
-    {
-        var student = await _studentRepository.GetByIdAsync(id);
-        return _mapper.Map<StudentResponseDto>(student);
-    }
-
-    public async Task<StudentResponseDto> UpdateStudentAcademicStatusAsync(Guid id, AcademicStatus status)
-    {
-        await _studentRepository.UpdateAcademicStatusAsync(id, status);
-        return await GetStudentByIdAsync(id);
-    }
-
-    public async Task<bool> UploadProfileImageAsync(Guid studentId, string imagePath)
-    {
-        var student = await _studentRepository.GetByIdAsync(studentId);
-        if (student == null)
-            return false;
-
-        student.ProfileImage = imagePath;
-        student.User.UpdatedAt = DateTime.UtcNow;
-
-        await _studentRepository.UpdateAsync(student);
-        return true;
-    }
+    
 
     public async Task AddStudent(CreateStudentDto dto)
     {
