@@ -24,6 +24,7 @@ namespace HUP.Repositories.Implementations
                 .Where(e => e.StudentId == studentId && !e.IsDeleted)
                 .Include(e => e.CourseOffering)
                 .Include(e => e.Student)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -34,6 +35,7 @@ namespace HUP.Repositories.Implementations
                 && e.StudentId == studentId && !e.IsDeleted)
                 .Include(e => e.CourseOffering)
                 .Include(e => e.Student)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -55,10 +57,17 @@ namespace HUP.Repositories.Implementations
                 .Include(e => e.CourseOffering)
                 .Include(e => e.Student)
                 .Where(e => !e.IsDeleted)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
-        public async Task<Enrollment> GetByIdAsync(Guid id)
+        public async Task<Enrollment> GetByIdReadOnly(Guid id)
+        {
+            var enrollment = await _context.Enrollments.AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
+            return enrollment;
+        }
+        public async Task<Enrollment> GetByIdTracking(Guid id)
         {
             var enrollment = await _context.Enrollments
                 .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);

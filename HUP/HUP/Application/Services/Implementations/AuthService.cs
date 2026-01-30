@@ -83,7 +83,7 @@ namespace HUP.Application.Services.Implementations
 
         public async Task<bool> UpdatePassword(string currentPassword, string newPassword , Guid userId)
         {
-            var user = await _repository.GetByIdAsync(userId);
+            var user = await _repository.GetByIdReadOnly(userId);
             if (user == null) return false;
             // Verify current password
             var verification = _hasher.VerifyHashedPassword(user, user.PasswordHash, currentPassword);

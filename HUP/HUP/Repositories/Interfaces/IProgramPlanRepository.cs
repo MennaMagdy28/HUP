@@ -10,7 +10,7 @@ namespace HUP.Repositories.Interfaces
         Task AddAsync(ProgramPlan entity);
         Task<IEnumerable<ProgramPlan>> GetAllAsync();
         Task<IEnumerable<ProgramPlan>> GetByDepartmentAsync(Guid departmentId);
-        Task<ProgramPlan> GetByIdAsync(Guid deptId, Guid courseId);
+        Task<ProgramPlan> GetByIdReadOnly(Guid deptId, Guid courseId);
         Task RemoveAsync(Guid deptId, Guid courseId);
         Task SaveChangesAsync();
         void Update(ProgramPlan entity);

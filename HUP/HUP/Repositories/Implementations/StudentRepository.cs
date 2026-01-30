@@ -20,18 +20,30 @@ namespace HUP.Repositories.Implementations
 
         public async Task<IEnumerable<Student>> GetAllAsync()
         {
-            return await _context.Students.ToListAsync();
+            return await _context.Students.AsNoTracking().ToListAsync();
         }
 
         public async Task<IEnumerable<Student>> GetByFacultyAsync(Guid facultyId)
         {
             return await _context.Students
                 .Where(s => s.Department.FacultyId == facultyId)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
         // ---
-        public async Task<Student> GetByIdAsync(Guid id)
+        public async Task<Student> GetByIdReadOnly(Guid id)
+        {
+            var student = await _context.Students
+                .Include(s => s.User)
+                .Include(s => s.Department)
+                .Include(s=> s.Department.Faculty)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.UserId == id);
+            return student;
+        }
+
+        public async Task<Student> GetByIdTracking(Guid id)
         {
             var student = await _context.Students
                 .Include(s => s.User)
@@ -45,6 +57,7 @@ namespace HUP.Repositories.Implementations
         {
             var students = await _context.Students
                 .Where(s => s.DepartmentId == departmentId)
+                .AsNoTracking()
                 .ToListAsync();
             return students;
         }
@@ -72,7 +85,7 @@ namespace HUP.Repositories.Implementations
 
         public async Task UpdateAcademicStatusAsync(Guid studentId, AcademicStatus status)
         {
-            var student = await GetByIdAsync(studentId);
+            var student = await GetByIdReadOnly(studentId);
             if (student != null)
             {
                 student.AcademicStatus = status;

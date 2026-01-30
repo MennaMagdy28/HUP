@@ -9,8 +9,8 @@ namespace HUP.Application.Services.Interfaces
         Task<EnrollmentResponseDto?> GetByIdAsync(Guid id);
         Task<IEnumerable<EnrollmentResponseDto>> GetAllAsync();
         Task AddAsync(CreateEnrollmentDto createEnrollmentDto);
-        Task UpdateStatus(Guid id, UpdateEnrollmentStatusDto updateEnrollmentDto);
-        Task UpdateGrades(Guid id, UpdateEnrollmentGradesDto dto);
+        Task Update(Guid id, UpdateEnrollmentDto updateEnrollmentDto);
+
         Task SoftDelete(Guid id);
         Task<bool> Exists(CreateEnrollmentDto dto);
         Task Remove(Guid id);

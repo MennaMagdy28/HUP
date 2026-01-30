@@ -14,13 +14,13 @@ public class PermissionRepository : IPermissionRepository
     }
     public async Task<IEnumerable<Permission>> GetAllPermissions()
     {
-        return await _context.Permissions.ToListAsync();
+        return await _context.Permissions.AsNoTracking().ToListAsync();
     }
 
     public async Task<List<string>> GetAllPermissionsForRole(Guid roleId)
     {
         var permissionNames = await _context.RolePermissions.Where(r => r.RoleId == roleId)
-            .Select(r => r.Permission.Name).ToListAsync();
+            .Select(r => r.Permission.Name).AsNoTracking().ToListAsync();
         return permissionNames;
     }
 

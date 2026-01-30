@@ -5,7 +5,7 @@ using HUP.Application.DTOs.AcademicDtos.Enrollment;
 
 namespace HUP.Application.Mappers
 {
-    [Mapper]
+    [Mapper(AllowNullPropertyAssignment = false)]
     public static partial class EnrollmentMapper
     {
         // Mapping for CreateEnrollmentDto
@@ -18,11 +18,11 @@ namespace HUP.Application.Mappers
 
         //Mapping for UpdateEnrollmentDto
         // status update
-        public static partial Enrollment ToEntityFromUpdateDto(UpdateEnrollmentStatusDto dto);
-        public static partial void ToUpdateStatus(UpdateEnrollmentStatusDto dto, Enrollment entity);
+        public static partial Enrollment ToEntityFromUpdateDto(UpdateEnrollmentDto dto);
+        public static partial void ToUpdate(UpdateEnrollmentDto dto, Enrollment entity);
 
         // grades update
-        public static partial Enrollment ToEntityFromUpdateGradeDto(UpdateEnrollmentGradesDto dto);
-        public static partial void ToUpdateGrades(UpdateEnrollmentGradesDto dto, Enrollment entity);
+        public static partial Enrollment ToEntityFromUpdateGradeDto(UpdateEnrollmentDto dto);
+
     }
 }

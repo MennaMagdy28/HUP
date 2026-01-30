@@ -18,7 +18,7 @@ namespace HUP.Application.Services.Implementations
 
         public async Task<TranscriptDto> GetByDepartmentAsync(Guid studentId)
         {
-            var student = await _studentRepository.GetByIdAsync(studentId);
+            var student = await _studentRepository.GetByIdReadOnly(studentId);
             if (student == null)
                 throw new Exception("Student not found");
 

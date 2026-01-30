@@ -19,6 +19,7 @@ namespace HUP.Repositories.Implementations
                 .Include(co => co.Course)
                 .Include(co => co.Semester)
                 .Where(co => co.DepartmentId == departmentId && co.SemesterId == semesterId && !co.IsDeleted)
+                .AsNoTracking()
                 .ToListAsync();
             return courseOfferings;
             
@@ -40,6 +41,7 @@ namespace HUP.Repositories.Implementations
                                                  e.Status == EnrollmentStatus.Completed)) // If has prerequisite → student must have COMPLETED it
                 .Include(co => co.Course)
                 .Include(co => co.Schedules)
+                .AsNoTracking()
                 .ToListAsync();
             return availableCourses;
         }
@@ -49,7 +51,7 @@ namespace HUP.Repositories.Implementations
             var entity = await _context.CourseOfferings.Where(co => co.CourseId == courseId
                                                                     && co.DepartmentId == deptId
                                                                     && co.SemesterId == semesterId
-                                                                    && !co.IsDeleted).FirstOrDefaultAsync();
+                                                                    && !co.IsDeleted).AsNoTracking().FirstOrDefaultAsync();
             return entity;
         }
 
@@ -64,17 +66,29 @@ namespace HUP.Repositories.Implementations
                 .Include(co => co.Course)
                 .Include(co => co.Semester)
                 .Where(co => !co.IsDeleted)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
-        public async Task<CourseOffering> GetByIdAsync(Guid id)
+        public async Task<CourseOffering> GetByIdReadOnly(Guid id)
         {
             var co = await _context.CourseOfferings
                 .Include(co => co.Course)
                 .Include(co => co.Semester)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(co => co.Id == id && !co.IsDeleted);
             return co;
         }
+        public async Task<CourseOffering> GetByIdTracking(Guid id)
+        {
+            var co = await _context.CourseOfferings
+                .Include(co => co.Course)
+                .Include(co => co.Semester)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(co => co.Id == id && !co.IsDeleted);
+            return co;
+        }
+
 
         public async Task RemoveAsync(Guid courseId)
         {

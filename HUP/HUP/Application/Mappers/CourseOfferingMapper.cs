@@ -4,7 +4,7 @@ using HUP.Core.Entities.Academics;
 
 namespace HUP.Application.Mappers
 {
-    [Mapper]
+    [Mapper(AllowNullPropertyAssignment = false)]
     public static partial class CourseOfferingMapper
     {
         // Map nested Course properties to CourseOfferingDto

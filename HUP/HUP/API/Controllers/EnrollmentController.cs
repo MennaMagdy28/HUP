@@ -52,32 +52,19 @@ namespace HUP.API.Controllers
             return StatusCode(StatusCodes.Status201Created);
         }
 
-        // Patch: api/Enrollment/{id}/status
+        // Patch: api/Enrollment/{id}
         [HttpPatch("{id}/status")]
-        public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateEnrollmentStatusDto updateDto)
+        public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateEnrollmentDto updateDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             var existing = await _service.GetByIdAsync(id);
             if (existing == null)
                 return NotFound();
-            await _service.UpdateStatus(id, updateDto);
+            await _service.Update(id, updateDto);
             return NoContent();
         }
-
-        // Patch: api/Enrollment/{id}/grades
-        [HttpPatch("{id}/grades")]
-        public async Task<IActionResult> UpdateGrades(Guid id, [FromBody] UpdateEnrollmentGradesDto updateDto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            var existing = await _service.GetByIdAsync(id);
-            if (existing == null)
-                return NotFound();
-            await _service.UpdateGrades(id, updateDto);
-            return NoContent();
-        }
-
+        
         // DELETE: api/Enrollment/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> SoftDelete(Guid id)

@@ -34,7 +34,7 @@ namespace HUP.Repositories.Implementations
             return entities;
         }
 
-        public async Task<ProgramPlan> GetByIdAsync(Guid deptId, Guid courseId)
+        public async Task<ProgramPlan> GetByIdReadOnly(Guid deptId, Guid courseId)
         {
             var p = await _context.ProgramPlan
                                 .AsNoTracking()
@@ -42,6 +42,15 @@ namespace HUP.Repositories.Implementations
                                 && pp.CourseId == courseId);
             return p;
         }
+        
+        public async Task<ProgramPlan> GetByIdTracking(Guid deptId, Guid courseId)
+        {
+            var p = await _context.ProgramPlan
+                .FirstOrDefaultAsync(pp => pp.DepartmentId == deptId 
+                                           && pp.CourseId == courseId);
+            return p;
+        }
+
 
         public async Task RemoveAsync(Guid deptId, Guid courseId)
         {

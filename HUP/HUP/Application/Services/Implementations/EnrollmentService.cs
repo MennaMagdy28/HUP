@@ -42,7 +42,7 @@ namespace HUP.Application.Services.Implementations
 
         public async Task<EnrollmentResponseDto> GetByIdAsync(Guid id)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.GetByIdReadOnly(id);
             var dto = EnrollmentMapper.ToResponseDto(entity);
             return dto;
         }
@@ -60,36 +60,27 @@ namespace HUP.Application.Services.Implementations
         }
         public async Task SoftDelete(Guid id)
         {
-            var enrollment = await _repository.GetByIdAsync(id);
+            var enrollment = await _repository.GetByIdReadOnly(id);
             enrollment.IsDeleted = true;
             enrollment.UpdatedAt = DateTime.Now;
             await _repository.SaveChangesAsync();
         }
 
-        public async Task UpdateStatus(Guid id, UpdateEnrollmentStatusDto dto)
+        public async Task Update(Guid id, UpdateEnrollmentDto dto)
         {
-            var enrollment = await _repository.GetByIdAsync(id);
+            var enrollment = await _repository.GetByIdTracking(id);
             enrollment.UpdatedAt = DateTime.Now;
             // the mapper will copy the values in it to the entity
-            // ef core tracks the changes and update only only specific attributes
-            EnrollmentMapper.ToUpdateStatus(dto, enrollment);
+            // ef core tracks the changes and update only specific attributes
+            EnrollmentMapper.ToUpdate(dto, enrollment);
             await _repository.SaveChangesAsync();
         }
-
-        public async Task UpdateGrades(Guid id, UpdateEnrollmentGradesDto dto)
-        {
-            var enrollment = await _repository.GetByIdAsync(id);
-            enrollment.UpdatedAt = DateTime.Now;
-            // the mapper will copy the values in it to the entity
-            // ef core tracks the changes and update only only specific attributes
-            EnrollmentMapper.ToUpdateGrades(dto, enrollment);
-            await _repository.SaveChangesAsync();
-        }
+        
 
         public async Task<List<SemesterTranscriptDto>> GetStudentGradesAsync(Guid studentId)
         {
             var models = await _repository.GetStudentSemesterGradeModelsAsync(studentId);
-            var student = await _studentRepo.GetByIdAsync(studentId);
+            var student = await _studentRepo.GetByIdReadOnly(studentId);
 
             var departmentId = student.DepartmentId;
 
@@ -104,7 +95,7 @@ namespace HUP.Application.Services.Implementations
             {
                 var totalGrade = m.ClassGrade + m.MidtermGrade + m.FinalGrade;
 
-                var programPlan = await _planRepo.GetByIdAsync(departmentId, m.CourseId);
+                var programPlan = await _planRepo.GetByIdReadOnly(departmentId, m.CourseId);
                 var maxGrade = programPlan.FinalGrade;
 
                 var grade = getGrade(totalGrade / maxGrade * 100);

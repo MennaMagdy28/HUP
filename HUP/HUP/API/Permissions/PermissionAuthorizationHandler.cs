@@ -44,7 +44,7 @@ public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionReq
         // set the value in cache
         if (role == null)
         {
-            var user = await _repository.GetByIdAsync(Guid.Parse(userId));
+            var user = await _repository.GetByIdReadOnly(Guid.Parse(userId));
             role = user.RoleId.ToString();
             await _cache.SetAsync(roleKey, role, 2);
         }

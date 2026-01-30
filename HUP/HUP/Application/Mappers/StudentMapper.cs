@@ -3,7 +3,7 @@ using HUP.Core.Entities.Academics;
 using Riok.Mapperly.Abstractions;
 
 namespace HUP.Application.Mappers;
-[Mapper]
+[Mapper(AllowNullPropertyAssignment = false)]
 public static partial class StudentMapper
 {
     public static StudentProfileDto ToStudentProfile(Student student)

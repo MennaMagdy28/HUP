@@ -20,16 +20,25 @@ namespace HUP.Repositories.Implementations
 
         public async Task<IEnumerable<Exam>> GetAllAsync()
         {
-            return await _context.Exams.ToListAsync();
+            return await _context.Exams.AsNoTracking().ToListAsync();
         }
 
-        public Task<Exam> GetByIdAsync(Guid id)
+        public Task<Exam> GetByIdReadOnly(Guid id)
         {
             var exam = _context.Exams.Include(e => e.CourseOffering)
                 .ThenInclude(c => c.Department)
                 .ThenInclude(d => d.Instructors)
                 .ThenInclude(i => i.User)
-                .FirstOrDefaultAsync(e => e.Id == id);
+                .AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
+            return exam;
+        }
+        public Task<Exam> GetByIdTracking(Guid id)
+        {
+            var exam = _context.Exams.Include(e => e.CourseOffering)
+                .ThenInclude(c => c.Department)
+                .ThenInclude(d => d.Instructors)
+                .ThenInclude(i => i.User)
+                .AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
             return exam;
         }
 
@@ -85,7 +94,7 @@ namespace HUP.Repositories.Implementations
 
         public async Task DeleteAsync(Guid id)
         {
-            var exam = await GetByIdAsync(id);
+            var exam = await GetByIdReadOnly(id);
             if (exam != null)
             {
                 exam.UpdatedAt = DateTime.UtcNow;

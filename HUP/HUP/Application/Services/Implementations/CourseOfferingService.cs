@@ -19,7 +19,7 @@ namespace HUP.Application.Services.Implementations
 
         public async Task<CourseOfferingDto?> GetByIdAsync(Guid id)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.GetByIdReadOnly(id);
             if (entity == null)
                 return null;
             
@@ -54,7 +54,7 @@ namespace HUP.Application.Services.Implementations
 
         public async Task SoftDelete(Guid id)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.GetByIdReadOnly(id);
             entity.IsDeleted = true;
             entity.UpdatedAt = DateTime.Now;
             await _repository.SaveChangesAsync();
@@ -65,8 +65,7 @@ namespace HUP.Application.Services.Implementations
             await _repository.RemoveAsync(id);
             await _repository.SaveChangesAsync();
         }
-
-
+        
         public async Task<IEnumerable<CourseOfferingDto>> GetActiveCourseOfferingAsync(Guid departmentId, Guid semesterId)
         {
             var entities = await _repository.GetActiveCourseOfferingAsync(departmentId, semesterId);

@@ -22,10 +22,18 @@ namespace HUP.Repositories.Implementations
             return await _context.Departments
                 .AsNoTracking()
                 .Where(d => !d.IsDeleted)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
-        public async Task<Department> GetByIdAsync(Guid id)
+        public async Task<Department> GetByIdReadOnly(Guid id)
+        {
+            var dept = await _context.Departments
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+            return dept;
+        }
+        public async Task<Department> GetByIdTracking(Guid id)
         {
             var dept = await _context.Departments
                 .AsNoTracking()

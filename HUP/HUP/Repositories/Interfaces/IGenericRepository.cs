@@ -7,7 +7,9 @@ namespace HUP.Repositories.Interfaces
     public interface IGenericRepository<T> where T : class
     {
         //CRUD queries + soft delete
-        Task<T> GetByIdAsync(Guid id);
+        Task<T> GetByIdReadOnly(Guid id);
+        Task<T> GetByIdTracking(Guid id);
+        
         Task<IEnumerable<T>> GetAllAsync();
         Task AddAsync(T entity);
         Task RemoveAsync(Guid id);

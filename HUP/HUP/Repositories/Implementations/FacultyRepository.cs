@@ -13,15 +13,21 @@ public class FacultyRepository : IFacultyRepository
     {
         _context = context;
     }
-    public async Task<Faculty> GetByIdAsync(Guid id)
+    public async Task<Faculty> GetByIdReadOnly(Guid id)
     {
-        var faculty = await _context.Faculties.FindAsync(id);
+        var faculty = await _context.Faculties.AsNoTracking().FirstOrDefaultAsync(f => f.Id == id);
+        return faculty;
+    }
+    public async Task<Faculty> GetByIdTracking(Guid id)
+    {
+        var faculty = await _context.Faculties.FirstOrDefaultAsync(f => f.Id == id);
         return faculty;
     }
 
+
     public async Task<IEnumerable<Faculty>> GetAllAsync()
     {
-        var faculties =await _context.Faculties.Where(f =>f.IsDeleted == false).ToListAsync();
+        var faculties =await _context.Faculties.Where(f =>f.IsDeleted == false).AsNoTracking().ToListAsync();
         return faculties;
     }
 

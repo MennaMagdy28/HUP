@@ -20,14 +20,20 @@ namespace HUP.Repositories.Implementations
         }
         public async Task<IEnumerable<Schedule>> GetAllAsync()
         {
-            return await _context.Schedules.ToListAsync();
+            return await _context.Schedules.AsNoTracking().ToListAsync();
         }
 
-        public async Task<Schedule> GetByIdAsync(Guid id)
+        public async Task<Schedule> GetByIdReadOnly(Guid id)
         {
-            var s = await _context.Schedules.FindAsync(id);
+            var s = await _context.Schedules.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
             return s;
         }
+        public async Task<Schedule> GetByIdTracking(Guid id)
+        {
+            var s = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == id);
+            return s;
+        }
+
 
         public async Task RemoveAsync(Guid id)
         {
