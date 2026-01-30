@@ -1,4 +1,3 @@
-using AutoMapper;
 using HUP.Application.DTOs.AcademicDtos;
 using HUP.Application.DTOs.AcademicDtos.Student;
 using HUP.Application.Mappers;
@@ -14,15 +13,13 @@ public class StudentService : IStudentService
 {
     private readonly IStudentRepository _studentRepository;
     private readonly IUserRepository _userRepository;
-    private readonly IMapper _mapper;
     private readonly IPasswordHasher<User> _hasher;
 
-    public StudentService(IStudentRepository studentRepository, IUserRepository userRepository, IPasswordHasher<User> hasher, IMapper mapper)
+    public StudentService(IStudentRepository studentRepository, IUserRepository userRepository, IPasswordHasher<User> hasher)
     {
         _studentRepository = studentRepository;
         _userRepository = userRepository;
         _hasher = hasher;
-        _mapper = mapper;
     }
     
     public async Task<StudentProfileDto> GetStudentProfile(Guid userId)
