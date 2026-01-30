@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Menna Magdy\\RiderProjects\\HUP\\HUP\\HUP\\HUP.csproj": {}
+    "M:\\University_Portal\\HUP\\HUP\\HUP.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Menna Magdy\\RiderProjects\\HUP\\HUP\\HUP\\HUP.csproj": {
+    "M:\\University_Portal\\HUP\\HUP\\HUP.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Menna Magdy\\RiderProjects\\HUP\\HUP\\HUP\\HUP.csproj",
+        "projectUniqueName": "M:\\University_Portal\\HUP\\HUP\\HUP.csproj",
         "projectName": "HUP",
-        "projectPath": "C:\\Users\\Menna Magdy\\RiderProjects\\HUP\\HUP\\HUP\\HUP.csproj",
+        "projectPath": "M:\\University_Portal\\HUP\\HUP\\HUP.csproj",
         "packagesPath": "C:\\Users\\Menna Magdy\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Menna Magdy\\RiderProjects\\HUP\\HUP\\HUP\\obj\\",
+        "outputPath": "M:\\University_Portal\\HUP\\HUP\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

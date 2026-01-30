@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "IPBlz9Lk1xc=",
+  "dgSpecHash": "y1GQdnvZeZE=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Menna Magdy\\RiderProjects\\HUP\\HUP\\HUP\\HUP.csproj",
+  "projectFilePath": "M:\\University_Portal\\HUP\\HUP\\HUP.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Menna Magdy\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\Menna Magdy\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
