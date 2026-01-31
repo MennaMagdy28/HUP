@@ -8,8 +8,8 @@ namespace HUP.Application.Services.Interfaces
     public interface ICourseOfferingService
     {
         // CRUD queries + soft delete
-        Task<CourseOfferingDto?> GetByIdAsync(Guid id);
-        Task<IEnumerable<CourseOfferingDto>> GetAllAsync();
+        Task<CourseOfferingDto?> GetByIdAsync(Guid id, string lang);
+        Task<IEnumerable<CourseOfferingDto>> GetAllAsync(string lang);
         Task AddAsync(CreateCourseOfferingDto courseOfferingDto);
         // Task Update(Guid id, CreateCourseOfferingDto courseOfferingDto);
         Task SoftDelete(Guid id);
@@ -17,8 +17,8 @@ namespace HUP.Application.Services.Interfaces
 
         Task<bool> Exists(CreateCourseOfferingDto dto);
         // Specific CourseOffering queries
-        Task<IEnumerable<CourseOfferingDto>> GetActiveCourseOfferingAsync(Guid departmentId, Guid semesterId);
-        Task<IEnumerable<CourseOfferingDto>> GetAvailableToRegisterAsync(Guid studentId);
+        Task<IEnumerable<CourseOfferingDto>> GetActiveCourseOfferingAsync(Guid departmentId, Guid semesterId, string lang);
+        Task<IEnumerable<CourseOfferingDto>> GetAvailableToRegisterAsync(Guid studentId,string lang);
     }
 }
 

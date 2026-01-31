@@ -1,4 +1,4 @@
-using HUP.Core.Enums;
+using HUP.Core.Enums.AcademicEnums;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace HUP.Core.Entities.Academics
 {

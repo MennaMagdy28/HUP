@@ -5,7 +5,7 @@ using HUP.Core.Entities.Academics;
 using HUP.Repositories.Interfaces;
 using System.Threading.Tasks;
 using HUP.Application.DTOs.AcademicDtos;
-using HUP.Core.Enums;
+using HUP.Core.Enums.AcademicEnums;
 
 namespace HUP.Application.Services.Implementations
 {

@@ -1,8 +1,6 @@
 using System.Security.Claims;
 using HUP.Application.DTOs.AcademicDtos.CourseOffering;
 using Microsoft.AspNetCore.Mvc;
-using HUP.Application.Mappers;
-using HUP.Core.Entities.Academics;
 using HUP.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 
@@ -21,17 +19,17 @@ namespace HUP.API.Controllers
 
        // GET: api/CourseOffering
        [HttpGet]
-       public async Task<ActionResult<IEnumerable<CourseOfferingDto>>> GetAll()
+       public async Task<ActionResult<IEnumerable<CourseOfferingDto>>> GetAll([FromHeader(Name = "Accept-Language")] string lang = "ar")
        {
-           var courseOfferings = await _service.GetAllAsync();
+           var courseOfferings = await _service.GetAllAsync(lang);
            return Ok(courseOfferings);
        }
 
        // GET: api/CourseOffering/{id}
        [HttpGet("{id}")]
-       public async Task<ActionResult<CourseOfferingDto>> GetById(Guid id)
+       public async Task<ActionResult<CourseOfferingDto>> GetById(Guid id, [FromHeader(Name = "Accept-Language")] string lang = "ar")
        {
-           var courseOffering = await _service.GetByIdAsync(id);
+           var courseOffering = await _service.GetByIdAsync(id, lang);
            if (courseOffering == null)
            {
                return NotFound();
@@ -41,19 +39,21 @@ namespace HUP.API.Controllers
 
        // GET: api/CourseOffering/active/{departmentId}/{semesterId}
        [HttpGet("active/{departmentId}/{semesterId}")]
-       public async Task<ActionResult<IEnumerable<CourseOfferingDto>>> GetActiveCourseOfferings(Guid departmentId, Guid semesterId)
+       public async Task<ActionResult<IEnumerable<CourseOfferingDto>>> GetActiveCourseOfferings(Guid departmentId, Guid semesterId
+           , [FromHeader(Name = "Accept-Language")] string lang = "ar" )
        {
-           var courseOfferings = await _service.GetActiveCourseOfferingAsync(departmentId, semesterId);
+           var courseOfferings = await _service.GetActiveCourseOfferingAsync(departmentId, semesterId
+           ,lang);
            return Ok(courseOfferings);
        }
 
        // GET: api/CourseOffering/available/{studentId}
        [HttpGet("available/")]
        [Authorize]
-       public async Task<ActionResult<IEnumerable<CourseOfferingDto>>> GetAvailableToRegister()
+       public async Task<ActionResult<IEnumerable<CourseOfferingDto>>> GetAvailableToRegister([FromHeader(Name = "Accept-Language")] string lang = "ar")
        {
            var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-           var courseOfferings = await _service.GetAvailableToRegisterAsync(studentId);
+           var courseOfferings = await _service.GetAvailableToRegisterAsync(studentId, lang);
            return Ok(courseOfferings);
        }
 
@@ -96,11 +96,6 @@ namespace HUP.API.Controllers
        [HttpDelete("{id}")]
        public async Task<IActionResult> Delete(Guid id)
        {
-           var courseOffering = await _service.GetByIdAsync(id);
-           if (courseOffering == null)
-           {
-               return NotFound();
-           }
            await _service.SoftDelete(id);
            return NoContent();
        }
@@ -109,11 +104,6 @@ namespace HUP.API.Controllers
        [HttpDelete("{id}/hard")]
        public async Task<IActionResult> HardDelete(Guid id)
        {
-           var courseOffering = await _service.GetByIdAsync(id);
-           if (courseOffering == null)
-           {
-               return NotFound();
-           }
            await _service.Remove(id);
            return NoContent();
        }

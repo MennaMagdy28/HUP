@@ -6,6 +6,6 @@ namespace HUP.Application.Services.Interfaces;
 
 public interface IStudentService
 {
-    Task<StudentProfileDto> GetStudentProfile(Guid userId);
+    Task<StudentProfileDto> GetStudentProfile(Guid userId, string lang);
     Task AddStudent(CreateStudentDto dto);
 }

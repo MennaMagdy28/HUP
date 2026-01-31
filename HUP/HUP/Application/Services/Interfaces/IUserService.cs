@@ -14,7 +14,7 @@ public interface IUserService
     public Task<ProfileStatus> GetProfileStatus(Guid userId, bool isPasswordExpired);
 
     public Task<IEnumerable<UsersListResponse>> GetAllUsers();
-    public Task<ProfileInfoDto> GetUserById(Guid userId);
+    public Task<ProfileInfoDto> GetUserById(Guid userId, string lang);
     public Task<bool> InsertMissingData(Guid userId, UpdateInfoDto dto);
     public Task AddAsync(CreateUserDto dto);
     public Task<bool> Exists(string nationalId);

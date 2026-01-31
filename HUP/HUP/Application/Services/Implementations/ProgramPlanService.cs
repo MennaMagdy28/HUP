@@ -1,6 +1,6 @@
 using HUP.Application.DTOs.AcademicDtos.ProgramPlan;
 using HUP.Application.Services.Interfaces;
-using HUP.Core.Enums;
+using HUP.Core.Enums.AcademicEnums;
 using HUP.Repositories.Interfaces;
 
 namespace HUP.Application.Services.Implementations

@@ -6,6 +6,7 @@ using HUP.Application.Services.Interfaces;
 using HUP.Common.Helpers;
 using HUP.Core.Entities.Identity;
 using HUP.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 
 namespace HUP.Application.Services.Implementations;
@@ -82,10 +83,10 @@ public class UserService : IUserService
         return usersList;
     }
 
-    public async Task<ProfileInfoDto> GetUserById(Guid userId)
+    public async Task<ProfileInfoDto> GetUserById(Guid userId, string lang)
     {
         var user = await _repository.GetByIdReadOnly(userId);
-        var userProfileData = UserMapper.ToProfileDto(user);
+        var userProfileData = UserMapper.ToProfileDto(user, lang);
         return userProfileData;
     }
 

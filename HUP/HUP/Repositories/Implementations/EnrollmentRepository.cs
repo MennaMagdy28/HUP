@@ -3,7 +3,7 @@ using HUP.Core.Entities.Academics;
 using HUP.Data;
 using Microsoft.EntityFrameworkCore;
 using HUP.Core.Models;
-using HUP.Core.Enums;
+using HUP.Core.Enums.AcademicEnums;
 
 namespace HUP.Repositories.Implementations
 {

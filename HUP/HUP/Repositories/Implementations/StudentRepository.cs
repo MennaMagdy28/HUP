@@ -1,5 +1,5 @@
 ﻿using HUP.Core.Entities.Academics;
-using HUP.Core.Enums;
+using HUP.Core.Enums.AcademicEnums;
 using HUP.Data;
 using HUP.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;

@@ -17,19 +17,19 @@ namespace HUP.Application.Services.Implementations
             _repository = repository;
         }
 
-        public async Task<CourseOfferingDto?> GetByIdAsync(Guid id)
+        public async Task<CourseOfferingDto?> GetByIdAsync(Guid id, string lang)
         {
             var entity = await _repository.GetByIdReadOnly(id);
             if (entity == null)
                 return null;
             
-            return CourseOfferingMapper.ToDto(entity);
+            return CourseOfferingMapper.ToDto(entity, lang);
         }
 
-        public async Task<IEnumerable<CourseOfferingDto>> GetAllAsync()
+        public async Task<IEnumerable<CourseOfferingDto>> GetAllAsync(string lang)
         {
             var entities = await _repository.GetAllAsync();
-            return CourseOfferingMapper.ToDto(entities);
+            return CourseOfferingMapper.ToDto(entities, lang);
         }
 
         public async Task<bool> Exists(CreateCourseOfferingDto dto)
@@ -66,16 +66,17 @@ namespace HUP.Application.Services.Implementations
             await _repository.SaveChangesAsync();
         }
         
-        public async Task<IEnumerable<CourseOfferingDto>> GetActiveCourseOfferingAsync(Guid departmentId, Guid semesterId)
+        public async Task<IEnumerable<CourseOfferingDto>> GetActiveCourseOfferingAsync(Guid departmentId,
+            Guid semesterId, string lang)
         {
             var entities = await _repository.GetActiveCourseOfferingAsync(departmentId, semesterId);
-            return CourseOfferingMapper.ToDto(entities);
+            return CourseOfferingMapper.ToDto(entities, lang);
         }
 
-        public async Task<IEnumerable<CourseOfferingDto>> GetAvailableToRegisterAsync(Guid studentId)
+        public async Task<IEnumerable<CourseOfferingDto>> GetAvailableToRegisterAsync(Guid studentId, string lang)
         {
             var courses = await _repository.GetAvailableToRegisterAsync(studentId);
-            var dtos = CourseOfferingMapper.ToDto(courses);
+            var dtos = CourseOfferingMapper.ToDto(courses, lang);
             return dtos;
         }
     }

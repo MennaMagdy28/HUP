@@ -25,9 +25,9 @@ public class UserController : ControllerBase
     }
     //Get : api/User/{id}
     [HttpGet("{id}")]
-    public async Task<ActionResult<ProfileInfoDto>> GetById(Guid id)
+    public async Task<ActionResult<ProfileInfoDto>> GetById(Guid id, [FromHeader(Name = "Accept-Language")] string lang = "ar")
     {
-        var profile = await _userService.GetUserById(id);
+        var profile = await _userService.GetUserById(id, lang);
         if (profile == null)
             return BadRequest("User not found.");
         return Ok(profile);
@@ -76,9 +76,6 @@ public class UserController : ControllerBase
     [HttpDelete("{id}/hard")]
     public async Task<IActionResult> HardDelete(Guid id)
     {
-        var user = await _userService.GetUserById(id);
-        if (user == null)
-            return NotFound();
         await _userService.Remove(id);
         return NoContent();
     }

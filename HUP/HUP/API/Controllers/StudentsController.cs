@@ -32,10 +32,10 @@ namespace HUP.API.Controllers
 
         [HttpGet("Profile")]
         [Authorize]
-        public async Task<ActionResult<StudentProfileDto>> GetProfile()
+        public async Task<ActionResult<StudentProfileDto>> GetProfile([FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var id = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            var profile = await _studentService.GetStudentProfile(id);
+            var profile = await _studentService.GetStudentProfile(id, lang);
             if (profile == null)
                 return BadRequest("User not found.");
             return Ok(profile);

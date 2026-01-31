@@ -1,4 +1,6 @@
+using System.Text.Json;
 using HUP.Application.DTOs.IdentityDtos.UserDtos;
+using HUP.Common.Helpers;
 using HUP.Core.Entities.Identity;
 using HUP.Core.Models;
 using Riok.Mapperly.Abstractions;
@@ -13,20 +15,40 @@ namespace HUP.Application.Mappers
         public static partial UserDto ToDto(User user);
         public static partial UsersListResponse ToListDto(UserSummary user);
 
-        public static ProfileInfoDto ToProfileDto(User user)
+        public static ProfileInfoDto ToProfileDto(User user, string lang)
         {
             var dto = new ProfileInfoDto();
-            dto.ContactInfo = ToContactDto(user.ContactInfo);
-            dto.PersonalInfo = ToPersonalDto(user.PersonalInfo);
-            dto.FullName = user.FullName;
+            dto.ContactInfo = ToContactDto(user.ContactInfo, lang);
+            dto.PersonalInfo = ToPersonalDto(user.PersonalInfo, lang);
+            dto.FullName = LocalizationHelper.Get<string>(user.FullName, lang);
             dto.Email = user.Email;
             dto.NationalId = user.NationalId;
             return dto;
         }
-        public static partial PersonalInfoDto ToPersonalDto(UserPersonalInfo personalInfo);
-        public static partial ContactInfoDto ToContactDto(UserContact contactInfo);
-        public static partial UserPersonalInfo ToPersonalEntity(CreatePersonalInfo personalInfo);
-        public static partial UserContact ToContactEntity(CreateContactInfo contactInfo);
+
+        public static PersonalInfoDto ToPersonalDto(UserPersonalInfo personalInfo, string lang)
+        {
+            var dto = new PersonalInfoDto();
+            dto.BirthDate = personalInfo.BirthDate;
+            dto.BirthPlace = LocalizationHelper.Get(personalInfo.BirthPlace, lang);
+            dto.Gender = LocalizationHelper.Get(personalInfo.Gender, lang);
+            dto.Nationality = LocalizationHelper.Get(personalInfo.Nationality, lang);
+            dto.Religion = LocalizationHelper.Get(personalInfo.Religion, lang);
+            return dto;
+        }
+
+        public static ContactInfoDto ToContactDto(UserContact contactInfo, string lang)
+        {
+            var dto = new ContactInfoDto();
+            dto.Address = contactInfo.Address;
+            if (contactInfo.City != null)
+                dto.City = LocalizationHelper.Get(contactInfo.City, lang);
+            dto.PhoneNumber = contactInfo.PhoneNumber;
+            dto.AltEmail = contactInfo.AltEmail;
+            return dto;
+        }
+        public static partial UserPersonalInfo ToPersonalEntity(PersonalInfoDto personalInfo);
+        public static partial UserContact ToContactEntity(ContactInfoDto contactInfo);
 
         public static User ToCreateEntity(CreateUserDto userDto)
         {
@@ -35,21 +57,13 @@ namespace HUP.Application.Mappers
             user.PersonalInfo = ToPersonalEntity(userDto.PersonalInfo);
             user.NationalId = userDto.NationalId;
             user.Email = userDto.Email;
-            user.FullName = userDto.FullName;
+            user.FullName = JsonSerializer.Serialize(userDto.FullName);
             user.PasswordHash = userDto.PasswordHash;
             user.RoleId = userDto.RoleId;
             return user;
         }
 
-        [MapProperty(nameof(UpdateInfoDto.FullEnglishName), nameof(User.PersonalInfo.FullEnglishName))]
-        [MapProperty(nameof(UpdateInfoDto.Address), nameof(User.ContactInfo.Address))]
-        [MapProperty(nameof(UpdateInfoDto.City), nameof(User.ContactInfo.City))]
-        [MapProperty(nameof(UpdateInfoDto.BirthPlace), nameof(User.PersonalInfo.BirthPlace))]
-        [MapProperty(nameof(UpdateInfoDto.AltEmail), nameof(User.ContactInfo.AltEmail))]
-        [MapProperty(nameof(UpdateInfoDto.PhoneNumber), nameof(User.ContactInfo.PhoneNumber))]
-
         public static partial User ToUpdate(UpdateInfoDto infoDto);
-
-
+        
     }
 }

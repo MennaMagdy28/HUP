@@ -22,16 +22,15 @@ public class StudentService : IStudentService
         _hasher = hasher;
     }
     
-    public async Task<StudentProfileDto> GetStudentProfile(Guid userId)
+    public async Task<StudentProfileDto> GetStudentProfile(Guid userId , string lang)
     {
         var student = await _studentRepository.GetByIdReadOnly(userId);
         if (student == null)
             return null;
-        var profile = StudentMapper.ToStudentProfile(student);
+        var profile = StudentMapper.ToStudentProfile(student, lang);
         return profile;
     }
     
-
     public async Task AddStudent(CreateStudentDto dto)
     {
         var student = StudentMapper.ToCreateStudent(dto);
