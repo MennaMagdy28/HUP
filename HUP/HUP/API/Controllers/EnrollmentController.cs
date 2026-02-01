@@ -17,7 +17,10 @@ namespace HUP.API.Controllers
         {
             _service = service;
         }
-
+        //TODO
+        // ADD LOCALIZATION
+        // ADD FILTERS 
+        
         // GET: api/Enrollment
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EnrollmentResponseDto>>> GetAll()

@@ -20,6 +20,8 @@ namespace HUP.API.Controllers
         {
             _studentService = studentService;
         }
+        //TODO
+        //ADD UPDATE PROFILE, REGISTER STUDENT, SOFT DELETE
         
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateStudentDto createDto)

@@ -15,7 +15,8 @@ namespace HUP.Api.Controllers
         {
             _programPlanService = programPlanService;
         }
-
+        //TODO
+        // ADD LOCALIZATION
         [HttpGet("student/")]
         [Authorize]
         public async Task<IActionResult> GetProgramPlanByStudentId()

@@ -16,6 +16,9 @@ namespace HUP.API.Controllers
        {
            _service = service;
        }
+       
+        //TODO
+       //ADD UPDATE, MODIFY DELETE
 
        // GET: api/CourseOffering
        [HttpGet]

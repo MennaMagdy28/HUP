@@ -4,6 +4,7 @@ using HUP.Repositories.Interfaces;
 using HUP.Application.Services.Interfaces;
 using System.Threading.Tasks;
 using HUP.Application.DTOs.AcademicDtos.CourseOffering;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 
 namespace HUP.Application.Services.Implementations
@@ -60,6 +61,8 @@ namespace HUP.Application.Services.Implementations
             await _repository.SaveChangesAsync();
         }
 
+        //TODO
+        //fix: return value to the controller
         public async Task Remove(Guid id)
         {
             await _repository.RemoveAsync(id);

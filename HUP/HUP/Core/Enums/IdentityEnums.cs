@@ -19,11 +19,11 @@
 
     public enum BirthPlace
     {
-        
+        //TODO
     }
 
     public enum City
     {
-        
+        //TODO
     }
 }

@@ -13,7 +13,8 @@
         [Localized("Female", "أنثى")]
         Female
     }
-    
+    //TODO
+    //Add localized attributes
 
     public enum ExamType
     {
@@ -53,6 +54,8 @@
         Professor,
         AssistantProfessor
     }
+    //TODO
+    //search : تربية رياضية 
 
     public enum FacultyTitle
     {

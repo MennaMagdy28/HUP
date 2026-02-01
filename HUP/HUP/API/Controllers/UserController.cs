@@ -17,6 +17,8 @@ public class UserController : ControllerBase
     }
 
     //GET : api/User
+    //TODO
+    // (ADD PAGINATION + FILTERS)
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UsersListResponse>>> GetAll()
     {
