@@ -42,5 +42,16 @@ namespace HUP.API.Controllers
                 return BadRequest("User not found.");
             return Ok(profile);
         }
+
+        [HttpPatch("Status")]
+        [Authorize]
+        public async Task<IActionResult> UpdateAcademicStatus([FromBody] StudentStatusDto statusDto)
+        {
+            var id = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            bool result = await _studentService.UpdateStudentStatus(id, statusDto);
+            if (!result) return BadRequest("Failed to update status");
+            return Ok("Status updated successfully.");
+        }
+
     }
 }

@@ -1,6 +1,13 @@
-namespace HUP.API.Controllers;
+using System.Security.Claims;
+using HUP.Application.DTOs.IdentityDtos.UserDtos;
+using HUP.Application.Services.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
-public class ExamController
-{ 
+namespace HUP.API.Controllers;
+[ApiController]
+[Route("api/[controller]")]
+public class ExamController : ControllerBase
+{
     //TODO
 }

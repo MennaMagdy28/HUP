@@ -81,8 +81,10 @@
         FacultyOfAppliedArts,
         [Localized("Faculty of Fine Arts", "كلية الفنون الجميلة")]
         FacultyOfFineArts,
-        [Localized("Faculty of ", "كلية علوم الرياضة بنين")]
-        FacultyOfSportsScience,
+        [Localized("Faculty of Sports Science - Boys", "كلية علوم الرياضة بنين")]
+        FacultyOfSportsScienceBoys,
+        [Localized("Faculty of Sports Science - Girls", "كلية علوم الرياضة بنات")]
+        FacultyOfSportsScienceGirls,
         [Localized("Faculty of Engineering Mataria", "كلية الهندسه (مطريه)")]
         FacultyOfEngineeringMataria,
         [Localized("Faculty of Engineering Helwan", "كلية الهندسة بحلوان")]

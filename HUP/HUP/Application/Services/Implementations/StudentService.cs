@@ -2,6 +2,7 @@ using HUP.Application.DTOs.AcademicDtos;
 using HUP.Application.DTOs.AcademicDtos.Student;
 using HUP.Application.Mappers;
 using HUP.Application.Services.Interfaces;
+using HUP.Common.Helpers;
 using HUP.Core.Entities.Identity;
 using HUP.Core.Enums;
 using HUP.Repositories.Interfaces;
@@ -43,5 +44,15 @@ public class StudentService : IStudentService
         student.UserId = user.Id;
         await _studentRepository.AddAsync(student);
         await _studentRepository.SaveChangesAsync();
+    }
+    
+    public async Task<bool> UpdateStudentStatus(Guid studentId, StudentStatusDto statusDto)
+    {
+        var student = await _studentRepository.GetByIdTracking(studentId);
+        if (student == null)
+            return false;
+        student = StudentMapper.UpdateStatus(statusDto);
+        await _studentRepository.SaveChangesAsync();
+        return true;
     }
 }

@@ -32,6 +32,7 @@ public static partial class StudentMapper
         student.User = UserMapper.ToCreateEntity(dto.UserInfo);
         return student;
     }
-    public static partial Student MapEntityFields(CreateStudentDto dto); 
+    public static partial Student MapEntityFields(CreateStudentDto dto);
 
+    public static partial Student UpdateStatus(StudentStatusDto statusDto);
 }
