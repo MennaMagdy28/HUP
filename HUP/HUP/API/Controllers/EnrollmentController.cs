@@ -23,21 +23,25 @@ namespace HUP.API.Controllers
         
         // GET: api/Enrollment
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EnrollmentResponseDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<EnrollmentResponseDto>>> GetAll([FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
-            var enrollments = await _service.GetAllAsync();
+            var enrollments = await _service.GetAllAsync(lang);
             return Ok(enrollments);
         }
 
         // GET: api/Enrollment/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<EnrollmentResponseDto>> GetById(Guid id)
+        public async Task<ActionResult<EnrollmentResponseDto>> GetById(Guid id,
+            [FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
-            var enrollment = await _service.GetByIdAsync(id);
+            var enrollment = await _service.GetByIdAsync(id, lang);
             if (enrollment == null)
             {
                 return NotFound();
             }
+
+            enrollment.StudentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
             return Ok(enrollment);
         }
 
@@ -61,9 +65,6 @@ namespace HUP.API.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var existing = await _service.GetByIdAsync(id);
-            if (existing == null)
-                return NotFound();
             await _service.Update(id, updateDto);
             return NoContent();
         }
@@ -72,9 +73,6 @@ namespace HUP.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> SoftDelete(Guid id)
         {
-            var enrollment = await _service.GetByIdAsync(id);
-            if (enrollment == null)
-                return NotFound();
             await _service.SoftDelete(id);
             return NoContent();
         }
@@ -83,9 +81,6 @@ namespace HUP.API.Controllers
         [HttpDelete("{id}/hard")]
         public async Task<IActionResult> HardDelete(Guid id)
         {
-            var enrollment = await _service.GetByIdAsync(id);
-            if (enrollment == null)
-                return NotFound();
             await _service.Remove(id);
             return NoContent();
         }
@@ -93,19 +88,19 @@ namespace HUP.API.Controllers
         // Get: api/Enrollment/AllGrades/{studentId}
         [Authorize]
         [HttpGet("AllGrades")]
-        public async Task<IActionResult> GetStudentGrades()
+        public async Task<IActionResult> GetStudentGrades([FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            var result = await _service.GetStudentGradesAsync(studentId);
+            var result = await _service.GetStudentGradesAsync(studentId, lang);
             return Ok(result);
         }
 
         // GET: api/Enrollment/Registered/{studentId}
         [HttpGet("Registered")]
-        public async Task<ActionResult<IEnumerable<EnrollmentResponseDto>>> GetRegisteredByStudentAsync()
+        public async Task<ActionResult<IEnumerable<EnrollmentResponseDto>>> GetRegisteredByStudentAsync([FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            var result = await _service.GetRegisteredByStudentAsync(studentId);
+            var result = await _service.GetRegisteredByStudentAsync(studentId, lang);
             return Ok(result);
         }
     }

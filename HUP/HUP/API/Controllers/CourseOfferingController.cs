@@ -77,23 +77,12 @@ namespace HUP.API.Controllers
        }
 
        // PUT: api/CourseOffering/{id}
-       // [HttpPut("{id}")]
-       // public async Task<IActionResult> Update(Guid id, [FromBody] CreateCourseOfferingDto updateDto)
-       // {
-       //     if (!ModelState.IsValid)
-       //     {
-       //         return BadRequest(ModelState);
-       //     }
-       //
-       //     var existingCourseOffering = await _service.GetByIdAsync(id);
-       //     if (existingCourseOffering == null)
-       //     {
-       //         return NotFound();
-       //     }
-       //
-       //     await _service.Update(id, updateDto);
-       //     return NoContent();
-       // }
+       [HttpPut("{id}")]
+       public async Task<IActionResult> Update(Guid id, [FromBody] CreateCourseOfferingDto updateDto)
+       {
+           // await _service.Update(id, updateDto);
+           return NoContent();
+       }
 
        // DELETE: api/CourseOffering/{id}
        [HttpDelete("{id}")]

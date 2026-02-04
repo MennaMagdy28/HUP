@@ -46,9 +46,9 @@ public class StudentService : IStudentService
         await _studentRepository.SaveChangesAsync();
     }
     
-    public async Task<bool> UpdateStudentStatus(Guid studentId, StudentStatusDto statusDto)
+    public async Task<bool> UpdateStudentStatus(StudentStatusDto statusDto)
     {
-        var student = await _studentRepository.GetByIdTracking(studentId);
+        var student = await _studentRepository.GetByIdTracking(statusDto.StudentId);
         if (student == null)
             return false;
         student = StudentMapper.UpdateStatus(statusDto);

@@ -1,5 +1,6 @@
 using HUP.Application.DTOs.AcademicDtos.ProgramPlan;
 using HUP.Application.Services.Interfaces;
+using HUP.Common.Helpers;
 using HUP.Core.Enums.AcademicEnums;
 using HUP.Repositories.Interfaces;
 
@@ -16,7 +17,7 @@ namespace HUP.Application.Services.Implementations
             _studentRepository = studentRepository;
         }
 
-        public async Task<TranscriptDto> GetByDepartmentAsync(Guid studentId)
+        public async Task<TranscriptDto> GetByDepartmentAsync(Guid studentId, string lang)
         {
             var student = await _studentRepository.GetByIdReadOnly(studentId);
             if (student == null)
@@ -26,8 +27,8 @@ namespace HUP.Application.Services.Implementations
 
            var items = plans.Select(p => new ProgramPlanItemDto
             {
-                Code = p.Course.CourseCode,
-                CourseName = p.Course.CourseName,
+                Code = LocalizationHelper.Get<string>(p.Course.CourseCode, lang),
+                CourseName = LocalizationHelper.Get<string>(p.Course.CourseName, lang),
                 Hours = p.Course.Credits,
                 Total = 0,
                 Grade = "",

@@ -5,6 +5,6 @@ namespace HUP.Application.Services.Interfaces
 {
     public interface IProgramPlanService
     {
-        Task<TranscriptDto> GetByDepartmentAsync(Guid StudentId);
+        Task<TranscriptDto> GetByDepartmentAsync(Guid StudentId, string lang);
     }
 }

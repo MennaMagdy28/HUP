@@ -55,7 +55,7 @@ namespace HUP.Application.Services.Implementations
 
         public async Task SoftDelete(Guid id)
         {
-            var entity = await _repository.GetByIdReadOnly(id);
+            var entity = await _repository.GetByIdTracking(id);
             entity.IsDeleted = true;
             entity.UpdatedAt = DateTime.Now;
             await _repository.SaveChangesAsync();

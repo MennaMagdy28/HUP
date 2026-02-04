@@ -47,8 +47,7 @@ namespace HUP.API.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateAcademicStatus([FromBody] StudentStatusDto statusDto)
         {
-            var id = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            bool result = await _studentService.UpdateStudentStatus(id, statusDto);
+            bool result = await _studentService.UpdateStudentStatus(statusDto);
             if (!result) return BadRequest("Failed to update status");
             return Ok("Status updated successfully.");
         }
