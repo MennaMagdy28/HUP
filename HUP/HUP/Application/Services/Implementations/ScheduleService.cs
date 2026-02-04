@@ -14,14 +14,16 @@ public class ScheduleService : IScheduleService
     {
         _repository = scheduleRepository;
     }
-    public async Task Create(ScheduleSlotDto dto)
+    public async Task Create(ScheduleSlotCreateDto createDto)
     {
         var slot = new Schedule();
-        slot = ScheduleMapper.ToEntity(dto);
+        slot.Id = Guid.NewGuid();
+        slot.CreatedAt = DateTime.Now;
+        slot = ScheduleMapper.ToEntity(createDto);
         await _repository.AddAsync(slot);
     }
 
-    public Task Update(ScheduleSlotDto dto)
+    public Task Update(ScheduleSlotCreateDto createDto)
     {
         throw new NotImplementedException();
     }

@@ -17,11 +17,11 @@ public class ScheduleController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ScheduleSlotDto>> AddSlot(ScheduleSlotDto dto)
+    public async Task<ActionResult<ScheduleSlotCreateDto>> AddSlot(ScheduleSlotCreateDto createDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
-        await _scheduleService.Create(dto);
+        await _scheduleService.Create(createDto);
         return Ok("Created Successfully");
     }
 

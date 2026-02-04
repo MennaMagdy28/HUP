@@ -4,8 +4,8 @@ namespace HUP.Application.Services.Interfaces;
 
 public interface IScheduleService
 {
-    Task Create(ScheduleSlotDto dto);
-    Task Update(ScheduleSlotDto dto);
+    Task Create(ScheduleSlotCreateDto createDto);
+    Task Update(ScheduleSlotCreateDto createDto);
     Task SoftDelete(Guid id);
     Task Remove(Guid dto);
     
