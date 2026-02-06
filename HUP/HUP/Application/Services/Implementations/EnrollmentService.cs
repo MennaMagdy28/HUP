@@ -154,7 +154,7 @@ namespace HUP.Application.Services.Implementations
             return transcript;
         }
 
-        public async Task<IEnumerable<EnrollmentResponseDto>> GetRegisteredByStudentAsync(Guid studentId, EnrollmentFilterDto filter, string lang)
+        public async Task<IEnumerable<EnrollmentResponseDto>> GetRegisteredByStudentAsync(Guid studentId, string lang, EnrollmentFilterDto filter)
         {
             var enrollments = await _repository.GetFilteredAsync(studentId, filter);
 

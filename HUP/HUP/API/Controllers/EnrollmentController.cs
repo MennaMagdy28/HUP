@@ -90,10 +90,10 @@ namespace HUP.API.Controllers
         // GET: api/Enrollment/Student
         [Authorize]
         [HttpGet("Student")]
-        public async Task<ActionResult<IEnumerable<EnrollmentResponseDto>>> GetRegisteredByStudentAsync([FromQuery] EnrollmentFilterDto filter)
+        public async Task<ActionResult<IEnumerable<EnrollmentResponseDto>>> GetRegisteredByStudentAsync([FromQuery] EnrollmentFilterDto filter, [FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var result = await _service.GetRegisteredByStudentAsync(studentId, filter);
+            var result = await _service.GetRegisteredByStudentAsync(studentId, lang, filter);
             return Ok(result);
         }
     }
