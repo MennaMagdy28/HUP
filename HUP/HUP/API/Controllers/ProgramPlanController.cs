@@ -19,10 +19,10 @@ namespace HUP.Api.Controllers
         // ADD LOCALIZATION
         [HttpGet("student/")]
         [Authorize]
-        public async Task<IActionResult> GetProgramPlanByStudentId()
+        public async Task<IActionResult> GetProgramPlanByStudentId([FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            var result = await _programPlanService.GetByDepartmentAsync(studentId);
+            var result = await _programPlanService.GetByDepartmentAsync(studentId, lang);
 
             if (result == null)
                 return NotFound();

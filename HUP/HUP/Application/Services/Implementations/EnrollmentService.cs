@@ -5,6 +5,7 @@ using HUP.Core.Entities.Academics;
 using HUP.Repositories.Interfaces;
 using System.Threading.Tasks;
 using HUP.Application.DTOs.AcademicDtos;
+using HUP.Common.Helpers;
 using HUP.Core.Enums.AcademicEnums;
 
 namespace HUP.Application.Services.Implementations
@@ -33,17 +34,17 @@ namespace HUP.Application.Services.Implementations
             await _repository.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<EnrollmentResponseDto>> GetAllAsync()
+        public async Task<IEnumerable<EnrollmentResponseDto>> GetAllAsync(string lang)
         {
             var entities =  await _repository.GetAllAsync();
-            var dtos = entities.Select(e => EnrollmentMapper.ToResponseDto(e));
+            var dtos = entities.Select(e => EnrollmentMapper.ToResponseDto(e, lang));
             return dtos;
         }
 
-        public async Task<EnrollmentResponseDto> GetByIdAsync(Guid id)
+        public async Task<EnrollmentResponseDto> GetByIdAsync(Guid id, string lang)
         {
             var entity = await _repository.GetByIdReadOnly(id);
-            var dto = EnrollmentMapper.ToResponseDto(entity);
+            var dto = EnrollmentMapper.ToResponseDto(entity, lang);
             return dto;
         }
 
@@ -77,7 +78,7 @@ namespace HUP.Application.Services.Implementations
         }
         
 
-        public async Task<List<SemesterTranscriptDto>> GetStudentGradesAsync(Guid studentId)
+        public async Task<List<SemesterTranscriptDto>> GetStudentGradesAsync(Guid studentId, string lang)
         {
             var models = await _repository.GetStudentSemesterGradeModelsAsync(studentId);
             var student = await _studentRepo.GetByIdReadOnly(studentId);
@@ -110,9 +111,9 @@ namespace HUP.Application.Services.Implementations
                 computedCourses.Add(new SemesterGradesDto
                 {
                     SemesterId = m.SemesterId,
-                    SemesterName = m.SemesterName,
-                    CourseCode = m.CourseCode,
-                    CourseName = m.CourseName,
+                    SemesterName = LocalizationHelper.Get<string>(m.SemesterName, lang),
+                    CourseCode = LocalizationHelper.Get<string>(m.CourseCode,lang),
+                    CourseName = LocalizationHelper.Get<string>(m.CourseName,lang),
                     TotalGrade = totalGrade,
                     Grade = grade,
                     CreditHours = m.CourseCredits,
@@ -153,11 +154,11 @@ namespace HUP.Application.Services.Implementations
             return transcript;
         }
 
-        public async Task<IEnumerable<EnrollmentResponseDto>> GetRegisteredByStudentAsync(Guid studentId, EnrollmentFilterDto filter)
+        public async Task<IEnumerable<EnrollmentResponseDto>> GetRegisteredByStudentAsync(Guid studentId, EnrollmentFilterDto filter, string lang)
         {
             var enrollments = await _repository.GetFilteredAsync(studentId, filter);
 
-            return enrollments.Select(EnrollmentMapper.ToResponseDto);
+            return enrollments.Select(e => EnrollmentMapper.ToResponseDto(e, lang));
         }
 
         public string getGrade(decimal grade)

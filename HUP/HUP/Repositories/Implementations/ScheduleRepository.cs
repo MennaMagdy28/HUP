@@ -25,7 +25,11 @@ namespace HUP.Repositories.Implementations
 
         public async Task<Schedule> GetByIdReadOnly(Guid id)
         {
-            var s = await _context.Schedules.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+            var s = await _context.Schedules
+                .Where(s => s.Id == id)
+                .Include(s => s.CourseOffering)
+                .Include(s => s.CourseOffering.Course)
+                .AsNoTracking().FirstOrDefaultAsync();
             return s;
         }
         public async Task<Schedule> GetByIdTracking(Guid id)

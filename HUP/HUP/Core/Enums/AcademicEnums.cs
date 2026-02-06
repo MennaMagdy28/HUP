@@ -39,6 +39,24 @@
        Department
     }
 
+    public enum DayOfWeek
+    {
+        [Localized("Monday", "الأثنين")]
+        Monday,
+        [Localized("Tuesday", "الثلثاء")]
+        Tuesday,
+        [Localized("Wednesday", "الأربعاء")]
+        Wednesday,
+        [Localized("Thursday", "الخميس")]
+        Thursday,
+        [Localized("Friday", "الجمعة")]
+        Friday,
+        [Localized("Saturday", "السبت")]
+        Saturday,
+        [Localized("Sunday", "الأحد")]
+        Sunday
+    }
+
     public enum UserRoles
     {
         Admin,

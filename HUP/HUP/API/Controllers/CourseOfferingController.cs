@@ -77,7 +77,12 @@ namespace HUP.API.Controllers
        }
 
        // PUT: api/CourseOffering/{id}
-       // [HttpPut("{id}")]
+       [HttpPut("{id}")]
+       public async Task<IActionResult> Update(Guid id, [FromBody] CreateCourseOfferingDto updateDto)
+       {
+           // await _service.Update(id, updateDto);
+           return NoContent();
+       }
 
        // DELETE: api/CourseOffering/{id}
        [HttpDelete("{id}")]

@@ -8,5 +8,5 @@ public interface IStudentService
 {
     Task<StudentProfileDto> GetStudentProfile(Guid userId, string lang);
     Task AddStudent(CreateStudentDto dto);
-    Task<bool> UpdateStudentStatus(Guid studentId, StudentStatusDto dto);
+    Task<bool> UpdateStudentStatus(StudentStatusDto dto);
 }
