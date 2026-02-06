@@ -15,7 +15,6 @@ namespace HUP.Repositories.Implementations
         {
             _context = context;
             _studentRepository = studentRepository;
-
         }
         
         public async Task<IEnumerable<Enrollment>> GetByStudentId(Guid studentId)
@@ -116,11 +115,16 @@ namespace HUP.Repositories.Implementations
                 })
                 .ToListAsync();
         }
-        public async Task<IEnumerable<Enrollment>> GetRegisteredByStudentAsync(Guid studentId)
+
+        public async Task<IEnumerable<Enrollment>> GetFilteredAsync(Guid studentId, EnrollmentFilterDto filter)
         {
-            return await _context.Enrollments
-                .Where(e => e.StudentId == studentId && e.Status == EnrollmentStatus.Registered)
-                .ToListAsync();
+            var query = _context.Enrollments
+                .Where(e => e.StudentId == studentId);
+
+            if (filter.Status.HasValue)
+                query = query.Where(e => e.Status == filter.Status);
+
+            return await query.ToListAsync();
         }
     }
 }

@@ -20,14 +20,6 @@ namespace HUP.API.Controllers
         //TODO
         // ADD LOCALIZATION
         // ADD FILTERS 
-        
-        // GET: api/Enrollment
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<EnrollmentResponseDto>>> GetAll()
-        {
-            var enrollments = await _service.GetAllAsync();
-            return Ok(enrollments);
-        }
 
         // GET: api/Enrollment/{id}
         [HttpGet("{id}")]
@@ -100,12 +92,13 @@ namespace HUP.API.Controllers
             return Ok(result);
         }
 
-        // GET: api/Enrollment/Registered/{studentId}
-        [HttpGet("Registered")]
-        public async Task<ActionResult<IEnumerable<EnrollmentResponseDto>>> GetRegisteredByStudentAsync()
+        // GET: api/Enrollment/Student
+        [Authorize]
+        [HttpGet("Student")]
+        public async Task<ActionResult<IEnumerable<EnrollmentResponseDto>>> GetRegisteredByStudentAsync([FromQuery] EnrollmentFilterDto filter)
         {
-            var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            var result = await _service.GetRegisteredByStudentAsync(studentId);
+            var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var result = await _service.GetRegisteredByStudentAsync(studentId, filter);
             return Ok(result);
         }
     }

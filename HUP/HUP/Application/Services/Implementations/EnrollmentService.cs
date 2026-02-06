@@ -153,10 +153,11 @@ namespace HUP.Application.Services.Implementations
             return transcript;
         }
 
-        public async Task<IEnumerable<EnrollmentResponseDto>> GetRegisteredByStudentAsync(Guid studentId)
+        public async Task<IEnumerable<EnrollmentResponseDto>> GetRegisteredByStudentAsync(Guid studentId, EnrollmentFilterDto filter)
         {
-            var enrollments = await _repository.GetRegisteredByStudentAsync(studentId);
-            return enrollments.Select(e => EnrollmentMapper.ToResponseDto(e));
+            var enrollments = await _repository.GetFilteredAsync(studentId, filter);
+
+            return enrollments.Select(EnrollmentMapper.ToResponseDto);
         }
 
         public string getGrade(decimal grade)
