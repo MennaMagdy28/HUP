@@ -8,6 +8,7 @@ namespace HUP.Core.Entities.Academics
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public DateTime RegistrationDeadline { get; set; }
+        public DateTime DropDeadline { get; set; } // Added DropDeadline
         public bool IsActive { get; set; }
     }
 }

@@ -102,6 +102,39 @@ namespace HUP.Application.Validators.Implementations
             }
         }
 
+        public async Task ValidateDropAsync(Guid enrollmentId, Guid studentId)
+        {
+            var enrollment = await _enrollmentRepo.GetByIdWithDetailsAsync(enrollmentId);
+            if (enrollment == null)
+                throw new KeyNotFoundException("Enrollment not found.");
+
+            if (enrollment.StudentId != studentId)
+                throw new UnauthorizedAccessException("Cannot drop another student's course.");
+
+            var activeSemester = await _semesterRepo.GetActiveSemesterAsync();
+            if (activeSemester == null)
+                throw new InvalidOperationException("No active semester.");
+
+            // 1. Drop Deadline Check
+            if (DateTime.UtcNow > activeSemester.DropDeadline)
+            {
+                throw new InvalidOperationException("Drop deadline has passed.");
+            }
+
+            // 2. Minimum Credits Check (e.g. 12 credits)
+            // Fetch all current enrollments
+            var currentEnrollments = await _enrollmentRepo.GetByStudentAndSemesterAsync(studentId, activeSemester.SemesterName);
+            var currentCredits = currentEnrollments.Sum(e => e.CourseOffering?.Course?.Credits ?? 0);
+            var courseCredits = enrollment.CourseOffering?.Course?.Credits ?? 0;
+
+            if (currentCredits - courseCredits < 12)
+            {
+                // Warning: Business rule might vary (e.g. withdrawal vs drop).
+                // For now, enforcing min credits for "Drop".
+                throw new InvalidOperationException("Cannot drop course. Total credits would fall below minimum load (12).");
+            }
+        }
+
         private async Task<bool> CanStudentEnroll(Guid studentId)
         {
             var student = await _studentRepo.GetByIdReadOnly(studentId);

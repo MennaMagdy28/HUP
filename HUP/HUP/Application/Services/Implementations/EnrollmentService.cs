@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 using HUP.Application.DTOs.AcademicDtos;
 using HUP.Common.Helpers;
 using HUP.Core.Enums.AcademicEnums;
-using HUP.Data;
-using Microsoft.EntityFrameworkCore;
 using HUP.Application.Validators.Interfaces;
+using HUP.Core.Interfaces;
 
 namespace HUP.Application.Services.Implementations
 {
@@ -21,7 +20,7 @@ namespace HUP.Application.Services.Implementations
         private readonly ICourseOfferingRepository _offeringRepo;
         private readonly IScheduleRepository _scheduleRepo;
         private readonly IEnrollmentValidator _validator;
-        private readonly HupDbContext _dbContext;
+        private readonly ITransactionService _transactionService;
         private readonly ISemesterRepository _semesterRepo;
 
         public EnrollmentService(
@@ -31,7 +30,7 @@ namespace HUP.Application.Services.Implementations
             ICourseOfferingRepository offeringRepo,
             IScheduleRepository scheduleRepo,
             IEnrollmentValidator validator,
-            HupDbContext dbContext,
+            ITransactionService transactionService,
             ISemesterRepository semesterRepo)
         {
             _repository = repository;
@@ -40,14 +39,13 @@ namespace HUP.Application.Services.Implementations
             _offeringRepo = offeringRepo;
             _scheduleRepo = scheduleRepo;
             _validator = validator;
-            _dbContext = dbContext;
+            _transactionService = transactionService;
             _semesterRepo = semesterRepo;
         }
 
         public async Task AddAsync(CreateEnrollmentDto dto)
         {
-            using var transaction = await _dbContext.Database.BeginTransactionAsync();
-            try
+            await _transactionService.ExecuteInTransactionAsync(async () =>
             {
                 // Validate Business Rules
                 await _validator.ValidateEnrollmentAsync(dto);
@@ -79,14 +77,7 @@ namespace HUP.Application.Services.Implementations
 
                 await _repository.AddAsync(enrollment);
                 await _repository.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+            });
         }
 
         public async Task<bool> CanStudentEnroll(Guid studentId)
@@ -138,15 +129,25 @@ namespace HUP.Application.Services.Implementations
 
         public async Task Remove(Guid id)
         {
-            await _repository.RemoveAsync(id);
-            await _repository.SaveChangesAsync();
+            var enrollment = await _repository.GetByIdTrackingAsync(id);
+            if (enrollment != null)
+            {
+                await _validator.ValidateDropAsync(id, enrollment.StudentId);
+                await _repository.RemoveAsync(id);
+                await _repository.SaveChangesAsync();
+            }
         }
         public async Task SoftDelete(Guid id)
         {
             var enrollment = await _repository.GetByIdTrackingAsync(id);
-            enrollment.IsDeleted = true;
-            enrollment.UpdatedAt = DateTime.Now;
-            await _repository.SaveChangesAsync();
+            if (enrollment != null)
+            {
+                await _validator.ValidateDropAsync(id, enrollment.StudentId);
+
+                enrollment.IsDeleted = true;
+                enrollment.UpdatedAt = DateTime.Now;
+                await _repository.SaveChangesAsync();
+            }
         }
 
         public async Task Update(Guid id, UpdateEnrollmentDto dto)
