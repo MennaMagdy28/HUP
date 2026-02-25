@@ -1,4 +1,4 @@
-﻿using HUP.Core.Entities.Identity;
+using HUP.Core.Entities.Identity;
 using HUP.Core.Models;
 using HUP.Data;
 using HUP.Repositories.Interfaces;
@@ -6,14 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HUP.Repositories.Implementations;
 
-public class UserRepository : IUserRepository
+public class UserRepository : GenericRepository<User>, IUserRepository
 {
-    private readonly HupDbContext _context;
-    public UserRepository(HupDbContext context)
+    public UserRepository(HupDbContext context) : base(context)
     {
-        _context = context;
     }
-    public async Task<User> GetByIdReadOnly(Guid id)
+
+    public override async Task<User> GetByIdReadOnly(Guid id)
     {
         var user = await _context.Users
             .Include(u => u.ContactInfo)
@@ -22,7 +21,7 @@ public class UserRepository : IUserRepository
         return user;
     }
     //get by id with ef tracking for updates
-    public async Task<User> GetByIdTracking(Guid id)
+    public override async Task<User> GetByIdTracking(Guid id)
     {
         var user = await _context.Users
             .Include(u => u.ContactInfo)
@@ -74,7 +73,7 @@ public class UserRepository : IUserRepository
     }
 
 
-    public async Task<IEnumerable<User>> GetAllAsync()
+    public override async Task<IEnumerable<User>> GetAllAsync()
     {
         return await _context.Users
             .Include(u => u.PersonalInfo)
@@ -82,22 +81,5 @@ public class UserRepository : IUserRepository
             .Include(u => u.UserRole)
             .AsNoTracking()
             .ToListAsync();
-    }
-
-    public async Task AddAsync(User entity)
-    {
-        await _context.Users.AddAsync(entity);
-    }
-
-    public async Task RemoveAsync(Guid id)
-    {
-        var entity = await _context.Users.FindAsync(id);
-        if (entity != null)
-            _context.Users.Remove(entity);
-    }
-
-    public async Task SaveChangesAsync()
-    {
-        await _context.SaveChangesAsync();
     }
 }

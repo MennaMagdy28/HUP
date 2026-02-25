@@ -58,8 +58,6 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddUser([FromBody] CreateUserDto dto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
         var exist = await _userService.Exists(dto.NationalId);
         if (exist) return BadRequest("This national Id is already registered");
         await _userService.AddAsync(dto);

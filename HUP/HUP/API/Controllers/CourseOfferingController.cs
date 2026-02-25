@@ -64,11 +64,6 @@ namespace HUP.API.Controllers
        [HttpPost]
        public async Task<ActionResult<CourseOfferingDto>> Create([FromBody] CreateCourseOfferingDto createDto)
        {
-           if (!ModelState.IsValid)
-           {
-               return BadRequest(ModelState);
-           }
-
            var exist = await _service.Exists(createDto);
            if (exist)
                return BadRequest("Course offering already exists");

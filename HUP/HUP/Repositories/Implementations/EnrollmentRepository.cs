@@ -1,21 +1,16 @@
-﻿using HUP.Repositories.Interfaces;
+using HUP.Repositories.Interfaces;
 using HUP.Core.Entities.Academics;
 using HUP.Data;
 using Microsoft.EntityFrameworkCore;
 using HUP.Core.Models;
 using HUP.Core.Enums.AcademicEnums;
-using MongoDB.Driver;
 
 namespace HUP.Repositories.Implementations
 {
-    public class EnrollmentRepository : IEnrollmentRepository
+    public class EnrollmentRepository : GenericRepository<Enrollment>, IEnrollmentRepository
     {
-        private readonly HupDbContext _context;
-        private readonly IStudentRepository _studentRepository;
-        public EnrollmentRepository(HupDbContext context, IStudentRepository studentRepository)
+        public EnrollmentRepository(HupDbContext context) : base(context)
         {
-            _context = context;
-            _studentRepository = studentRepository;
         }
         
         public async Task<IEnumerable<Enrollment>> GetByStudentId(Guid studentId)
@@ -46,12 +41,7 @@ namespace HUP.Repositories.Implementations
                 .FirstOrDefaultAsync(); 
         }
 
-        public async Task AddAsync(Enrollment entity)
-        {
-            await _context.Enrollments.AddAsync(entity);
-        }
-
-        public async Task<IEnumerable<Enrollment>> GetAllAsync()
+        public override async Task<IEnumerable<Enrollment>> GetAllAsync()
         {
             return await _context.Enrollments
                 .Include(e => e.CourseOffering)
@@ -59,32 +49,6 @@ namespace HUP.Repositories.Implementations
                 .Where(e => !e.IsDeleted)
                 .AsNoTracking()
                 .ToListAsync();
-        }
-
-        public async Task<Enrollment> GetByIdReadOnly(Guid id)
-        {
-            var enrollment = await _context.Enrollments.AsNoTracking()
-                .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
-            return enrollment;
-        }
-        public async Task<Enrollment> GetByIdTracking(Guid id)
-        {
-            var enrollment = await _context.Enrollments
-                .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
-            return enrollment;
-        }
-
-        public async Task RemoveAsync(Guid enrollmentId)
-        {
-            var enrollment = await _context.Enrollments.FindAsync(enrollmentId);
-
-            if (enrollment != null) 
-                _context.Enrollments.Remove(enrollment);
-        }
-        
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Enrollment>> GetByStudentAndSemesterAsync(Guid studentId, string semester)
@@ -130,6 +94,5 @@ namespace HUP.Repositories.Implementations
 
             return await query.ToListAsync();
         }
-
     }
 }

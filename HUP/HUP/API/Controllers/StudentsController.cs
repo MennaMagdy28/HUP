@@ -26,8 +26,6 @@ namespace HUP.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateStudentDto createDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
             await _studentService.AddStudent(createDto);
             return Ok("Added");
         }

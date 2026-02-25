@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using Microsoft.EntityFrameworkCore;
+using HUP.Core.Entities.Shared;
 using HUP.Core.Entities.Academics;
 using HUP.Core.Entities.Identity;
 using HUP.Core.Entities.Permissions;
@@ -204,6 +206,24 @@ namespace HUP.Data
                 .WithMany(co => co.Schedules)
                 .HasForeignKey(s => s.CourseOfferingId)
                 .OnDelete(DeleteBehavior.Restrict); 
+
+            // Apply Global Query Filter for BaseEntity
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
+                {
+                    var method = SetGlobalQueryMethod.MakeGenericMethod(entityType.ClrType);
+                    method.Invoke(this, new object[] { modelBuilder });
+                }
+            }
+        }
+
+        static readonly MethodInfo SetGlobalQueryMethod = typeof(HupDbContext).GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
+            .Single(t => t.IsGenericMethod && t.Name == nameof(SetGlobalQuery));
+
+        private void SetGlobalQuery<T>(ModelBuilder builder) where T : BaseEntity
+        {
+            builder.Entity<T>().HasQueryFilter(e => !e.IsDeleted);
         }
     }
 }

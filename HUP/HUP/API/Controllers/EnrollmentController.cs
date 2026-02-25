@@ -41,8 +41,6 @@ namespace HUP.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateEnrollmentDto createDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
             createDto.StudentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var exist = await _service.Exists(createDto);
             if (exist)
@@ -55,8 +53,6 @@ namespace HUP.API.Controllers
         [HttpPatch("{id}/status")]
         public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateEnrollmentDto updateDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
             await _service.Update(id, updateDto);
             return NoContent();
         }

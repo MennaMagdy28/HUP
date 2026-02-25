@@ -1,20 +1,14 @@
-﻿using HUP.Core.Entities.Permissions;
+using HUP.Core.Entities.Permissions;
 using HUP.Data;
 using HUP.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace HUP.Repositories.Implementations;
 
-public class PermissionRepository : IPermissionRepository
+public class PermissionRepository : GenericRepository<Permission>, IPermissionRepository
 {
-    private readonly HupDbContext _context;
-    public PermissionRepository(HupDbContext context)
+    public PermissionRepository(HupDbContext context) : base(context)
     {
-        _context = context;
-    }
-    public async Task<IEnumerable<Permission>> GetAllPermissions()
-    {
-        return await _context.Permissions.AsNoTracking().ToListAsync();
     }
 
     public async Task<List<string>> GetAllPermissionsForRole(Guid roleId)
@@ -24,22 +18,9 @@ public class PermissionRepository : IPermissionRepository
         return permissionNames;
     }
 
-    public async Task AddPermission(Permission permission)
-    {
-        await _context.Permissions.AddAsync(permission);
-    }
-
     public void UpdatePermission(Permission permission)
     {
         _context.Permissions.Update(permission);
-    }
-
-    public async Task DeletePermissionAsync(Guid id)
-    {
-        var entity = await _context.Permissions.FindAsync(id);
-        
-        if (entity != null)
-            _context.Permissions.Remove(entity);
     }
 
     public async Task AddRolePermission(Guid permissionId, Guid roleId)
@@ -54,11 +35,7 @@ public class PermissionRepository : IPermissionRepository
     {
         var relation = _context.RolePermissions.FirstOrDefault(rp => rp.PermissionId == permissionId
                                                                      && rp.RoleId == roleId);
-        _context.RolePermissions.Remove(relation);
-    }
-
-    public async Task SaveChangesAsync()
-    {
-        await _context.SaveChangesAsync();
+        if (relation != null)
+            _context.RolePermissions.Remove(relation);
     }
 }

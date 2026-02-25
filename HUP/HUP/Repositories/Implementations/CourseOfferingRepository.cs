@@ -1,4 +1,4 @@
-﻿using HUP.Core.Entities.Academics;
+using HUP.Core.Entities.Academics;
 using HUP.Core.Enums.AcademicEnums;
 using HUP.Data;
 using HUP.Repositories.Interfaces;
@@ -6,12 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HUP.Repositories.Implementations
 {
-    public class CourseOfferingRepository : ICourseOfferingRepository
+    public class CourseOfferingRepository : GenericRepository<CourseOffering>, ICourseOfferingRepository
     {
-        private readonly HupDbContext _context;
-        public CourseOfferingRepository(HupDbContext context)
+        public CourseOfferingRepository(HupDbContext context) : base(context)
         {
-            _context = context;
         }
         public async Task<IEnumerable<CourseOffering>> GetActiveCourseOfferingAsync(Guid departmentId, Guid semesterId)
         {
@@ -55,12 +53,7 @@ namespace HUP.Repositories.Implementations
             return entity;
         }
 
-        public async Task AddAsync(CourseOffering entity)
-        {            
-            await _context.CourseOfferings.AddAsync(entity);
-        }
-
-        public async Task<IEnumerable<CourseOffering>> GetAllAsync()
+        public override async Task<IEnumerable<CourseOffering>> GetAllAsync()
         {
             return await _context.CourseOfferings
                 .Include(co => co.Course)
@@ -70,7 +63,7 @@ namespace HUP.Repositories.Implementations
                 .ToListAsync();
         }
 
-        public async Task<CourseOffering> GetByIdReadOnly(Guid id)
+        public override async Task<CourseOffering> GetByIdReadOnly(Guid id)
         {
             var co = await _context.CourseOfferings
                 .Include(co => co.Course)
@@ -79,7 +72,7 @@ namespace HUP.Repositories.Implementations
                 .FirstOrDefaultAsync(co => co.Id == id && !co.IsDeleted);
             return co;
         }
-        public async Task<CourseOffering> GetByIdTracking(Guid id)
+        public override async Task<CourseOffering> GetByIdTracking(Guid id)
         {
             var co = await _context.CourseOfferings
                 .Include(co => co.Course)
@@ -87,21 +80,6 @@ namespace HUP.Repositories.Implementations
                 .AsNoTracking()
                 .FirstOrDefaultAsync(co => co.Id == id && !co.IsDeleted);
             return co;
-        }
-
-
-        public async Task RemoveAsync(Guid courseId)
-        {
-            var entity = await _context.CourseOfferings.FindAsync(courseId);
-
-            if (entity != null)
-                _context.CourseOfferings.Remove(entity);
-        }
- 
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
         }
     }
 }
-    

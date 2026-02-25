@@ -1,29 +1,24 @@
-﻿using HUP.Core.Entities.Academics;
+using HUP.Core.Entities.Academics;
 using HUP.Data;
 using HUP.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace HUP.Repositories.Implementations
 {
-    public class ExamRepository : IExamRepository
+    public class ExamRepository : GenericRepository<Exam>, IExamRepository
     {
-        private readonly HupDbContext _context;
-        public ExamRepository(HupDbContext context)
+        public ExamRepository(HupDbContext context) : base(context)
         {
-            _context = context;
-        }
-        public async Task AddAsync(Exam exam)
-        {
-            await _context.Exams.AddAsync(exam);
-            await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Exam>> GetAllAsync()
+        public override async Task<IEnumerable<Exam>> GetAllAsync()
         {
-            return await _context.Exams.AsNoTracking().ToListAsync();
+            return await _context.Exams
+                .AsNoTracking()
+                .ToListAsync();
         }
 
-        public Task<Exam> GetByIdReadOnly(Guid id)
+        public override Task<Exam> GetByIdReadOnly(Guid id)
         {
             var exam = _context.Exams.Include(e => e.CourseOffering)
                 .ThenInclude(c => c.Department)
@@ -32,7 +27,7 @@ namespace HUP.Repositories.Implementations
                 .AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
             return exam;
         }
-        public Task<Exam> GetByIdTracking(Guid id)
+        public override Task<Exam> GetByIdTracking(Guid id)
         {
             var exam = _context.Exams.Include(e => e.CourseOffering)
                 .ThenInclude(c => c.Department)
@@ -41,21 +36,6 @@ namespace HUP.Repositories.Implementations
                 .AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
             return exam;
         }
-
-        public async Task RemoveAsync(Guid id)
-        {
-            var entity = await _context.Exams.FindAsync(id);
-
-            if (entity != null)
-                _context.Exams.Remove(entity);
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
-
-
 
         public async Task<IEnumerable<Exam>> GetByCoursesAsync(List<Guid> courseIds)
         {
@@ -90,16 +70,6 @@ namespace HUP.Repositories.Implementations
             exam.UpdatedAt = DateTime.UtcNow;
             _context.Exams.Update(exam);
             await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(Guid id)
-        {
-            var exam = await GetByIdReadOnly(id);
-            if (exam != null)
-            {
-                exam.UpdatedAt = DateTime.UtcNow;
-                await UpdateAsync(exam);
-            }
         }
     }
 }

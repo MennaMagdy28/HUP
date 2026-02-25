@@ -35,7 +35,7 @@ namespace HUP.Application.Services.Implementations
 
         public async Task<bool> Exists(CreateCourseOfferingDto dto)
         {
-            var entity = _repository.GetExistingAsync(dto.CourseId, dto.DepartmentId, dto.SemesterId);
+            var entity = await _repository.GetExistingAsync(dto.CourseId, dto.DepartmentId, dto.SemesterId);
             return entity != null;
         }
 
