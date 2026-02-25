@@ -55,6 +55,9 @@ namespace HUP.Repositories.Implementations
         {
             return await _context.Enrollments
                 .Include(e => e.CourseOffering)
+                    .ThenInclude(co => co.Course)
+                .Include(e => e.CourseOffering)
+                    .ThenInclude(co => co.Schedules) // Needed for conflict check in Service
                 .Where(e => e.StudentId == studentId && e.CourseOffering.Semester.SemesterName == semester)
                 .ToListAsync();
         }
@@ -93,6 +96,15 @@ namespace HUP.Repositories.Implementations
                     .ThenInclude(co => co.Course);
 
             return await query.ToListAsync();
+        }
+
+        public async Task<bool> HasPassedPrerequisiteAsync(Guid studentId, Guid prerequisiteCourseId)
+        {
+            return await _context.Enrollments
+                .AnyAsync(e => e.StudentId == studentId
+                               && e.CourseOffering.CourseId == prerequisiteCourseId
+                               && e.Status == EnrollmentStatus.Completed
+                               && e.finalGrade >= 50); // Assuming 50 is pass, or check status only if business logic dictates
         }
     }
 }

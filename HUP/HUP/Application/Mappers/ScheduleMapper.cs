@@ -9,18 +9,28 @@ namespace HUP.Application.Mappers
     [Mapper(AllowNullPropertyAssignment = false)]
     public static partial class ScheduleMapper
     {
+        [MapProperty(nameof(ScheduleSlotCreateDto.StartTime), nameof(Schedule.StartTime), StringFormat = "HH:mm")]
+        [MapProperty(nameof(ScheduleSlotCreateDto.EndTime), nameof(Schedule.EndTime), StringFormat = "HH:mm")]
         public static partial Schedule ToEntity(ScheduleSlotCreateDto createDto);
+
+        private static TimeSpan MapDateTimeToTimeSpan(DateTime dateTime) => dateTime.TimeOfDay;
 
         public static ScheduleSlotDto ToDto(Schedule entity, string lang)
         {
             var slot = new ScheduleSlotDto();
-            slot.CourseCode = LocalizationHelper.Get<string>(entity.CourseOffering.Course.CourseCode, lang);
-            slot.CourseName = LocalizationHelper.Get<string>(entity.CourseOffering.Course.CourseName, lang);
+            if (entity.CourseOffering?.Course != null)
+            {
+                slot.CourseCode = LocalizationHelper.Get<string>(entity.CourseOffering.Course.CourseCode, lang);
+                slot.CourseName = LocalizationHelper.Get<string>(entity.CourseOffering.Course.CourseName, lang);
+            }
             slot.DayOfWeek = LocalizationHelper.Get(entity.DayOfWeek, lang);
             slot.StartTime = entity.StartTime;
             slot.EndTime = entity.EndTime;
             slot.Group = entity.Group;
-            slot.InstructorName = LocalizationHelper.Get<string>(entity.InstructorName, lang);
+            if (entity.Instructor != null)
+            {
+                slot.InstructorName = LocalizationHelper.Get<string>(entity.Instructor.User?.FullName, lang) ?? "Unknown";
+            }
             slot.Hall = LocalizationHelper.Get<string>(entity.Hall, lang);
             return slot;
         }

@@ -81,5 +81,15 @@ namespace HUP.Repositories.Implementations
                 .FirstOrDefaultAsync(co => co.Id == id && !co.IsDeleted);
             return co;
         }
+
+        public async Task<CourseOffering?> GetWithSchedulesAsync(Guid id)
+        {
+            return await _context.CourseOfferings
+                .Include(co => co.Course)
+                .Include(co => co.Semester)
+                .Include(co => co.Schedules)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(co => co.Id == id && !co.IsDeleted);
+        }
     }
 }

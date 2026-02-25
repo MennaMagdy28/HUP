@@ -13,6 +13,6 @@ namespace HUP.Core.Entities.Academics
         public User User { get; set; }
         public Department Department { get; set; }
         public Department DepartmentHeaded { get; set; }
-        public ICollection<CourseOfferingInstructor> CourseOfferings { get; set; }
+        public ICollection<Schedule> Schedules { get; set; }
     }
 }

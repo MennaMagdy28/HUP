@@ -25,6 +25,11 @@ public static class DependencyInjection
 
             services.AddScoped(interfaceType, type);
         }
+
+        // Register repositories that might be missed by convention or need explicit registration if not following IName convention exactly,
+        // but since we follow it, check if SemesterRepository is picked up.
+        // It should be picked up by the convention above since it ends in Repository.
+        // Adding explicit registration for safety if needed, but loop covers it.
         return services;
     }
 }

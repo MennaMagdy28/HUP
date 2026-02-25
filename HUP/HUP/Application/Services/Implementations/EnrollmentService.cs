@@ -1,4 +1,4 @@
-﻿using HUP.Application.Mappers;
+using HUP.Application.Mappers;
 using HUP.Application.Services.Interfaces;
 using HUP.Application.DTOs.AcademicDtos.Enrollment;
 using HUP.Core.Entities.Academics;
@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using HUP.Application.DTOs.AcademicDtos;
 using HUP.Common.Helpers;
 using HUP.Core.Enums.AcademicEnums;
+using HUP.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace HUP.Application.Services.Implementations
 {
@@ -15,23 +17,149 @@ namespace HUP.Application.Services.Implementations
         private readonly IEnrollmentRepository _repository;
         private readonly IStudentRepository _studentRepo;
         private readonly IProgramPlanRepository _planRepo;
+        private readonly ICourseOfferingRepository _offeringRepo;
+        private readonly ISemesterRepository _semesterRepo;
+        private readonly IScheduleRepository _scheduleRepo;
+        private readonly HupDbContext _dbContext;
 
-        public EnrollmentService(IEnrollmentRepository repository, IStudentRepository studentRepo, IProgramPlanRepository planRepo)
+        public EnrollmentService(IEnrollmentRepository repository, IStudentRepository studentRepo, IProgramPlanRepository planRepo, ICourseOfferingRepository offeringRepo, ISemesterRepository semesterRepo, IScheduleRepository scheduleRepo, HupDbContext dbContext)
         {
             _repository = repository;
             _studentRepo = studentRepo;
             _planRepo = planRepo;
+            _offeringRepo = offeringRepo;
+            _semesterRepo = semesterRepo;
+            _scheduleRepo = scheduleRepo;
+            _dbContext = dbContext;
         }
 
         public async Task AddAsync(CreateEnrollmentDto dto)
         {
-            var enrollment = EnrollmentMapper.ToEntityFromCreateDto(dto);
-            enrollment.Id = Guid.NewGuid();
-            enrollment.EnrollmentDate = DateTime.Now;
-            enrollment.CreatedAt = DateTime.Now;
-            enrollment.Status = EnrollmentStatus.Registered;
-            await _repository.AddAsync(enrollment);
-            await _repository.SaveChangesAsync();
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                // 1. GPA Window Check
+                if (!await CanStudentEnroll(dto.StudentId))
+                {
+                    throw new InvalidOperationException("Enrollment is not yet open for your GPA tier.");
+                }
+
+                // 2. Duplicate Check
+                var existingEnrollment = await _repository.GetExistingAsync(dto.StudentId, dto.CourseOfferingId);
+                if (existingEnrollment != null)
+                {
+                    throw new InvalidOperationException("Student is already enrolled in this course.");
+                }
+
+                // Retrieve with Schedules
+                var courseOffering = await _offeringRepo.GetWithSchedulesAsync(dto.CourseOfferingId);
+                if (courseOffering == null)
+                    throw new InvalidOperationException("Course offering not found.");
+
+                // 3. Prerequisite Check
+                if (courseOffering.Course != null && courseOffering.Course.PrerequisiteId != null)
+                {
+                     var hasPassed = await _repository.HasPassedPrerequisiteAsync(dto.StudentId, courseOffering.Course.PrerequisiteId.Value);
+                     if (!hasPassed)
+                     {
+                         throw new InvalidOperationException($"Prerequisite not met for course {courseOffering.Course.CourseCode}.");
+                     }
+                }
+
+
+                // 4. Capacity & Conflict Check
+                var student = await _studentRepo.GetByIdReadOnly(dto.StudentId);
+                var studentGroup = student.Group;
+
+                // Filter schedules by student group
+                var offeringSchedules = courseOffering.Schedules?.Where(s => s.Group == studentGroup).ToList();
+
+                if (offeringSchedules != null && offeringSchedules.Any())
+                {
+                    // Fetch existing enrollments for conflict check
+                    var currentEnrollments = await _repository.GetByStudentAndSemesterAsync(dto.StudentId, courseOffering.Semester.SemesterName);
+
+                    foreach (var slot in offeringSchedules)
+                    {
+                        // Conflict Check
+                        foreach (var enrolled in currentEnrollments)
+                        {
+                             // Ensure we check against the student's group in enrolled courses too
+                             var enrolledSchedules = enrolled.CourseOffering.Schedules?.Where(s => s.Group == studentGroup);
+                             if (enrolledSchedules != null)
+                             {
+                                 foreach (var existingSlot in enrolledSchedules)
+                                 {
+                                     if (slot.DayOfWeek == existingSlot.DayOfWeek)
+                                     {
+                                         if (slot.StartTime < existingSlot.EndTime && slot.EndTime > existingSlot.StartTime)
+                                         {
+                                             throw new InvalidOperationException($"Time conflict with course {enrolled.CourseOffering.Course.CourseCode} on {slot.DayOfWeek}.");
+                                         }
+                                     }
+                                 }
+                             }
+                        }
+
+                        // Capacity Check & Seat Decrement (Atomic)
+                        var booked = await _scheduleRepo.TryBookSeatAsync(slot.Id);
+                        if (!booked)
+                        {
+                             throw new InvalidOperationException($"Seat unavailable for schedule {slot.DayOfWeek} {slot.StartTime}.");
+                        }
+                    }
+                }
+                else
+                {
+                    // If no schedules for this group, should we allow enrollment?
+                    // Usually indicates setup error or open enrollment without schedules.
+                    // Proceeding, but logging or throwing might be safer depending on business rule.
+                    // For now, allowing as "Online/No Schedule" course if no schedules exist.
+                }
+
+                var enrollment = EnrollmentMapper.ToEntityFromCreateDto(dto);
+                enrollment.Id = Guid.NewGuid();
+                enrollment.EnrollmentDate = DateTime.Now;
+                enrollment.CreatedAt = DateTime.Now;
+                enrollment.Status = EnrollmentStatus.Registered;
+
+                await _repository.AddAsync(enrollment);
+                await _repository.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+        public async Task<bool> CanStudentEnroll(Guid studentId)
+        {
+            var student = await _studentRepo.GetByIdReadOnly(studentId);
+            if (student == null) return false;
+
+            var activeSemester = await _semesterRepo.GetActiveSemesterAsync();
+            if (activeSemester == null) return false;
+
+            var startTime = activeSemester.StartDate;
+            var now = DateTime.UtcNow;
+
+            var gpa = student.Cgpa;
+
+            if (gpa >= 3.8m)
+            {
+                return now >= startTime;
+            }
+            else if (gpa >= 3.5m)
+            {
+                return now >= startTime.AddHours(2);
+            }
+            else
+            {
+                return now >= startTime.AddHours(4);
+            }
         }
 
         public async Task<IEnumerable<EnrollmentResponseDto>> GetAllAsync(string lang)
@@ -71,8 +199,6 @@ namespace HUP.Application.Services.Implementations
         {
             var enrollment = await _repository.GetByIdTracking(id);
             enrollment.UpdatedAt = DateTime.Now;
-            // the mapper will copy the values in it to the entity
-            // ef core tracks the changes and update only specific attributes
             EnrollmentMapper.ToUpdate(dto, enrollment);
             await _repository.SaveChangesAsync();
         }
@@ -85,11 +211,9 @@ namespace HUP.Application.Services.Implementations
 
             var departmentId = student.DepartmentId;
 
-            // Accumulators for cumulative GPA
             decimal cumulativePoints = 0;
             decimal cumulativeHours = 0;
 
-            // Temporary ungrouped list of courses with computed values
             var computedCourses = new List<SemesterGradesDto>();
 
             foreach (var m in models)
@@ -103,11 +227,9 @@ namespace HUP.Application.Services.Implementations
                 var gradePts = GetGradePoints(grade);
                 var creditPts = gradePts * m.CourseCredits;
 
-                // Add to cumulative totals
                 cumulativePoints += creditPts;
                 cumulativeHours += m.CourseCredits;
 
-                // Add computed course to TEMP LIST (ungrouped!)
                 computedCourses.Add(new SemesterGradesDto
                 {
                     SemesterId = m.SemesterId,
@@ -122,12 +244,10 @@ namespace HUP.Application.Services.Implementations
                 });
             }
 
-            // Compute cumulative GPA once
             var cumulativeGPA = cumulativeHours == 0
                 ? 0
                 : cumulativePoints / cumulativeHours;
 
-            // Now group using the computed data
             var grouped = computedCourses.GroupBy(c => c.SemesterName);
 
             var transcript = new List<SemesterTranscriptDto>();
