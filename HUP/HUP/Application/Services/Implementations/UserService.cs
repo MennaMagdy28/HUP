@@ -85,14 +85,14 @@ public class UserService : IUserService
 
     public async Task<ProfileInfoDto> GetUserById(Guid userId, string lang)
     {
-        var user = await _repository.GetByIdReadOnly(userId);
+        var user = await _repository.GetByIdWithDetailsAsync(userId);
         var userProfileData = UserMapper.ToProfileDto(user, lang);
         return userProfileData;
     }
 
     public async Task<bool> InsertMissingData(Guid userId, UpdateInfoDto dto)
     {
-        var user = await _repository.GetByIdTracking(userId);
+        var user = await _repository.GetByIdTrackingAsync(userId);
         if (user == null) return false;
 
         var missingFields = await GetMissingInfo(userId);
@@ -130,7 +130,7 @@ public class UserService : IUserService
 
     public async Task<string?> SoftDelete(Guid userId)
     {
-        var user = await _repository.GetByIdTracking(userId);
+        var user = await _repository.GetByIdTrackingAsync(userId);
         if (user == null) return null;
         user.IsDeleted = true;
         user.UpdatedAt = DateTime.Now;
@@ -140,7 +140,7 @@ public class UserService : IUserService
 
     public async Task<bool> Update(Guid userId, UpdateInfoDto dto)
     {
-        var user = await _repository.GetByIdTracking(userId);
+        var user = await _repository.GetByIdTrackingAsync(userId);
         if (user == null) return false;
 
         user = UserMapper.ToUpdate(dto);

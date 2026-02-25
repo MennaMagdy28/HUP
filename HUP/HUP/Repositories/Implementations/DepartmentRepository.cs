@@ -16,7 +16,7 @@ namespace HUP.Repositories.Implementations
             _cacheService = cacheService;
         }
 
-        public override async Task<IEnumerable<Department>> GetAllAsync()
+        public async Task<IEnumerable<Department>> GetAllWithDetailsAsync()
         {
             var cached = await _cacheService.GetAsync<IEnumerable<Department>>(CacheKey);
             if (cached != null)
@@ -24,29 +24,44 @@ namespace HUP.Repositories.Implementations
                 return cached;
             }
 
-            var departments = await base.GetAllAsync();
+            var departments = await _context.Departments
+                .AsNoTracking()
+                .Where(d => !d.IsDeleted)
+                .AsNoTracking()
+                .ToListAsync();
             await _cacheService.SetAsync(CacheKey, departments, 60); // 60 minutes
             return departments;
         }
 
-        public override async Task AddAsync(Department entity)
+        public new async Task AddAsync(Department entity)
         {
             await base.AddAsync(entity);
             await _cacheService.RemoveAsync(CacheKey);
         }
 
-        public override async Task RemoveAsync(Guid id)
+        public new async Task RemoveAsync(Guid id)
         {
             await base.RemoveAsync(id);
             await _cacheService.RemoveAsync(CacheKey);
         }
 
+        public async Task<Department> GetByIdWithDetailsAsync(Guid id)
+        {
+            var dept = await _context.Departments
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+            return dept;
+        }
+        public async Task<Department> GetByIdTrackingAsync(Guid id)
+        {
+            var dept = await _context.Departments
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+            return dept;
+        }
+
         public async Task<IEnumerable<Department>> GetByFacultyIdAsync(Guid facultyId)
         {
-            // We could cache this too, but for now let's stick to the main list as per request
-            // Or we could derive it from the cached full list if it's small enough.
-            // But let's keep it simple and just query DB or implement specific cache if needed.
-            // The request says "When these lists are requested", implying the main lists.
             return await _context.Departments.Where(d => d.FacultyId == facultyId).ToListAsync();
         }
     }

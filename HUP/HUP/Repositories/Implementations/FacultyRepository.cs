@@ -16,7 +16,7 @@ namespace HUP.Repositories.Implementations
             _cacheService = cacheService;
         }
 
-        public override async Task<IEnumerable<Faculty>> GetAllAsync()
+        public async Task<IEnumerable<Faculty>> GetAllWithDetailsAsync()
         {
             var cached = await _cacheService.GetAsync<IEnumerable<Faculty>>(CacheKey);
             if (cached != null)
@@ -24,21 +24,36 @@ namespace HUP.Repositories.Implementations
                 return cached;
             }
 
-            var faculties = await base.GetAllAsync();
+            var faculties = await _context.Faculties.Where(f =>f.IsDeleted == false).AsNoTracking().ToListAsync();
             await _cacheService.SetAsync(CacheKey, faculties, 60); // 60 minutes
             return faculties;
         }
 
-        public override async Task AddAsync(Faculty entity)
+        public new async Task AddAsync(Faculty entity)
         {
             await base.AddAsync(entity);
             await _cacheService.RemoveAsync(CacheKey);
         }
 
-        public override async Task RemoveAsync(Guid id)
+        public new async Task RemoveAsync(Guid id)
         {
             await base.RemoveAsync(id);
             await _cacheService.RemoveAsync(CacheKey);
+        }
+
+        public void Update(Faculty entity)
+        {
+            _context.Faculties.Update(entity);
+        }
+
+        public void SoftDelete(Guid id)
+        {
+            var faculty = _context.Faculties.Find(id);
+            if (faculty != null)
+            {
+                faculty.IsDeleted = true;
+                _context.Faculties.Update(faculty);
+            }
         }
     }
 }

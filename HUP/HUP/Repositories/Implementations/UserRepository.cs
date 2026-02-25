@@ -12,7 +12,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     {
     }
 
-    public override async Task<User> GetByIdReadOnly(Guid id)
+    public async Task<User> GetByIdWithDetailsAsync(Guid id)
     {
         var user = await _context.Users
             .Include(u => u.ContactInfo)
@@ -21,7 +21,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         return user;
     }
     //get by id with ef tracking for updates
-    public override async Task<User> GetByIdTracking(Guid id)
+    public async Task<User> GetByIdTrackingAsync(Guid id)
     {
         var user = await _context.Users
             .Include(u => u.ContactInfo)
@@ -73,7 +73,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     }
 
 
-    public override async Task<IEnumerable<User>> GetAllAsync()
+    public async Task<IEnumerable<User>> GetAllWithDetailsAsync()
     {
         return await _context.Users
             .Include(u => u.PersonalInfo)

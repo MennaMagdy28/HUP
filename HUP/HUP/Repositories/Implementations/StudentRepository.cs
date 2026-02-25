@@ -20,8 +20,7 @@ namespace HUP.Repositories.Implementations
                 .ToListAsync();
         }
 
-        // ---
-        public override async Task<Student> GetByIdReadOnly(Guid id)
+        public async Task<Student> GetByIdWithDetailsAsync(Guid id)
         {
             var student = await _context.Students
                 .Include(s => s.User)
@@ -32,7 +31,7 @@ namespace HUP.Repositories.Implementations
             return student;
         }
 
-        public override async Task<Student> GetByIdTracking(Guid id)
+        public async Task<Student> GetByIdTrackingAsync(Guid id)
         {
             var student = await _context.Students
                 .Include(s => s.User)

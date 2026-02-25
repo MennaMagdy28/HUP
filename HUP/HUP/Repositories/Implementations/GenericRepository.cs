@@ -16,17 +16,17 @@ namespace HUP.Repositories.Implementations
             _dbSet = _context.Set<T>();
         }
 
-        public virtual async Task AddAsync(T entity)
+        public async Task AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
         }
 
-        public virtual async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _dbSet.AsNoTracking().ToListAsync();
         }
 
-        public virtual async Task<T> GetByIdReadOnly(Guid id)
+        public async Task<T> GetByIdReadOnly(Guid id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity != null)
@@ -36,12 +36,12 @@ namespace HUP.Repositories.Implementations
             return entity;
         }
 
-        public virtual async Task<T> GetByIdTracking(Guid id)
+        public async Task<T> GetByIdTracking(Guid id)
         {
             return await _dbSet.FindAsync(id);
         }
 
-        public virtual async Task RemoveAsync(Guid id)
+        public async Task RemoveAsync(Guid id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity != null)
@@ -58,7 +58,7 @@ namespace HUP.Repositories.Implementations
             }
         }
 
-        public virtual async Task SaveChangesAsync()
+        public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
         }

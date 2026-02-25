@@ -9,6 +9,7 @@ using HUP.Common.Helpers;
 using HUP.Core.Enums.AcademicEnums;
 using HUP.Data;
 using Microsoft.EntityFrameworkCore;
+using HUP.Application.Validators.Interfaces;
 
 namespace HUP.Application.Services.Implementations
 {
@@ -18,19 +19,29 @@ namespace HUP.Application.Services.Implementations
         private readonly IStudentRepository _studentRepo;
         private readonly IProgramPlanRepository _planRepo;
         private readonly ICourseOfferingRepository _offeringRepo;
-        private readonly ISemesterRepository _semesterRepo;
         private readonly IScheduleRepository _scheduleRepo;
+        private readonly IEnrollmentValidator _validator;
         private readonly HupDbContext _dbContext;
+        private readonly ISemesterRepository _semesterRepo;
 
-        public EnrollmentService(IEnrollmentRepository repository, IStudentRepository studentRepo, IProgramPlanRepository planRepo, ICourseOfferingRepository offeringRepo, ISemesterRepository semesterRepo, IScheduleRepository scheduleRepo, HupDbContext dbContext)
+        public EnrollmentService(
+            IEnrollmentRepository repository,
+            IStudentRepository studentRepo,
+            IProgramPlanRepository planRepo,
+            ICourseOfferingRepository offeringRepo,
+            IScheduleRepository scheduleRepo,
+            IEnrollmentValidator validator,
+            HupDbContext dbContext,
+            ISemesterRepository semesterRepo)
         {
             _repository = repository;
             _studentRepo = studentRepo;
             _planRepo = planRepo;
             _offeringRepo = offeringRepo;
-            _semesterRepo = semesterRepo;
             _scheduleRepo = scheduleRepo;
+            _validator = validator;
             _dbContext = dbContext;
+            _semesterRepo = semesterRepo;
         }
 
         public async Task AddAsync(CreateEnrollmentDto dto)
@@ -38,70 +49,19 @@ namespace HUP.Application.Services.Implementations
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
-                // 1. GPA Window Check
-                if (!await CanStudentEnroll(dto.StudentId))
-                {
-                    throw new InvalidOperationException("Enrollment is not yet open for your GPA tier.");
-                }
+                // Validate Business Rules
+                await _validator.ValidateEnrollmentAsync(dto);
 
-                // 2. Duplicate Check
-                var existingEnrollment = await _repository.GetExistingAsync(dto.StudentId, dto.CourseOfferingId);
-                if (existingEnrollment != null)
-                {
-                    throw new InvalidOperationException("Student is already enrolled in this course.");
-                }
-
-                // Retrieve with Schedules
+                // Perform Atomic Seat Booking
                 var courseOffering = await _offeringRepo.GetWithSchedulesAsync(dto.CourseOfferingId);
-                if (courseOffering == null)
-                    throw new InvalidOperationException("Course offering not found.");
-
-                // 3. Prerequisite Check
-                if (courseOffering.Course != null && courseOffering.Course.PrerequisiteId != null)
-                {
-                     var hasPassed = await _repository.HasPassedPrerequisiteAsync(dto.StudentId, courseOffering.Course.PrerequisiteId.Value);
-                     if (!hasPassed)
-                     {
-                         throw new InvalidOperationException($"Prerequisite not met for course {courseOffering.Course.CourseCode}.");
-                     }
-                }
-
-
-                // 4. Capacity & Conflict Check
-                var student = await _studentRepo.GetByIdReadOnly(dto.StudentId);
+                var student = await _studentRepo.GetByIdWithDetailsAsync(dto.StudentId);
                 var studentGroup = student.Group;
-
-                // Filter schedules by student group
                 var offeringSchedules = courseOffering.Schedules?.Where(s => s.Group == studentGroup).ToList();
 
                 if (offeringSchedules != null && offeringSchedules.Any())
                 {
-                    // Fetch existing enrollments for conflict check
-                    var currentEnrollments = await _repository.GetByStudentAndSemesterAsync(dto.StudentId, courseOffering.Semester.SemesterName);
-
                     foreach (var slot in offeringSchedules)
                     {
-                        // Conflict Check
-                        foreach (var enrolled in currentEnrollments)
-                        {
-                             // Ensure we check against the student's group in enrolled courses too
-                             var enrolledSchedules = enrolled.CourseOffering.Schedules?.Where(s => s.Group == studentGroup);
-                             if (enrolledSchedules != null)
-                             {
-                                 foreach (var existingSlot in enrolledSchedules)
-                                 {
-                                     if (slot.DayOfWeek == existingSlot.DayOfWeek)
-                                     {
-                                         if (slot.StartTime < existingSlot.EndTime && slot.EndTime > existingSlot.StartTime)
-                                         {
-                                             throw new InvalidOperationException($"Time conflict with course {enrolled.CourseOffering.Course.CourseCode} on {slot.DayOfWeek}.");
-                                         }
-                                     }
-                                 }
-                             }
-                        }
-
-                        // Capacity Check & Seat Decrement (Atomic)
                         var booked = await _scheduleRepo.TryBookSeatAsync(slot.Id);
                         if (!booked)
                         {
@@ -109,14 +69,8 @@ namespace HUP.Application.Services.Implementations
                         }
                     }
                 }
-                else
-                {
-                    // If no schedules for this group, should we allow enrollment?
-                    // Usually indicates setup error or open enrollment without schedules.
-                    // Proceeding, but logging or throwing might be safer depending on business rule.
-                    // For now, allowing as "Online/No Schedule" course if no schedules exist.
-                }
 
+                // Create Enrollment Record
                 var enrollment = EnrollmentMapper.ToEntityFromCreateDto(dto);
                 enrollment.Id = Guid.NewGuid();
                 enrollment.EnrollmentDate = DateTime.Now;
@@ -164,14 +118,14 @@ namespace HUP.Application.Services.Implementations
 
         public async Task<IEnumerable<EnrollmentResponseDto>> GetAllAsync(string lang)
         {
-            var entities =  await _repository.GetAllAsync();
+            var entities =  await _repository.GetAllWithDetailsAsync();
             var dtos = entities.Select(e => EnrollmentMapper.ToResponseDto(e, lang));
             return dtos;
         }
 
         public async Task<EnrollmentResponseDto> GetByIdAsync(Guid id, string lang)
         {
-            var entity = await _repository.GetByIdReadOnly(id);
+            var entity = await _repository.GetByIdWithDetailsAsync(id);
             var dto = EnrollmentMapper.ToResponseDto(entity, lang);
             return dto;
         }
@@ -189,7 +143,7 @@ namespace HUP.Application.Services.Implementations
         }
         public async Task SoftDelete(Guid id)
         {
-            var enrollment = await _repository.GetByIdTracking(id);
+            var enrollment = await _repository.GetByIdTrackingAsync(id);
             enrollment.IsDeleted = true;
             enrollment.UpdatedAt = DateTime.Now;
             await _repository.SaveChangesAsync();
@@ -197,7 +151,7 @@ namespace HUP.Application.Services.Implementations
 
         public async Task Update(Guid id, UpdateEnrollmentDto dto)
         {
-            var enrollment = await _repository.GetByIdTracking(id);
+            var enrollment = await _repository.GetByIdTrackingAsync(id);
             enrollment.UpdatedAt = DateTime.Now;
             EnrollmentMapper.ToUpdate(dto, enrollment);
             await _repository.SaveChangesAsync();

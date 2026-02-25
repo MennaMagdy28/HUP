@@ -25,7 +25,7 @@ public class StudentService : IStudentService
     
     public async Task<StudentProfileDto> GetStudentProfile(Guid userId , string lang)
     {
-        var student = await _studentRepository.GetByIdReadOnly(userId);
+        var student = await _studentRepository.GetByIdWithDetailsAsync(userId);
         if (student == null)
             return null;
         var profile = StudentMapper.ToStudentProfile(student, lang);
@@ -48,7 +48,7 @@ public class StudentService : IStudentService
     
     public async Task<bool> UpdateStudentStatus(StudentStatusDto statusDto)
     {
-        var student = await _studentRepository.GetByIdTracking(statusDto.StudentId);
+        var student = await _studentRepository.GetByIdTrackingAsync(statusDto.StudentId);
         if (student == null)
             return false;
         student = StudentMapper.UpdateStatus(statusDto);

@@ -41,7 +41,7 @@ namespace HUP.Repositories.Implementations
                 .FirstOrDefaultAsync(); 
         }
 
-        public override async Task<IEnumerable<Enrollment>> GetAllAsync()
+        public async Task<IEnumerable<Enrollment>> GetAllWithDetailsAsync()
         {
             return await _context.Enrollments
                 .Include(e => e.CourseOffering)
@@ -49,6 +49,19 @@ namespace HUP.Repositories.Implementations
                 .Where(e => !e.IsDeleted)
                 .AsNoTracking()
                 .ToListAsync();
+        }
+
+        public async Task<Enrollment> GetByIdWithDetailsAsync(Guid id)
+        {
+            var enrollment = await _context.Enrollments.AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
+            return enrollment;
+        }
+        public async Task<Enrollment> GetByIdTrackingAsync(Guid id)
+        {
+            var enrollment = await _context.Enrollments
+                .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
+            return enrollment;
         }
 
         public async Task<IEnumerable<Enrollment>> GetByStudentAndSemesterAsync(Guid studentId, string semester)

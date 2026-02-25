@@ -53,7 +53,7 @@ namespace HUP.Repositories.Implementations
             return entity;
         }
 
-        public override async Task<IEnumerable<CourseOffering>> GetAllAsync()
+        public async Task<IEnumerable<CourseOffering>> GetAllWithDetailsAsync()
         {
             return await _context.CourseOfferings
                 .Include(co => co.Course)
@@ -63,7 +63,7 @@ namespace HUP.Repositories.Implementations
                 .ToListAsync();
         }
 
-        public override async Task<CourseOffering> GetByIdReadOnly(Guid id)
+        public async Task<CourseOffering> GetByIdWithDetailsAsync(Guid id)
         {
             var co = await _context.CourseOfferings
                 .Include(co => co.Course)
@@ -72,7 +72,7 @@ namespace HUP.Repositories.Implementations
                 .FirstOrDefaultAsync(co => co.Id == id && !co.IsDeleted);
             return co;
         }
-        public override async Task<CourseOffering> GetByIdTracking(Guid id)
+        public async Task<CourseOffering> GetByIdTrackingAsync(Guid id)
         {
             var co = await _context.CourseOfferings
                 .Include(co => co.Course)

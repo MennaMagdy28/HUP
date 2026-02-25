@@ -11,7 +11,7 @@ namespace HUP.Repositories.Implementations
         {
         }
 
-        public override async Task<Schedule> GetByIdReadOnly(Guid id)
+        public async Task<Schedule> GetByIdWithDetailsAsync(Guid id)
         {
             var s = await _context.Schedules
                 .Where(s => s.Id == id)

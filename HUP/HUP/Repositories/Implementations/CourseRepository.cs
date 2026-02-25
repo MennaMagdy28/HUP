@@ -11,14 +11,14 @@ namespace HUP.Repositories.Implementations
         {
         }
 
-        public override async Task<Course> GetByIdReadOnly(Guid id) {
+        public async Task<Course> GetByIdWithDetailsAsync(Guid id) {
             var course = await _context.Courses
                 .Include(c => c.Prerequisite)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == id);
             return course;
         }
-        public override async Task<Course> GetByIdTracking(Guid id) {
+        public async Task<Course> GetByIdTrackingAsync(Guid id) {
             var course = await _context.Courses
                 .Include(c => c.Prerequisite)
                 .AsNoTracking()
@@ -26,7 +26,7 @@ namespace HUP.Repositories.Implementations
             return course;
         }
 
-        public override async Task<IEnumerable<Course>> GetAllAsync()
+        public async Task<IEnumerable<Course>> GetAllWithDetailsAsync()
         {
             return await _context.Courses
                 .Include(c => c.Prerequisite)
