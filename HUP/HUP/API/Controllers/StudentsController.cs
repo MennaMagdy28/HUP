@@ -1,4 +1,4 @@
-﻿using HUP.Application.DTOs.AcademicDtos;
+using HUP.Application.DTOs.AcademicDtos;
 using HUP.Application.DTOs.AcademicDtos.Enrollment;
 using HUP.Application.DTOs.AcademicDtos.Student;
 using HUP.Application.Services.Interfaces;
@@ -48,6 +48,15 @@ namespace HUP.API.Controllers
             bool result = await _studentService.UpdateStudentStatus(statusDto);
             if (!result) return BadRequest("Failed to update status");
             return Ok("Status updated successfully.");
+        }
+
+        [HttpPost("photo")]
+        [Authorize]
+        public async Task<IActionResult> UploadPhoto(IFormFile file)
+        {
+            var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var photoUrl = await _studentService.UploadProfilePhotoAsync(studentId, file);
+            return Ok(new { Url = photoUrl });
         }
 
     }
