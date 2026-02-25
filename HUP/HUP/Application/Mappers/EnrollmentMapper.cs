@@ -18,15 +18,24 @@ namespace HUP.Application.Mappers
 
         public static EnrollmentResponseDto ToResponseDto(Enrollment entity, string lang)
         {
-            var dto = new EnrollmentResponseDto();
-            dto.Id = entity.Id;
-            dto.EnrollmentDate = entity.EnrollmentDate;
-            dto.Status = LocalizationHelper.Get(entity.Status, lang);
-            dto.Grade = entity.finalGrade;
-            dto.CourseCode = LocalizationHelper.Get<string>(entity.CourseOffering.Course.CourseCode, lang);
-            dto.CourseCode = LocalizationHelper.Get<string>(entity.CourseOffering.Course.CourseName, lang);
-            return dto;
+            return new EnrollmentResponseDto
+            {
+                Id = entity.Id,
+                StudentId = entity.StudentId,
+                EnrollmentDate = entity.EnrollmentDate,
+                Status = LocalizationHelper.Get(entity.Status, lang),
+                Grade = entity.finalGrade,
+
+                CourseCode = entity.CourseOffering?.Course == null
+                    ? string.Empty
+                    : LocalizationHelper.Get<string>(entity.CourseOffering.Course.CourseCode, lang),
+
+                CourseName = entity.CourseOffering?.Course == null
+                    ? string.Empty
+                    : LocalizationHelper.Get<string>(entity.CourseOffering.Course.CourseName, lang),
+            };
         }
+
 
         //Mapping for UpdateEnrollmentDto
         // status update

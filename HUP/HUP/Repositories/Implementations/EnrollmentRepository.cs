@@ -4,6 +4,7 @@ using HUP.Data;
 using Microsoft.EntityFrameworkCore;
 using HUP.Core.Models;
 using HUP.Core.Enums.AcademicEnums;
+using MongoDB.Driver;
 
 namespace HUP.Repositories.Implementations
 {
@@ -119,12 +120,16 @@ namespace HUP.Repositories.Implementations
         public async Task<IEnumerable<Enrollment>> GetFilteredAsync(Guid studentId, EnrollmentFilterDto filter)
         {
             var query = _context.Enrollments
-                .Where(e => e.StudentId == studentId);
+                .Where(e => e.StudentId == studentId);                
 
             if (filter.Status.HasValue)
                 query = query.Where(e => e.Status == filter.Status);
 
+            query = query.Include(e => e.CourseOffering)
+                    .ThenInclude(co => co.Course);
+
             return await query.ToListAsync();
         }
+
     }
 }
