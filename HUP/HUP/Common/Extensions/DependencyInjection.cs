@@ -30,6 +30,7 @@ public static class DependencyInjection
 
         services.AddScoped<HUP.Application.Validators.Interfaces.IEnrollmentValidator, HUP.Application.Validators.Implementations.EnrollmentValidator>();
         services.AddScoped<IExamService, ExamService>();
+        services.AddScoped<IFinancialService, FinancialService>();
         services.AddScoped<HUP.Core.Interfaces.ITransactionService, HUP.Repositories.Implementations.TransactionService>();
 
         return services;

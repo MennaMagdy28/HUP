@@ -4,6 +4,7 @@ using HUP.Core.Entities.Shared;
 using HUP.Core.Entities.Academics;
 using HUP.Core.Entities.Identity;
 using HUP.Core.Entities.Permissions;
+using HUP.Core.Entities.Financial;
 
 
 namespace HUP.Data
@@ -28,6 +29,9 @@ namespace HUP.Data
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<ProgramPlan> ProgramPlan { get; set; }
         public DbSet<Semester> Semesters { get; set; }
+        public DbSet<Fee> Fees { get; set; }
+        public DbSet<StudentFee> StudentFees { get; set; }
+        public DbSet<Payment> Payments { get; set; }
         
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -197,6 +201,25 @@ namespace HUP.Data
                 .HasOne(s => s.Instructor)
                 .WithMany(i => i.Schedules)
                 .HasForeignKey(s => s.InstructorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Financial Relationships
+            modelBuilder.Entity<StudentFee>()
+                .HasOne(sf => sf.Student)
+                .WithMany()
+                .HasForeignKey(sf => sf.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StudentFee>()
+                .HasOne(sf => sf.Fee)
+                .WithMany()
+                .HasForeignKey(sf => sf.FeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.StudentFee)
+                .WithMany(sf => sf.Payments)
+                .HasForeignKey(p => p.StudentFeeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Apply Global Query Filter for BaseEntity
