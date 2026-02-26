@@ -33,13 +33,13 @@ namespace HUP.Repositories.Implementations
             return departments;
         }
 
-        public new async Task AddAsync(Department entity)
+        public override async Task AddAsync(Department entity)
         {
             await base.AddAsync(entity);
             await _cacheService.RemoveAsync(CacheKey);
         }
 
-        public new async Task RemoveAsync(Guid id)
+        public override async Task RemoveAsync(Guid id)
         {
             await base.RemoveAsync(id);
             await _cacheService.RemoveAsync(CacheKey);

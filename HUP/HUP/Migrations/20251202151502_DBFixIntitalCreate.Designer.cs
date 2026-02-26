@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HUP.Migrations
 {
     [DbContext(typeof(HupDbContext))]
-    [Migration("20260210190342_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251202151502_DBFixIntitalCreate")]
+    partial class DBFixIntitalCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -109,6 +109,63 @@ namespace HUP.Migrations
                     b.HasIndex("InstructorId");
 
                     b.ToTable("CourseOfferingInstructors");
+                });
+
+            modelBuilder.Entity("HUP.Core.Entities.Academics.CourseSchedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CourseID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CourseOfferingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("InstructorID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Room")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Semester")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseOfferingId");
+
+                    b.HasIndex("InstructorID");
+
+                    b.ToTable("CourseSchedules");
                 });
 
             modelBuilder.Entity("HUP.Core.Entities.Academics.Department", b =>
@@ -366,14 +423,6 @@ namespace HUP.Migrations
                         .HasColumnType("time");
 
                     b.Property<string>("Group")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Hall")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InstructorName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -652,6 +701,25 @@ namespace HUP.Migrations
                     b.Navigation("Instructor");
                 });
 
+            modelBuilder.Entity("HUP.Core.Entities.Academics.CourseSchedule", b =>
+                {
+                    b.HasOne("HUP.Core.Entities.Academics.CourseOffering", "CourseOffering")
+                        .WithMany()
+                        .HasForeignKey("CourseOfferingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HUP.Core.Entities.Academics.Instructor", "Instructor")
+                        .WithMany()
+                        .HasForeignKey("InstructorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CourseOffering");
+
+                    b.Navigation("Instructor");
+                });
+
             modelBuilder.Entity("HUP.Core.Entities.Academics.Department", b =>
                 {
                     b.HasOne("HUP.Core.Entities.Academics.Faculty", "Faculty")
@@ -812,8 +880,8 @@ namespace HUP.Migrations
                             b1.Property<string>("AltEmail")
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<int?>("City")
-                                .HasColumnType("int");
+                            b1.Property<string>("City")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("PhoneNumber")
                                 .HasColumnType("nvarchar(max)");
@@ -834,17 +902,23 @@ namespace HUP.Migrations
                             b1.Property<DateTime>("BirthDate")
                                 .HasColumnType("datetime2");
 
-                            b1.Property<int>("BirthPlace")
-                                .HasColumnType("int");
+                            b1.Property<string>("BirthPlace")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("FullEnglishName")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<int>("Gender")
                                 .HasColumnType("int");
 
-                            b1.Property<int>("Nationality")
-                                .HasColumnType("int");
+                            b1.Property<string>("Nationality")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
 
-                            b1.Property<int>("Religion")
-                                .HasColumnType("int");
+                            b1.Property<string>("Religion")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
 
                             b1.HasKey("UserId");
 

@@ -44,6 +44,10 @@ namespace HUP.Core.Constants
         // Program Plan
         public const string VIEW_PROGRAM_PLAN = "VIEW_PROGRAM_PLAN";
 
+        // Departments & Faculties
+        public const string VIEW_DEPARTMENTS = "VIEW_DEPARTMENTS";
+        public const string VIEW_FACULTIES = "VIEW_FACULTIES";
+
         public static List<string> GetAll()
         {
             return typeof(AppPermissions).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.FlattenHierarchy)
