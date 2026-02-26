@@ -5,6 +5,7 @@ using System.Security.Authentication;
 using System.Security.Claims;
 using HUP.Application.DTOs.AuthDtos;
 using Microsoft.AspNetCore.Authorization;
+using HUP.Core.Constants;
 
 namespace HUP.API.Controllers
 {
@@ -33,7 +34,7 @@ namespace HUP.API.Controllers
             return Ok(response);
         }
 
-        [Authorize]
+        [Authorize(Policy = AppPermissions.UPDATE_PROFILE)]
         [HttpPost("change-password")]
         public async Task<IActionResult> UpdatePassword([FromBody] UpdatePassword dto)
         {

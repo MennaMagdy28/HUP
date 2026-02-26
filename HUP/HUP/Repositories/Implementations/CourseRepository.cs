@@ -1,26 +1,24 @@
-﻿using HUP.Repositories.Interfaces;
+using HUP.Repositories.Interfaces;
 using HUP.Core.Entities.Academics;
 using HUP.Data;
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+
 namespace HUP.Repositories.Implementations
 {
-    public class CourseRepository : ICourseRepository
+    public class CourseRepository : GenericRepository<Course>, ICourseRepository
     {
-        private readonly HupDbContext _context;
-        public CourseRepository(HupDbContext context)
+        public CourseRepository(HupDbContext context) : base(context)
         {
-            _context = context;
         }
 
-        public async Task<Course> GetByIdReadOnly(Guid id) {
+        public async Task<Course> GetByIdWithDetailsAsync(Guid id) {
             var course = await _context.Courses
                 .Include(c => c.Prerequisite)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == id);
             return course;
         }
-        public async Task<Course> GetByIdTracking(Guid id) {
+        public async Task<Course> GetByIdTrackingAsync(Guid id) {
             var course = await _context.Courses
                 .Include(c => c.Prerequisite)
                 .AsNoTracking()
@@ -28,29 +26,12 @@ namespace HUP.Repositories.Implementations
             return course;
         }
 
-        public async Task<IEnumerable<Course>> GetAllAsync() 
+        public async Task<IEnumerable<Course>> GetAllWithDetailsAsync()
         {
             return await _context.Courses
                 .Include(c => c.Prerequisite)
                 .AsNoTracking()
                 .ToListAsync();
-        }
-
-        public async Task AddAsync(Course course)
-        {
-            await _context.Courses.AddAsync(course);
-        }
-
-        public async Task RemoveAsync(Guid courseId)
-        {
-            var course = await _context.Courses.FindAsync(courseId);
-            if (course != null)
-                _context.Courses.Remove(course);
-        }
-
-        public async Task SaveChangesAsync()
-        {
-             await _context.SaveChangesAsync();
         }
     }
 }

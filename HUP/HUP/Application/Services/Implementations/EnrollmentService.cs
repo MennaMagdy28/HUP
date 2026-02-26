@@ -1,4 +1,4 @@
-﻿using HUP.Application.Mappers;
+using HUP.Application.Mappers;
 using HUP.Application.Services.Interfaces;
 using HUP.Application.DTOs.AcademicDtos.Enrollment;
 using HUP.Core.Entities.Academics;
@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using HUP.Application.DTOs.AcademicDtos;
 using HUP.Common.Helpers;
 using HUP.Core.Enums.AcademicEnums;
+using HUP.Application.Validators.Interfaces;
+using HUP.Core.Interfaces;
 
 namespace HUP.Application.Services.Implementations
 {
@@ -15,35 +17,106 @@ namespace HUP.Application.Services.Implementations
         private readonly IEnrollmentRepository _repository;
         private readonly IStudentRepository _studentRepo;
         private readonly IProgramPlanRepository _planRepo;
+        private readonly ICourseOfferingRepository _offeringRepo;
+        private readonly IScheduleRepository _scheduleRepo;
+        private readonly IEnrollmentValidator _validator;
+        private readonly ITransactionService _transactionService;
+        private readonly ISemesterRepository _semesterRepo;
 
-        public EnrollmentService(IEnrollmentRepository repository, IStudentRepository studentRepo, IProgramPlanRepository planRepo)
+        public EnrollmentService(
+            IEnrollmentRepository repository,
+            IStudentRepository studentRepo,
+            IProgramPlanRepository planRepo,
+            ICourseOfferingRepository offeringRepo,
+            IScheduleRepository scheduleRepo,
+            IEnrollmentValidator validator,
+            ITransactionService transactionService,
+            ISemesterRepository semesterRepo)
         {
             _repository = repository;
             _studentRepo = studentRepo;
             _planRepo = planRepo;
+            _offeringRepo = offeringRepo;
+            _scheduleRepo = scheduleRepo;
+            _validator = validator;
+            _transactionService = transactionService;
+            _semesterRepo = semesterRepo;
         }
 
         public async Task AddAsync(CreateEnrollmentDto dto)
         {
-            var enrollment = EnrollmentMapper.ToEntityFromCreateDto(dto);
-            enrollment.Id = Guid.NewGuid();
-            enrollment.EnrollmentDate = DateTime.Now;
-            enrollment.CreatedAt = DateTime.Now;
-            enrollment.Status = EnrollmentStatus.Registered;
-            await _repository.AddAsync(enrollment);
-            await _repository.SaveChangesAsync();
+            await _transactionService.ExecuteInTransactionAsync(async () =>
+            {
+                // Validate Business Rules
+                await _validator.ValidateEnrollmentAsync(dto);
+
+                // Perform Atomic Seat Booking
+                var courseOffering = await _offeringRepo.GetWithSchedulesAsync(dto.CourseOfferingId);
+                var student = await _studentRepo.GetByIdWithDetailsAsync(dto.StudentId);
+                var studentGroup = student.Group;
+                var offeringSchedules = courseOffering.Schedules?.Where(s => s.Group == studentGroup).ToList();
+
+                if (offeringSchedules != null && offeringSchedules.Any())
+                {
+                    foreach (var slot in offeringSchedules)
+                    {
+                        var booked = await _scheduleRepo.TryBookSeatAsync(slot.Id);
+                        if (!booked)
+                        {
+                             throw new InvalidOperationException($"Seat unavailable for schedule {slot.DayOfWeek} {slot.StartTime}.");
+                        }
+                    }
+                }
+
+                // Create Enrollment Record
+                var enrollment = EnrollmentMapper.ToEntityFromCreateDto(dto);
+                enrollment.Id = Guid.NewGuid();
+                enrollment.EnrollmentDate = DateTime.Now;
+                enrollment.CreatedAt = DateTime.Now;
+                enrollment.Status = EnrollmentStatus.Registered;
+
+                await _repository.AddAsync(enrollment);
+                await _repository.SaveChangesAsync();
+            });
+        }
+
+        public async Task<bool> CanStudentEnroll(Guid studentId)
+        {
+            var student = await _studentRepo.GetByIdReadOnly(studentId);
+            if (student == null) return false;
+
+            var activeSemester = await _semesterRepo.GetActiveSemesterAsync();
+            if (activeSemester == null) return false;
+
+            var startTime = activeSemester.StartDate;
+            var now = DateTime.UtcNow;
+
+            var gpa = student.Cgpa;
+
+            if (gpa >= 3.8m)
+            {
+                return now >= startTime;
+            }
+            else if (gpa >= 3.5m)
+            {
+                return now >= startTime.AddHours(2);
+            }
+            else
+            {
+                return now >= startTime.AddHours(4);
+            }
         }
 
         public async Task<IEnumerable<EnrollmentResponseDto>> GetAllAsync(string lang)
         {
-            var entities =  await _repository.GetAllAsync();
+            var entities =  await _repository.GetAllWithDetailsAsync();
             var dtos = entities.Select(e => EnrollmentMapper.ToResponseDto(e, lang));
             return dtos;
         }
 
         public async Task<EnrollmentResponseDto> GetByIdAsync(Guid id, string lang)
         {
-            var entity = await _repository.GetByIdReadOnly(id);
+            var entity = await _repository.GetByIdWithDetailsAsync(id);
             var dto = EnrollmentMapper.ToResponseDto(entity, lang);
             return dto;
         }
@@ -56,23 +129,31 @@ namespace HUP.Application.Services.Implementations
 
         public async Task Remove(Guid id)
         {
-            await _repository.RemoveAsync(id);
-            await _repository.SaveChangesAsync();
+            var enrollment = await _repository.GetByIdTrackingAsync(id);
+            if (enrollment != null)
+            {
+                await _validator.ValidateDropAsync(id, enrollment.StudentId);
+                await _repository.RemoveAsync(id);
+                await _repository.SaveChangesAsync();
+            }
         }
         public async Task SoftDelete(Guid id)
         {
-            var enrollment = await _repository.GetByIdReadOnly(id);
-            enrollment.IsDeleted = true;
-            enrollment.UpdatedAt = DateTime.Now;
-            await _repository.SaveChangesAsync();
+            var enrollment = await _repository.GetByIdTrackingAsync(id);
+            if (enrollment != null)
+            {
+                await _validator.ValidateDropAsync(id, enrollment.StudentId);
+
+                enrollment.IsDeleted = true;
+                enrollment.UpdatedAt = DateTime.Now;
+                await _repository.SaveChangesAsync();
+            }
         }
 
         public async Task Update(Guid id, UpdateEnrollmentDto dto)
         {
-            var enrollment = await _repository.GetByIdTracking(id);
+            var enrollment = await _repository.GetByIdTrackingAsync(id);
             enrollment.UpdatedAt = DateTime.Now;
-            // the mapper will copy the values in it to the entity
-            // ef core tracks the changes and update only specific attributes
             EnrollmentMapper.ToUpdate(dto, enrollment);
             await _repository.SaveChangesAsync();
         }
@@ -85,11 +166,9 @@ namespace HUP.Application.Services.Implementations
 
             var departmentId = student.DepartmentId;
 
-            // Accumulators for cumulative GPA
             decimal cumulativePoints = 0;
             decimal cumulativeHours = 0;
 
-            // Temporary ungrouped list of courses with computed values
             var computedCourses = new List<SemesterGradesDto>();
 
             foreach (var m in models)
@@ -103,11 +182,9 @@ namespace HUP.Application.Services.Implementations
                 var gradePts = GetGradePoints(grade);
                 var creditPts = gradePts * m.CourseCredits;
 
-                // Add to cumulative totals
                 cumulativePoints += creditPts;
                 cumulativeHours += m.CourseCredits;
 
-                // Add computed course to TEMP LIST (ungrouped!)
                 computedCourses.Add(new SemesterGradesDto
                 {
                     SemesterId = m.SemesterId,
@@ -122,12 +199,10 @@ namespace HUP.Application.Services.Implementations
                 });
             }
 
-            // Compute cumulative GPA once
             var cumulativeGPA = cumulativeHours == 0
                 ? 0
                 : cumulativePoints / cumulativeHours;
 
-            // Now group using the computed data
             var grouped = computedCourses.GroupBy(c => c.SemesterName);
 
             var transcript = new List<SemesterTranscriptDto>();

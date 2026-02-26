@@ -4,6 +4,8 @@ using HUP.Application.DTOs.IdentityDtos.UserDtos;
 using HUP.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using HUP.Core.Constants;
 
 namespace HUP.API.Controllers;
 [ApiController]
@@ -17,21 +19,22 @@ public class ScheduleController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = AppPermissions.CREATE_SCHEDULE)]
     public async Task<ActionResult<ScheduleSlotCreateDto>> AddSlot(ScheduleSlotCreateDto createDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
         await _scheduleService.Create(createDto);
         return Ok("Created Successfully");
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = AppPermissions.DELETE_SCHEDULE)]
     public async Task SoftDelete(Guid id)
     {
         await _scheduleService.SoftDelete(id);
     }
 
     [HttpDelete("{id}/hard")]
+    [Authorize(Policy = AppPermissions.DELETE_SCHEDULE)]
     public async Task Remove(Guid id)
     {
         await _scheduleService.Remove(id);

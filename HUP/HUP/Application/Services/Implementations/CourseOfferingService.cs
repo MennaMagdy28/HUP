@@ -20,7 +20,7 @@ namespace HUP.Application.Services.Implementations
 
         public async Task<CourseOfferingDto?> GetByIdAsync(Guid id, string lang)
         {
-            var entity = await _repository.GetByIdReadOnly(id);
+            var entity = await _repository.GetByIdWithDetailsAsync(id);
             if (entity == null)
                 return null;
             
@@ -29,13 +29,13 @@ namespace HUP.Application.Services.Implementations
 
         public async Task<IEnumerable<CourseOfferingDto>> GetAllAsync(string lang)
         {
-            var entities = await _repository.GetAllAsync();
+            var entities = await _repository.GetAllWithDetailsAsync();
             return CourseOfferingMapper.ToDto(entities, lang);
         }
 
         public async Task<bool> Exists(CreateCourseOfferingDto dto)
         {
-            var entity = _repository.GetExistingAsync(dto.CourseId, dto.DepartmentId, dto.SemesterId);
+            var entity = await _repository.GetExistingAsync(dto.CourseId, dto.DepartmentId, dto.SemesterId);
             return entity != null;
         }
 
@@ -55,7 +55,7 @@ namespace HUP.Application.Services.Implementations
 
         public async Task SoftDelete(Guid id)
         {
-            var entity = await _repository.GetByIdTracking(id);
+            var entity = await _repository.GetByIdTrackingAsync(id);
             entity.IsDeleted = true;
             entity.UpdatedAt = DateTime.Now;
             await _repository.SaveChangesAsync();

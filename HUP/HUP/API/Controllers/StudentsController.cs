@@ -1,4 +1,4 @@
-﻿using HUP.Application.DTOs.AcademicDtos;
+using HUP.Application.DTOs.AcademicDtos;
 using HUP.Application.DTOs.AcademicDtos.Enrollment;
 using HUP.Application.DTOs.AcademicDtos.Student;
 using HUP.Application.Services.Interfaces;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using HUP.Core.Constants;
 
 namespace HUP.API.Controllers
 {
@@ -24,16 +25,15 @@ namespace HUP.API.Controllers
         //ADD UPDATE PROFILE, REGISTER STUDENT, SOFT DELETE
         
         [HttpPost]
+        [Authorize(Policy = AppPermissions.CREATE_STUDENT)]
         public async Task<IActionResult> Create([FromBody] CreateStudentDto createDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
             await _studentService.AddStudent(createDto);
             return Ok("Added");
         }
 
         [HttpGet("Profile")]
-        [Authorize]
+        [Authorize(Policy = AppPermissions.VIEW_PROFILE)]
         public async Task<ActionResult<StudentProfileDto>> GetProfile([FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var id = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -44,12 +44,21 @@ namespace HUP.API.Controllers
         }
 
         [HttpPatch("Status")]
-        [Authorize]
+        [Authorize(Policy = AppPermissions.UPDATE_STUDENT_STATUS)]
         public async Task<IActionResult> UpdateAcademicStatus([FromBody] StudentStatusDto statusDto)
         {
             bool result = await _studentService.UpdateStudentStatus(statusDto);
             if (!result) return BadRequest("Failed to update status");
             return Ok("Status updated successfully.");
+        }
+
+        [HttpPost("photo")]
+        [Authorize(Policy = AppPermissions.UPDATE_PROFILE)]
+        public async Task<IActionResult> UploadPhoto(IFormFile file)
+        {
+            var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var photoUrl = await _studentService.UploadProfilePhotoAsync(studentId, file);
+            return Ok(new { Url = photoUrl });
         }
 
     }

@@ -1,4 +1,4 @@
-﻿using HUP.Core.Entities.Identity;
+using HUP.Core.Entities.Identity;
 using HUP.Core.Models;
 
 namespace HUP.Repositories.Interfaces;
@@ -9,4 +9,7 @@ public interface IUserRepository : IGenericRepository<User>
     Task<(UserPersonalInfo?, UserContact?)> GetUserInformation(Guid userId);
     Task<IEnumerable<UserSummary>> GetUserList();
     Task<User> GetUserProfileAsync(Guid userId);
+    Task<User> GetByIdWithDetailsAsync(Guid id);
+    Task<User> GetByIdTrackingAsync(Guid id);
+    Task<IEnumerable<User>> GetAllWithDetailsAsync();
 }

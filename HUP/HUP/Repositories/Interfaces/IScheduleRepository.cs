@@ -1,10 +1,11 @@
-﻿using HUP.Core.Entities.Academics;
+using HUP.Core.Entities.Academics;
 
-namespace HUP.Repositories.Interfaces
+namespace HUP.Repositories.Interfaces;
+
+public interface IScheduleRepository : IGenericRepository<HUP.Core.Entities.Academics.Schedule>
 {
-    // Extends the generic repository interface for basic CRUD operations
-    public interface IScheduleRepository : IGenericRepository<Schedule>
-    {
-        
-    }
+    Task<IEnumerable<HUP.Core.Entities.Academics.Schedule>> GetByStudentEnrollmentsAsync(Guid studentId);
+    Task<IEnumerable<HUP.Core.Entities.Academics.Schedule>> GetAvailableSlotsAsync();
+    Task<bool> TryBookSeatAsync(Guid scheduleId);
+    Task<Schedule> GetByIdWithDetailsAsync(Guid id);
 }

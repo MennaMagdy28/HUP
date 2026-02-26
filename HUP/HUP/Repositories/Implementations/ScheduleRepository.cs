@@ -1,55 +1,62 @@
-﻿using HUP.Core.Entities.Academics;
+using HUP.Core.Entities.Academics;
 using HUP.Data;
 using HUP.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace HUP.Repositories.Implementations
 {
-    public class ScheduleRepository : IScheduleRepository
+    public class ScheduleRepository : GenericRepository<Schedule>, IScheduleRepository
     {
-
-        private readonly HupDbContext _context;
-        public ScheduleRepository(HupDbContext context)
+        public ScheduleRepository(HupDbContext context) : base(context)
         {
-            _context = context;
         }
 
-        public async Task AddAsync(Schedule entity)
-        {
-            await _context.Schedules.AddAsync(entity);
-        }
-        public async Task<IEnumerable<Schedule>> GetAllAsync()
-        {
-            return await _context.Schedules.AsNoTracking().ToListAsync();
-        }
-
-        public async Task<Schedule> GetByIdReadOnly(Guid id)
+        public async Task<Schedule> GetByIdWithDetailsAsync(Guid id)
         {
             var s = await _context.Schedules
                 .Where(s => s.Id == id)
                 .Include(s => s.CourseOffering)
-                .Include(s => s.CourseOffering.Course)
+                    .ThenInclude(co => co.Course)
+                .Include(s => s.Instructor)
                 .AsNoTracking().FirstOrDefaultAsync();
             return s;
         }
-        public async Task<Schedule> GetByIdTracking(Guid id)
+
+        public async Task<IEnumerable<Schedule>> GetByStudentEnrollmentsAsync(Guid studentId)
         {
-            var s = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == id);
-            return s;
+            return await _context.Enrollments
+                .Where(e => e.StudentId == studentId && !e.IsDeleted)
+                .Where(e => e.CourseOffering.Semester.IsActive) // Filter by active semester
+                .SelectMany(e => e.CourseOffering.Schedules)
+                .Include(s => s.CourseOffering)
+                    .ThenInclude(co => co.Course)
+                .Include(s => s.Instructor)
+                    .ThenInclude(i => i.User)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
-
-        public async Task RemoveAsync(Guid id)
+        public async Task<IEnumerable<Schedule>> GetAvailableSlotsAsync()
         {
-            var entity = await _context.Schedules.FindAsync(id);
-            
-            if (entity != null)
-                _context.Schedules.Remove(entity);
+            return await _context.Schedules
+                .Where(s => s.AvailableSeats > 0 && !s.IsDeleted)
+                .Where(s => s.CourseOffering.Semester.IsActive) // Filter by active semester
+                .Include(s => s.CourseOffering)
+                    .ThenInclude(co => co.Course)
+                .Include(s => s.Instructor)
+                    .ThenInclude(i => i.User)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
-        public async Task SaveChangesAsync()
+        public async Task<bool> TryBookSeatAsync(Guid scheduleId)
         {
-            await _context.SaveChangesAsync();
-        }  
+            // Raw SQL update for atomicity and concurrency control
+            var rowsAffected = await _context.Database.ExecuteSqlRawAsync(
+                "UPDATE Schedules SET AvailableSeats = AvailableSeats - 1, UpdatedAt = GETUTCDATE() WHERE Id = {0} AND AvailableSeats > 0",
+                scheduleId);
+
+            return rowsAffected > 0;
+        }
     }
 }

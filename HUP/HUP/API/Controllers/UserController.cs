@@ -1,8 +1,10 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using HUP.Application.DTOs.IdentityDtos.UserDtos;
 using HUP.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using HUP.Core.Constants;
 
 namespace HUP.API.Controllers;
 [ApiController]
@@ -20,6 +22,7 @@ public class UserController : ControllerBase
     //TODO
     // (ADD PAGINATION + FILTERS)
     [HttpGet]
+    [Authorize(Policy = AppPermissions.VIEW_USERS)]
     public async Task<ActionResult<IEnumerable<UsersListResponse>>> GetAll()
     {
         var users = await _userService.GetAllUsers();
@@ -27,6 +30,7 @@ public class UserController : ControllerBase
     }
     //Get : api/User/{id}
     [HttpGet("{id}")]
+    [Authorize(Policy = AppPermissions.VIEW_PROFILE)]
     public async Task<ActionResult<ProfileInfoDto>> GetById(Guid id, [FromHeader(Name = "Accept-Language")] string lang = "ar")
     {
         var profile = await _userService.GetUserById(id, lang);
@@ -36,6 +40,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPatch("insert-profile-data")]
+    [Authorize(Policy = AppPermissions.UPDATE_PROFILE)]
     public async Task<IActionResult> InsertMissingData([FromBody] UpdateInfoDto dto)
     {
         Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -46,6 +51,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPatch("update-profile")]
+    [Authorize(Policy = AppPermissions.UPDATE_PROFILE)]
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateInfoDto dto)
     {
         Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -56,10 +62,9 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = AppPermissions.CREATE_USER)]
     public async Task<IActionResult> AddUser([FromBody] CreateUserDto dto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
         var exist = await _userService.Exists(dto.NationalId);
         if (exist) return BadRequest("This national Id is already registered");
         await _userService.AddAsync(dto);
@@ -67,6 +72,7 @@ public class UserController : ControllerBase
     }
     
     [HttpDelete("{id}")]
+    [Authorize(Policy = AppPermissions.DELETE_USER)]
     public async Task<IActionResult> SoftDelete(Guid id)
     {
         var user = await _userService.SoftDelete(id);
@@ -76,6 +82,7 @@ public class UserController : ControllerBase
     }
     
     [HttpDelete("{id}/hard")]
+    [Authorize(Policy = AppPermissions.DELETE_USER)]
     public async Task<IActionResult> HardDelete(Guid id)
     {
         await _userService.Remove(id);

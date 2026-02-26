@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using HUP.Application.Services.Interfaces;
+using HUP.Application.Services.Implementations;
 
 namespace HUP.Common.Extensions;
 
@@ -25,6 +27,12 @@ public static class DependencyInjection
 
             services.AddScoped(interfaceType, type);
         }
+
+        services.AddScoped<HUP.Application.Validators.Interfaces.IEnrollmentValidator, HUP.Application.Validators.Implementations.EnrollmentValidator>();
+        services.AddScoped<IExamService, ExamService>();
+        services.AddScoped<IFinancialService, FinancialService>();
+        services.AddScoped<HUP.Core.Interfaces.ITransactionService, HUP.Repositories.Implementations.TransactionService>();
+
         return services;
     }
 }

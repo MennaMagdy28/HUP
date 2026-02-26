@@ -1,4 +1,4 @@
-﻿using HUP.Core.Entities.Academics;
+using HUP.Core.Entities.Academics;
 using HUP.Core.Enums.AcademicEnums;
 using HUP.Data;
 using HUP.Repositories.Interfaces;
@@ -6,21 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HUP.Repositories.Implementations
 {
-    public class StudentRepository : IStudentRepository
+    public class StudentRepository : GenericRepository<Student>, IStudentRepository
     {
-        private readonly HupDbContext _context;
-        public StudentRepository(HupDbContext context)
+        public StudentRepository(HupDbContext context) : base(context)
         {
-            _context = context;
-        }
-        public async Task AddAsync(Student entity)
-        {
-            await _context.Students.AddAsync(entity);
-        }
-
-        public async Task<IEnumerable<Student>> GetAllAsync()
-        {
-            return await _context.Students.AsNoTracking().ToListAsync();
         }
 
         public async Task<IEnumerable<Student>> GetByFacultyAsync(Guid facultyId)
@@ -31,8 +20,7 @@ namespace HUP.Repositories.Implementations
                 .ToListAsync();
         }
 
-        // ---
-        public async Task<Student> GetByIdReadOnly(Guid id)
+        public async Task<Student> GetByIdWithDetailsAsync(Guid id)
         {
             var student = await _context.Students
                 .Include(s => s.User)
@@ -43,7 +31,7 @@ namespace HUP.Repositories.Implementations
             return student;
         }
 
-        public async Task<Student> GetByIdTracking(Guid id)
+        public async Task<Student> GetByIdTrackingAsync(Guid id)
         {
             var student = await _context.Students
                 .Include(s => s.User)
@@ -62,21 +50,7 @@ namespace HUP.Repositories.Implementations
             return students;
         }
 
-        public async Task RemoveAsync(Guid id)
-        {
-            var entity = await _context.Students.FindAsync(id);
-
-            if (entity != null)
-                _context.Students.Remove(entity);
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
-
-
-        // --- 
+        // ---
         public async Task UpdateAsync(Student student)
         {
             _context.Students.Update(student);

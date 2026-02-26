@@ -1,9 +1,11 @@
-﻿using HUP.Core.Entities.Academics;
+using HUP.Core.Entities.Academics;
 
 namespace HUP.Repositories.Interfaces
 {
     public interface ICourseRepository : IGenericRepository<Course>
     {
-        //to discuss (q: course might be available for many departments at the same faculty => University Requirements & Faculty Requirements)
+        Task<Course> GetByIdWithDetailsAsync(Guid id);
+        Task<Course> GetByIdTrackingAsync(Guid id);
+        Task<IEnumerable<Course>> GetAllWithDetailsAsync();
     }
 }

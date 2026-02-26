@@ -1,4 +1,4 @@
-﻿using HUP.Application.Services.Caching;
+using HUP.Application.Services.Caching;
 using HUP.Application.Services.Implementations;
 using HUP.Application.Services.Interfaces;
 using HUP.Common.Extensions;
@@ -15,6 +15,11 @@ using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using StackExchange.Redis;
 using System.Text;
+using FluentValidation;
+using HUP.Application.Validators;
+using HUP.API.Filters;
+using HUP.API.Middleware;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +37,10 @@ builder.Services.AddSingleton<ICacheService, CacheService>();
 // This registers Hasher, UserManager, SignInManager, etc.
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>(); 
 //tracks all services and repositories (DI)
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddApplicationServices();
+
+builder.Services.AddScoped<IAuthorizationHandler, HUP.API.Permissions.PermissionAuthorizationHandler>();
 
 builder.Services.AddAuthentication(options =>
     {
@@ -57,7 +65,20 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-builder.Services.AddControllers(); 
+builder.Services.AddAuthorization(options =>
+{
+    foreach (var permission in HUP.Core.Constants.AppPermissions.GetAll())
+    {
+        options.AddPolicy(permission, policy =>
+            policy.Requirements.Add(new HUP.API.Permissions.PermissionRequirement(permission)));
+    }
+});
+
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(); 
@@ -75,6 +96,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger(); 
@@ -82,6 +105,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowReactApp");
+app.UseStaticFiles();
 
 //app.UseHttpsRedirection();
 app.UseAuthorization();

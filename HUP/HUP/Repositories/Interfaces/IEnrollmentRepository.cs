@@ -1,4 +1,4 @@
-﻿using HUP.Core.Entities.Academics;
+using HUP.Core.Entities.Academics;
 using HUP.Core.Models;
 
 namespace HUP.Repositories.Interfaces
@@ -12,5 +12,9 @@ namespace HUP.Repositories.Interfaces
         Task<IEnumerable<Enrollment>> GetByStudentAndSemesterAsync(Guid studentId, string semester);
         Task<List<SemesterGrades>> GetStudentSemesterGradeModelsAsync(Guid studentId);
         Task<IEnumerable<Enrollment>> GetFilteredAsync(Guid studentId, EnrollmentFilterDto filter);
+        Task<bool> HasPassedPrerequisiteAsync(Guid studentId, Guid prerequisiteCourseId);
+        Task<IEnumerable<Enrollment>> GetAllWithDetailsAsync();
+        Task<Enrollment> GetByIdWithDetailsAsync(Guid id);
+        Task<Enrollment> GetByIdTrackingAsync(Guid id);
     }
 }

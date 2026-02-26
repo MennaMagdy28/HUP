@@ -6,6 +6,7 @@ using HUP.Common.Helpers;
 using HUP.Core.Entities.Identity;
 using HUP.Core.Enums;
 using HUP.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
 namespace HUP.Application.Services.Implementations;
@@ -25,7 +26,7 @@ public class StudentService : IStudentService
     
     public async Task<StudentProfileDto> GetStudentProfile(Guid userId , string lang)
     {
-        var student = await _studentRepository.GetByIdReadOnly(userId);
+        var student = await _studentRepository.GetByIdWithDetailsAsync(userId);
         if (student == null)
             return null;
         var profile = StudentMapper.ToStudentProfile(student, lang);
@@ -48,11 +49,62 @@ public class StudentService : IStudentService
     
     public async Task<bool> UpdateStudentStatus(StudentStatusDto statusDto)
     {
-        var student = await _studentRepository.GetByIdTracking(statusDto.StudentId);
+        var student = await _studentRepository.GetByIdTrackingAsync(statusDto.StudentId);
         if (student == null)
             return false;
         student = StudentMapper.UpdateStatus(statusDto);
         await _studentRepository.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<string> UploadProfilePhotoAsync(Guid studentId, IFormFile file)
+    {
+        // 1. Validation
+        if (file == null || file.Length == 0)
+            throw new ArgumentException("File cannot be empty.");
+
+        if (file.Length > 5 * 1024 * 1024) // 5MB
+            throw new ArgumentException("File size exceeds 5MB limit.");
+
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!allowedExtensions.Contains(extension))
+            throw new ArgumentException("Invalid file type. Only JPEG and PNG are allowed.");
+
+        // 2. Storage Path
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "students");
+        if (!Directory.Exists(uploadsFolder))
+            Directory.CreateDirectory(uploadsFolder);
+
+        var uniqueFileName = $"{studentId}{extension}";
+        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        // 3. Cleanup Old Photo (if exists, though overwrite works for same ext, safety for different ext)
+        // Check DB for existing photo path if extension differs, or just delete matches
+        var student = await _studentRepository.GetByIdTrackingAsync(studentId);
+        if (student == null)
+            throw new KeyNotFoundException("Student not found.");
+
+        if (!string.IsNullOrEmpty(student.ProfileImage))
+        {
+            var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", student.ProfileImage.TrimStart('/'));
+            if (File.Exists(oldPath))
+            {
+                File.Delete(oldPath);
+            }
+        }
+
+        // 4. Save File
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        // 5. Update DB
+        var relativePath = $"/uploads/students/{uniqueFileName}";
+        student.ProfileImage = relativePath;
+        await _studentRepository.SaveChangesAsync(); // Using repo save which calls context.SaveChanges
+
+        return relativePath;
     }
 }

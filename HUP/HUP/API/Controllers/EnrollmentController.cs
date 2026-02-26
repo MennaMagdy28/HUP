@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using HUP.Application.Services.Interfaces;
 using HUP.Application.DTOs.AcademicDtos.Enrollment;
 using Microsoft.AspNetCore.Authorization;
+using HUP.Core.Constants;
 
 namespace HUP.API.Controllers
 {
@@ -23,6 +24,7 @@ namespace HUP.API.Controllers
 
         // GET: api/Enrollment/{id}
         [HttpGet("{id}")]
+        [Authorize(Policy = AppPermissions.VIEW_ENROLLMENT)]
         public async Task<ActionResult<EnrollmentResponseDto>> GetById(Guid id,
             [FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
@@ -39,10 +41,9 @@ namespace HUP.API.Controllers
 
         // POST: api/Enrollment
         [HttpPost]
+        [Authorize(Policy = AppPermissions.CREATE_ENROLLMENT)]
         public async Task<IActionResult> Create([FromBody] CreateEnrollmentDto createDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
             createDto.StudentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var exist = await _service.Exists(createDto);
             if (exist)
@@ -53,16 +54,16 @@ namespace HUP.API.Controllers
 
         // Patch: api/Enrollment/{id}
         [HttpPatch("{id}/status")]
+        [Authorize(Policy = AppPermissions.UPDATE_ENROLLMENT)]
         public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateEnrollmentDto updateDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
             await _service.Update(id, updateDto);
             return NoContent();
         }
         
         // DELETE: api/Enrollment/{id}
         [HttpDelete("{id}")]
+        [Authorize(Policy = AppPermissions.DELETE_ENROLLMENT)]
         public async Task<IActionResult> SoftDelete(Guid id)
         {
             await _service.SoftDelete(id);
@@ -71,6 +72,7 @@ namespace HUP.API.Controllers
 
         // DELETE: api/Enrollment/{id}/hard
         [HttpDelete("{id}/hard")]
+        [Authorize(Policy = AppPermissions.DELETE_ENROLLMENT)]
         public async Task<IActionResult> HardDelete(Guid id)
         {
             await _service.Remove(id);
@@ -78,8 +80,8 @@ namespace HUP.API.Controllers
         }
 
         // Get: api/Enrollment/AllGrades/{studentId}
-        [Authorize]
         [HttpGet("AllGrades")]
+        [Authorize(Policy = AppPermissions.VIEW_GRADES)]
         public async Task<IActionResult> GetStudentGrades([FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -88,8 +90,8 @@ namespace HUP.API.Controllers
         }
 
         // GET: api/Enrollment/Student
-        [Authorize]
         [HttpGet("Student")]
+        [Authorize(Policy = AppPermissions.VIEW_ENROLLMENT)]
         public async Task<ActionResult<IEnumerable<EnrollmentResponseDto>>> GetRegisteredByStudentAsync([FromQuery] EnrollmentFilterDto filter, [FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
