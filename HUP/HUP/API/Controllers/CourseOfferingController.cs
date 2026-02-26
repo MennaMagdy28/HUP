@@ -3,6 +3,7 @@ using HUP.Application.DTOs.AcademicDtos.CourseOffering;
 using Microsoft.AspNetCore.Mvc;
 using HUP.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using HUP.Core.Constants;
 
 namespace HUP.API.Controllers
 {
@@ -22,6 +23,7 @@ namespace HUP.API.Controllers
 
        // GET: api/CourseOffering
        [HttpGet]
+       [Authorize(Policy = AppPermissions.VIEW_COURSE_OFFERING)]
        public async Task<ActionResult<IEnumerable<CourseOfferingDto>>> GetAll([FromHeader(Name = "Accept-Language")] string lang = "ar")
        {
            var courseOfferings = await _service.GetAllAsync(lang);
@@ -30,6 +32,7 @@ namespace HUP.API.Controllers
 
        // GET: api/CourseOffering/{id}
        [HttpGet("{id}")]
+       [Authorize(Policy = AppPermissions.VIEW_COURSE_OFFERING)]
        public async Task<ActionResult<CourseOfferingDto>> GetById(Guid id, [FromHeader(Name = "Accept-Language")] string lang = "ar")
        {
            var courseOffering = await _service.GetByIdAsync(id, lang);
@@ -42,6 +45,7 @@ namespace HUP.API.Controllers
 
        // GET: api/CourseOffering/active/{departmentId}/{semesterId}
        [HttpGet("active/{departmentId}/{semesterId}")]
+       [Authorize(Policy = AppPermissions.VIEW_COURSE_OFFERING)]
        public async Task<ActionResult<IEnumerable<CourseOfferingDto>>> GetActiveCourseOfferings(Guid departmentId, Guid semesterId
            , [FromHeader(Name = "Accept-Language")] string lang = "ar" )
        {
@@ -52,7 +56,7 @@ namespace HUP.API.Controllers
 
        // GET: api/CourseOffering/available/{studentId}
        [HttpGet("available/")]
-       [Authorize]
+       [Authorize(Policy = AppPermissions.VIEW_COURSE_OFFERING)]
        public async Task<ActionResult<IEnumerable<CourseOfferingDto>>> GetAvailableToRegister([FromHeader(Name = "Accept-Language")] string lang = "ar")
        {
            var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -62,6 +66,7 @@ namespace HUP.API.Controllers
 
        // POST: api/CourseOffering
        [HttpPost]
+       [Authorize(Policy = AppPermissions.CREATE_COURSE_OFFERING)]
        public async Task<ActionResult<CourseOfferingDto>> Create([FromBody] CreateCourseOfferingDto createDto)
        {
            var exist = await _service.Exists(createDto);
@@ -73,6 +78,7 @@ namespace HUP.API.Controllers
 
        // PUT: api/CourseOffering/{id}
        [HttpPut("{id}")]
+       [Authorize(Policy = AppPermissions.UPDATE_COURSE_OFFERING)]
        public async Task<IActionResult> Update(Guid id, [FromBody] CreateCourseOfferingDto updateDto)
        {
            // await _service.Update(id, updateDto);
@@ -81,6 +87,7 @@ namespace HUP.API.Controllers
 
        // DELETE: api/CourseOffering/{id}
        [HttpDelete("{id}")]
+       [Authorize(Policy = AppPermissions.DELETE_COURSE_OFFERING)]
        public async Task<IActionResult> Delete(Guid id)
        {
            await _service.SoftDelete(id);
@@ -89,6 +96,7 @@ namespace HUP.API.Controllers
 
        // DELETE: api/CourseOffering/{id}/hard
        [HttpDelete("{id}/hard")]
+       [Authorize(Policy = AppPermissions.DELETE_COURSE_OFFERING)]
        public async Task<IActionResult> HardDelete(Guid id)
        {
            await _service.Remove(id);
@@ -96,4 +104,3 @@ namespace HUP.API.Controllers
        }
    }
 }
-

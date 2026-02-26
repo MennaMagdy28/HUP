@@ -39,6 +39,8 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddApplicationServices();
 
+builder.Services.AddScoped<IAuthorizationHandler, HUP.API.Permissions.PermissionAuthorizationHandler>();
+
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -61,6 +63,15 @@ builder.Services.AddAuthentication(options =>
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
     });
+
+builder.Services.AddAuthorization(options =>
+{
+    foreach (var permission in HUP.Core.Constants.AppPermissions.GetAll())
+    {
+        options.AddPolicy(permission, policy =>
+            policy.Requirements.Add(new HUP.API.Permissions.PermissionRequirement(permission)));
+    }
+});
 
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
 builder.Services.AddControllers(options =>

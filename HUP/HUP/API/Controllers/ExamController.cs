@@ -5,6 +5,7 @@ using HUP.Core.Entities.Academics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using HUP.Core.Constants;
 
 namespace HUP.API.Controllers;
 [ApiController]
@@ -19,7 +20,7 @@ public class ExamController : ControllerBase
     }
 
     [HttpGet("student")]
-    [Authorize]
+    [Authorize(Policy = AppPermissions.VIEW_EXAM_SCHEDULE)]
     public async Task<ActionResult<IEnumerable<Exam>>> GetStudentExamSchedule()
     {
         var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);

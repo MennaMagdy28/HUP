@@ -3,6 +3,7 @@ using HUP.Application.DTOs.FinancialDtos;
 using HUP.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using HUP.Core.Constants;
 
 namespace HUP.API.Controllers
 {
@@ -18,7 +19,7 @@ namespace HUP.API.Controllers
         }
 
         [HttpGet("fees")]
-        [Authorize]
+        [Authorize(Policy = AppPermissions.VIEW_FEES)]
         public async Task<ActionResult<FinancialSummaryDto>> GetMyFees([FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);

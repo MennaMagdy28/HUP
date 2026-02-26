@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using HUP.Core.Constants;
 
 namespace HUP.API.Controllers
 {
@@ -24,6 +25,7 @@ namespace HUP.API.Controllers
         //ADD UPDATE PROFILE, REGISTER STUDENT, SOFT DELETE
         
         [HttpPost]
+        [Authorize(Policy = Permissions.CREATE_STUDENT)]
         public async Task<IActionResult> Create([FromBody] CreateStudentDto createDto)
         {
             await _studentService.AddStudent(createDto);
@@ -31,7 +33,7 @@ namespace HUP.API.Controllers
         }
 
         [HttpGet("Profile")]
-        [Authorize]
+        [Authorize(Policy = Permissions.VIEW_PROFILE)]
         public async Task<ActionResult<StudentProfileDto>> GetProfile([FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var id = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -42,7 +44,7 @@ namespace HUP.API.Controllers
         }
 
         [HttpPatch("Status")]
-        [Authorize]
+        [Authorize(Policy = Permissions.UPDATE_STUDENT_STATUS)]
         public async Task<IActionResult> UpdateAcademicStatus([FromBody] StudentStatusDto statusDto)
         {
             bool result = await _studentService.UpdateStudentStatus(statusDto);
@@ -51,7 +53,7 @@ namespace HUP.API.Controllers
         }
 
         [HttpPost("photo")]
-        [Authorize]
+        [Authorize(Policy = Permissions.UPDATE_PROFILE)]
         public async Task<IActionResult> UploadPhoto(IFormFile file)
         {
             var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
