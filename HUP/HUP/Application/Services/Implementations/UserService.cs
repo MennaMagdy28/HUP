@@ -148,4 +148,13 @@ public class UserService : IUserService
         await _repository.SaveChangesAsync();
         return true;
     }
+
+    public async Task<Guid> GetUserRoleIdAsync(Guid userId)
+    {
+        // Use generic GetByIdReadOnly (now GetByIdReadOnly in generic base)
+        // Or GetByIdWithDetailsAsync if strictly enforcing
+        // Using GetByIdReadOnly from Generic Base (non-virtual)
+        var user = await _repository.GetByIdReadOnly(userId);
+        return user?.RoleId ?? Guid.Empty;
+    }
 }

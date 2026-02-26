@@ -1,4 +1,4 @@
-﻿using HUP.Application.DTOs.IdentityDtos;
+using HUP.Application.DTOs.IdentityDtos;
 using HUP.Application.DTOs.IdentityDtos.UserDtos;
 using HUP.Core.Entities.Identity;
 
@@ -21,4 +21,5 @@ public interface IUserService
     public Task Remove(Guid userId);
     public Task<string> SoftDelete(Guid userId);
     public Task<bool> Update(Guid userId, UpdateInfoDto dto);
+    public Task<Guid> GetUserRoleIdAsync(Guid userId);
 }

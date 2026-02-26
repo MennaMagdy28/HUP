@@ -1,7 +1,6 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using HUP.Application.Services.Interfaces;
 using HUP.Core.Interfaces;
-using HUP.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 
 namespace HUP.API.Permissions;
@@ -9,13 +8,13 @@ namespace HUP.API.Permissions;
 public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
 {
     private readonly ICacheService _cache;
-    private readonly IUserRepository _repository;
+    private readonly IUserService _userService;
     private readonly IPermissionService _permissionService;
 
-    public PermissionAuthorizationHandler(ICacheService cacheService, IUserRepository userRepository,  IPermissionService permissionService)
+    public PermissionAuthorizationHandler(ICacheService cacheService, IUserService userService,  IPermissionService permissionService)
     {
         _cache = cacheService;
-        _repository = userRepository;
+        _userService = userService;
         _permissionService = permissionService;
     }
 
@@ -44,8 +43,8 @@ public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionReq
         // set the value in cache
         if (role == null)
         {
-            var user = await _repository.GetByIdReadOnly(Guid.Parse(userId));
-            role = user.RoleId.ToString();
+            var roleId = await _userService.GetUserRoleIdAsync(Guid.Parse(userId));
+            role = roleId.ToString();
             await _cache.SetAsync(roleKey, role, 2);
         }
         // if permissions value == null (expired)
