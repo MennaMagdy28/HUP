@@ -47,7 +47,7 @@ namespace HUP.Application.Mappers
             dto.AltEmail = contactInfo.AltEmail;
             return dto;
         }
-        public static partial UserPersonalInfo ToPersonalEntity(PersonalInfoDto personalInfo);
+        public static partial UserPersonalInfo ToPersonalEntity(CreatePersonalInfo personalInfo);
         public static partial UserContact ToContactEntity(ContactInfoDto contactInfo);
 
         public static User ToCreateEntity(CreateUserDto userDto)

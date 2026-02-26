@@ -49,22 +49,6 @@ namespace HUP.Repositories.Implementations
                 .ToListAsync();
             return students;
         }
-
-        // --- 
-        public async Task UpdateAsync(Student student)
-        {
-            _context.Students.Update(student);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateAcademicStatusAsync(Guid studentId, AcademicStatus status)
-        {
-            var student = await GetByIdReadOnly(studentId);
-            if (student != null)
-            {
-                student.AcademicStatus = status;
-                await UpdateAsync(student);
-            }
-        }
+        
     }
 }

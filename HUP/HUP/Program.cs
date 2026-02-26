@@ -19,6 +19,7 @@ using FluentValidation;
 using HUP.Application.Validators;
 using HUP.API.Filters;
 using HUP.API.Middleware;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 

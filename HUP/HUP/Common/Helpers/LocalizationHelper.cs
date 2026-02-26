@@ -10,6 +10,7 @@ public static class LocalizationHelper
 
     public static T Get<T>(string json, string lang)
     {
+        lang = lang.ToLower();
         var dict = JsonSerializer.Deserialize<Dictionary<string, T>>(json);
 
         if (dict.TryGetValue(lang, out var value))
@@ -19,6 +20,7 @@ public static class LocalizationHelper
     }
     public static string Get(Enum value, string lang)
     {
+        lang = lang.ToLower();
         var field = value.GetType().GetField(value.ToString());
         var attr = field?.GetCustomAttribute<LocalizedAttribute>();
 

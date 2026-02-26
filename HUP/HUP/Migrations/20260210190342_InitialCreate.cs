@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HUP.Migrations
 {
     /// <inheritdoc />
-    public partial class DBFixIntitalCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -147,6 +147,8 @@ namespace HUP.Migrations
                     DayOfWeek = table.Column<int>(type: "int", nullable: false),
                     StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
                     EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Hall = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InstructorName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
@@ -160,36 +162,6 @@ namespace HUP.Migrations
                         principalTable: "CourseOfferings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CourseSchedules",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CourseID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InstructorID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DayOfWeek = table.Column<int>(type: "int", nullable: false),
-                    StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Room = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Semester = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CourseOfferingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CourseSchedules", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CourseSchedules_CourseOfferings_CourseOfferingId",
-                        column: x => x.CourseOfferingId,
-                        principalTable: "CourseOfferings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -363,14 +335,13 @@ namespace HUP.Migrations
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PersonalInfo_FullEnglishName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PersonalInfo_Gender = table.Column<int>(type: "int", nullable: false),
                     PersonalInfo_BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PersonalInfo_Religion = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PersonalInfo_Nationality = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PersonalInfo_BirthPlace = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PersonalInfo_Religion = table.Column<int>(type: "int", nullable: false),
+                    PersonalInfo_Nationality = table.Column<int>(type: "int", nullable: false),
+                    PersonalInfo_BirthPlace = table.Column<int>(type: "int", nullable: false),
                     ContactInfo_Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ContactInfo_City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ContactInfo_City = table.Column<int>(type: "int", nullable: true),
                     ContactInfo_PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ContactInfo_AltEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -443,16 +414,6 @@ namespace HUP.Migrations
                 name: "IX_Courses_PrerequisiteId",
                 table: "Courses",
                 column: "PrerequisiteId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CourseSchedules_CourseOfferingId",
-                table: "CourseSchedules",
-                column: "CourseOfferingId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CourseSchedules_InstructorID",
-                table: "CourseSchedules",
-                column: "InstructorID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Departments_FacultyId",
@@ -558,14 +519,6 @@ namespace HUP.Migrations
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_CourseSchedules_Instructors_InstructorID",
-                table: "CourseSchedules",
-                column: "InstructorID",
-                principalTable: "Instructors",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
                 name: "FK_Departments_Faculties_FacultyId",
                 table: "Departments",
                 column: "FacultyId",
@@ -634,9 +587,6 @@ namespace HUP.Migrations
 
             migrationBuilder.DropTable(
                 name: "CourseOfferingInstructors");
-
-            migrationBuilder.DropTable(
-                name: "CourseSchedules");
 
             migrationBuilder.DropTable(
                 name: "Enrollments");
