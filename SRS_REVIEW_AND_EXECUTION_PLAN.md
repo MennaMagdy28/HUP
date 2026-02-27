@@ -19,6 +19,7 @@ This document provides a critical review of the Software Requirements Specificat
 | :--- | :--- | :--- | :--- |
 | **Identity** | Role-based Access, SSO, 2FA | **Partially Implemented**. JWT & Roles exist. | **High Risk:** IDOR vulnerabilities exist. No SSO/2FA. |
 | **Academic** | Class Schedules, Grades, Add/Drop | **Implemented**. Core logic exists in `EnrollmentService`. | **Medium Risk:** "Fat Service" (Enrollment) needs refactoring. |
+| **Admin & Staff** | Manage Users, Content, Requests | **Partial**. `UserController` exists but is generic. | **Medium Gap:** No dedicated endpoints for creating/managing `Instructors` or assigning roles beyond generic User creation. |
 | **Financial** | Fee View, Online Payments, Financial Aid | **Partial**. Entities exist (`StudentFee`). | **High Gap:** No fee generation logic (auto-calculation based on credits). No Payment Gateway. |
 | **Integration** | LMS, SIS, HR, Library, Chatbot | **Missing**. | **Future Scope:** strictly "To Be Implemented". |
 | **Support** | Complaints, Forms, Events | **Missing**. | **Future Scope:** No endpoints or entities found. |
@@ -42,8 +43,10 @@ This document provides a critical review of the Software Requirements Specificat
 
 ### Phase 2: Feature Completion - Financials & Academics (Weeks 3-4)
 *Goal: Complete the core "Business" logic.*
-1.  **Financial Engine:** Implement `FeeGenerationService` to calculate tuition based on Credit Hours * Cost Per Credit.
-2.  **Payment Stub:** Create a `PaymentService` to handle mock transactions (preparing for future Gateway integration).
+1.  **Staff & Admin Management:**
+    *   Implement dedicated `InstructorController` and service logic to manage faculty members (linking `User` to `Instructor`).
+    *   Enhance `UserController` to handle Role Assignment securely.
+2.  **Financial Engine:** Implement `FeeGenerationService` to calculate tuition based on Credit Hours * Cost Per Credit.
 3.  **Academic Enhancements:** Finalize `ExamService` to return actual schedules linked to enrollments.
 
 ### Phase 3: Integration & Documentation (Week 5)

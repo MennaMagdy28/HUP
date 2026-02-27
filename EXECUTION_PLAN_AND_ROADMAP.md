@@ -27,19 +27,20 @@ The execution plan is divided into three phases: **Stabilization**, **Feature Co
 **Goal:** Implement missing core business logic to meet the functional requirements for Academic and Financial services.
 
 **Tasks:**
-1.  **Financial Module:**
+1.  **Admin & Staff Management:**
+    *   Create `InstructorController` to handle the lifecycle of academic staff (CRUD).
+    *   Implement Role Management logic to securely assign "Instructor" or "Staff" roles to users.
+    *   *Deliverable:* Endpoints for managing university staff and their permissions.
+
+2.  **Financial Module:**
     *   Implement `FeeGenerationService` to calculate tuition fees based on credit hours and cost per credit.
     *   Create a `PaymentService` stub to handle mock transactions and update `StudentFee` status.
     *   *Deliverable:* Functional fee generation and payment tracking.
 
-2.  **Academic Enhancements:**
+3.  **Academic Enhancements:**
     *   Enhance `ExamService` to return exam schedules linked to specific student enrollments.
     *   Implement "Waitlist" functionality for full course offerings (optional but high value).
     *   *Deliverable:* Comprehensive academic schedule and exam views.
-
-3.  **Data Validation:**
-    *   Implement `FluentValidation` for all DTOs to ensure consistent input validation across the API.
-    *   *Deliverable:* Robust API that rejects invalid data with clear error messages.
 
 ### Phase 3: Integration & Advanced Features (Week 5)
 **Goal:** Prepare the system for deployment and integration with external systems, and finalize documentation.
