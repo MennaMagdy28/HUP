@@ -4,7 +4,7 @@ using HUP.Common.Helpers;
 using Riok.Mapperly.Abstractions;
 using HUP.Core.Entities.Academics;
 
-namespace HUP.Application.Mappers
+namespace HUP.Application.Mappers.Academic
 {
     [Mapper(AllowNullPropertyAssignment = false)]
     public static partial class ScheduleMapper
@@ -29,7 +29,7 @@ namespace HUP.Application.Mappers
             slot.Group = entity.Group;
             if (entity.Instructor != null)
             {
-                slot.InstructorName = LocalizationHelper.Get<string>(entity.Instructor.User?.FullName, lang) ?? "Unknown";
+                slot.InstructorName = LocalizationHelper.Get<string>(entity.Instructor.User?.FullName, lang) ?? "Unknow";
             }
             slot.Hall = LocalizationHelper.Get<string>(entity.Hall, lang);
             return slot;

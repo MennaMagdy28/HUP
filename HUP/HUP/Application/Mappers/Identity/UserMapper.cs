@@ -5,7 +5,7 @@ using HUP.Core.Entities.Identity;
 using HUP.Core.Models;
 using Riok.Mapperly.Abstractions;
 
-namespace HUP.Application.Mappers
+namespace HUP.Application.Mappers.Identity
 {
     [Mapper(AllowNullPropertyAssignment = false)]
     public static partial class UserMapper

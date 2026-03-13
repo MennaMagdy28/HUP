@@ -1,4 +1,4 @@
-using HUP.Application.Mappers;
+using HUP.Application.Mappers.Academic;
 using HUP.Core.Entities.Academics;
 using HUP.Repositories.Interfaces;
 using HUP.Application.Services.Interfaces;

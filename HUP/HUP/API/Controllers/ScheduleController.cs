@@ -25,6 +25,25 @@ public class ScheduleController : ControllerBase
         await _scheduleService.Create(createDto);
         return Ok("Created Successfully");
     }
+    
+    [HttpGet]
+    [Authorize(Policy = AppPermissions.VIEW_COURSE_OFFERING)]
+    public async Task<ActionResult<IEnumerable<ScheduleSlotDto>>> GetRegisteredSchedule([FromHeader(Name = "Accept-Language")] string lang = "ar")
+    {
+        var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        var courseOfferings = await _scheduleService.GetSlotsByStudentEnrollments(studentId, lang);
+        return Ok(courseOfferings);
+    }
+    
+    [HttpGet("Register/")]
+    [Authorize(Policy = AppPermissions.VIEW_COURSE_OFFERING)]
+    public async Task<ActionResult<IEnumerable<ScheduleSlotDto>>> GetAvailableToRegister([FromHeader(Name = "Accept-Language")] string lang = "ar")
+    {
+        var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        var courseOfferings = await _scheduleService.GetAvailableScheduleForEnrollment(studentId, lang);
+        return Ok(courseOfferings);
+    }
+
 
     [HttpDelete("{id}")]
     [Authorize(Policy = AppPermissions.DELETE_SCHEDULE)]

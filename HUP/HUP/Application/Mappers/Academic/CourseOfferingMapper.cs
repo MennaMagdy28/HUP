@@ -3,7 +3,7 @@ using HUP.Common.Helpers;
 using Riok.Mapperly.Abstractions;
 using HUP.Core.Entities.Academics;
 
-namespace HUP.Application.Mappers
+namespace HUP.Application.Mappers.Academic
 {
     [Mapper(AllowNullPropertyAssignment = false)]
     public static partial class CourseOfferingMapper

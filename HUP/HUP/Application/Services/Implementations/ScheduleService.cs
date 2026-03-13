@@ -1,5 +1,5 @@
 using HUP.Application.DTOs.AcademicDtos.Schedule;
-using HUP.Application.Mappers;
+using HUP.Application.Mappers.Academic;
 using HUP.Application.Services.Interfaces;
 using HUP.Core.Entities.Academics;
 using HUP.Repositories.Interfaces;
@@ -8,11 +8,13 @@ namespace HUP.Application.Services.Implementations;
 
 public class ScheduleService : IScheduleService
 {
-    private readonly IScheduleRepository _repository;
+    private readonly IScheduleRepository _schedulerepository;
+    private readonly ICourseOfferingRepository _courseOfferingRepository;
 
-    public ScheduleService(IScheduleRepository scheduleRepository)
+    public ScheduleService(IScheduleRepository scheduleRepository,  ICourseOfferingRepository courseOfferingRepository)
     {
-        _repository = scheduleRepository;
+        _schedulerepository = scheduleRepository;
+        _courseOfferingRepository = courseOfferingRepository;
     }
     public async Task Create(ScheduleSlotCreateDto createDto)
     {
@@ -20,19 +22,27 @@ public class ScheduleService : IScheduleService
         slot.Id = Guid.NewGuid();
         slot.CreatedAt = DateTime.Now;
         slot.AvailableSeats = createDto.TotalSeats; // Initialize available seats
-        await _repository.AddAsync(slot);
+        await _schedulerepository.AddAsync(slot);
     }
 
     public async Task<IEnumerable<ScheduleSlotDto>> GetSlotsByStudentEnrollments(Guid studentId, string lang)
     {
-        var slots = await _repository.GetByStudentEnrollmentsAsync(studentId);
+        var slots = await _schedulerepository.GetByStudentEnrollmentsAsync(studentId);
         return slots.Select(s => ScheduleMapper.ToDto(s, lang));
     }
 
-    public async Task<IEnumerable<ScheduleSlotDto>> GetAvailableSlotsForEnrollment(string lang)
+    public async Task<IEnumerable<ScheduleSlotDto>> GetAvailableScheduleForEnrollment(Guid studentId, string lang)
     {
-        var slots = await _repository.GetAvailableSlotsAsync();
-        return slots.Select(s => ScheduleMapper.ToDto(s, lang));
+        var availableCourses = await _courseOfferingRepository.GetAvailableToRegisterAsync(studentId);
+        var slots = await _schedulerepository.GetAvailableSlotsAsync();
+        var courseOfferingIds = availableCourses
+            .Select(c => c.Id)
+            .ToHashSet();
+
+        var availableSchedule = slots
+            .Where(s => courseOfferingIds.Contains(s.CourseOfferingId));
+        
+        return availableSchedule.Select(s => ScheduleMapper.ToDto(s, lang));
     }
 
     public Task Update(ScheduleSlotCreateDto createDto)
@@ -46,8 +56,8 @@ public class ScheduleService : IScheduleService
         // But GenericRepository.RemoveAsync requires an ID and fetches it.
         // ScheduleService previously used GetByIdTracking.
         // If we use RemoveAsync from repository, it will do the job.
-        await _repository.RemoveAsync(id);
-        await _repository.SaveChangesAsync();
+        await _schedulerepository.RemoveAsync(id);
+        await _schedulerepository.SaveChangesAsync();
     }
 
     public async Task Remove(Guid id)
@@ -64,7 +74,7 @@ public class ScheduleService : IScheduleService
          // Wait, the generic implementation forces soft delete if BaseEntity.
          // If hard delete is needed, we need a new method on GenericRepo 'HardRemoveAsync'.
          // I will leave it as is for now as this is a cleanup task, not adding new Hard Delete features unless requested.
-         await _repository.RemoveAsync(id);
-         await _repository.SaveChangesAsync();
+         await _schedulerepository.RemoveAsync(id);
+         await _schedulerepository.SaveChangesAsync();
     }
 }

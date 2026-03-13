@@ -1,5 +1,5 @@
 using HUP.Application.DTOs.AcademicDtos;
-using HUP.Application.Mappers;
+using HUP.Application.Mappers.Academic;
 using HUP.Application.Services.Interfaces;
 using HUP.Repositories.Interfaces;
 
