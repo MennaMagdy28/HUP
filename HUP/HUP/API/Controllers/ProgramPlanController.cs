@@ -19,7 +19,7 @@ namespace HUP.Api.Controllers
         //TODO
         // ADD LOCALIZATION
         [HttpGet("student/")]
-        [Authorize(Policy = AppPermissions.VIEW_PROGRAM_PLAN)]
+        //[Authorize(Policy = AppPermissions.VIEW_PROGRAM_PLAN)]
         public async Task<IActionResult> GetProgramPlanByStudentId([FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);

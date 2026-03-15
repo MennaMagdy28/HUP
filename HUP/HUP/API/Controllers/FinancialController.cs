@@ -19,7 +19,7 @@ namespace HUP.API.Controllers
         }
 
         [HttpGet("fees")]
-        [Authorize(Policy = AppPermissions.VIEW_FEES)]
+        //[Authorize(Policy = AppPermissions.VIEW_FEES)]
         public async Task<ActionResult<FinancialSummaryDto>> GetMyFees([FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
