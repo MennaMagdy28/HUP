@@ -2,7 +2,9 @@
 {
     public enum AcademicStatus
     {
+        [Localized("Active", "نشط")]
         Active,
+        [Localized("Graduated", "خريج")]
         Graduated
     }
 

@@ -34,7 +34,7 @@ namespace HUP.API.Controllers
             return Ok(response);
         }
 
-        [Authorize(Policy = AppPermissions.UPDATE_PROFILE)]
+        //[Authorize(Policy = AppPermissions.UPDATE_PROFILE)]
         [HttpPost("change-password")]
         public async Task<IActionResult> UpdatePassword([FromBody] UpdatePassword dto)
         {

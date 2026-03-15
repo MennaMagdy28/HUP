@@ -13,7 +13,14 @@ namespace HUP.Application.Mappers
         // Map UserDto to User entity and vice versa
         public static partial User ToEntity(UserDto userDto);
         public static partial UserDto ToDto(User user);
-        public static partial UsersListResponse ToListDto(UserSummary user);
+        public static UsersListResponse ToListDto(UserSummary user, string lang){
+            var dto = new UsersListResponse();
+            dto.Id = user.Id;
+            dto.FullName = LocalizationHelper.Get<string>(user.FullName, lang);
+            dto.NationalId = user.NationalId;
+            dto.RoleName = LocalizationHelper.Get<string>(user.RoleName, lang);
+            return dto;
+        }
 
         public static ProfileInfoDto ToProfileDto(User user, string lang)
         {

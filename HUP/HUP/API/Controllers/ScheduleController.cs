@@ -19,7 +19,7 @@ public class ScheduleController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = AppPermissions.CREATE_SCHEDULE)]
+    //[Authorize(Policy = AppPermissions.CREATE_SCHEDULE)]
     public async Task<ActionResult<ScheduleSlotCreateDto>> AddSlot(ScheduleSlotCreateDto createDto)
     {
         await _scheduleService.Create(createDto);
@@ -27,14 +27,14 @@ public class ScheduleController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Policy = AppPermissions.DELETE_SCHEDULE)]
+    //[Authorize(Policy = AppPermissions.DELETE_SCHEDULE)]
     public async Task SoftDelete(Guid id)
     {
         await _scheduleService.SoftDelete(id);
     }
 
     [HttpDelete("{id}/hard")]
-    [Authorize(Policy = AppPermissions.DELETE_SCHEDULE)]
+    //[Authorize(Policy = AppPermissions.DELETE_SCHEDULE)]
     public async Task Remove(Guid id)
     {
         await _scheduleService.Remove(id);

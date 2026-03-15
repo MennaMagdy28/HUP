@@ -20,7 +20,7 @@ public class ExamController : ControllerBase
     }
 
     [HttpGet("student")]
-    [Authorize(Policy = AppPermissions.VIEW_EXAM_SCHEDULE)]
+    //[Authorize(Policy = AppPermissions.VIEW_EXAM_SCHEDULE)]
     public async Task<ActionResult<IEnumerable<Exam>>> GetStudentExamSchedule()
     {
         var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);

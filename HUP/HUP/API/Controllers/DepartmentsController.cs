@@ -17,7 +17,7 @@ namespace HUP.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = AppPermissions.VIEW_DEPARTMENTS)]
+        //[Authorize(Policy = AppPermissions.VIEW_DEPARTMENTS)]
         public async Task<IActionResult> GetAll([FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var result = await _service.GetAllAsync(lang);
@@ -25,7 +25,7 @@ namespace HUP.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Policy = AppPermissions.VIEW_DEPARTMENTS)]
+        //[Authorize(Policy = AppPermissions.VIEW_DEPARTMENTS)]
         public async Task<IActionResult> GetById(Guid id, [FromHeader(Name = "Accept-Language")] string lang = "ar")
         {
             var result = await _service.GetByIdAsync(id, lang);
