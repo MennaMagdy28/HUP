@@ -1,6 +1,6 @@
 using HUP.Application.DTOs.AcademicDtos;
 using HUP.Application.DTOs.AcademicDtos.Student;
-using HUP.Application.Mappers;
+using HUP.Application.Mappers.Identity;
 using HUP.Application.Services.Interfaces;
 using HUP.Common.Helpers;
 using HUP.Core.Entities.Identity;

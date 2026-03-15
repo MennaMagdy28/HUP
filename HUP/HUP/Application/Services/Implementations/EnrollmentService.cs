@@ -1,4 +1,4 @@
-using HUP.Application.Mappers;
+using HUP.Application.Mappers.Academic;
 using HUP.Application.Services.Interfaces;
 using HUP.Application.DTOs.AcademicDtos.Enrollment;
 using HUP.Core.Entities.Academics;

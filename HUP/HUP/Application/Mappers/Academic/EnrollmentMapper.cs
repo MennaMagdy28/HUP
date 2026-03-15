@@ -4,7 +4,7 @@ using Riok.Mapperly.Abstractions;
 using HUP.Application.DTOs.AcademicDtos.Enrollment;
 using HUP.Common.Helpers;
 
-namespace HUP.Application.Mappers
+namespace HUP.Application.Mappers.Academic
 {
     [Mapper(AllowNullPropertyAssignment = false)]
     public static partial class EnrollmentMapper

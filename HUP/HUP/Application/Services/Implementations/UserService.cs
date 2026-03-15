@@ -1,7 +1,7 @@
 using System.Reflection;
 using HUP.Application.DTOs.IdentityDtos;
 using HUP.Application.DTOs.IdentityDtos.UserDtos;
-using HUP.Application.Mappers;
+using HUP.Application.Mappers.Identity;
 using HUP.Application.Services.Interfaces;
 using HUP.Common.Helpers;
 using HUP.Core.Entities.Identity;

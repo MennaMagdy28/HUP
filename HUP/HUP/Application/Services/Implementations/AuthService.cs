@@ -5,7 +5,7 @@ using HUP.Application.Services.Interfaces;
 using HUP.Application.DTOs.AuthDtos;
 using HUP.Application.DTOs.IdentityDtos;
 using HUP.Repositories.Interfaces;
-using HUP.Application.Mappers;
+using HUP.Application.Mappers.Identity;
 using HUP.Core.Entities.Identity;
 using HUP.Core.Interfaces;
 using Microsoft.AspNetCore.Identity;
