@@ -9,6 +9,6 @@ namespace HUP.Application.Services.Interfaces
         Task SoftDelete(Guid id);
         Task Remove(Guid id);
         Task<IEnumerable<ScheduleSlotDto>> GetSlotsByStudentEnrollments(Guid studentId, string lang);
-        Task<IEnumerable<ScheduleSlotDto>> GetAvailableSlotsForEnrollment(string lang);
+        Task<IEnumerable<ScheduleSlotDto>> GetAvailableScheduleForEnrollment(Guid studentId, string lang);
     }
 }

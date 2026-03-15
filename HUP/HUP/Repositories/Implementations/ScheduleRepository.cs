@@ -44,7 +44,6 @@ namespace HUP.Repositories.Implementations
                 .Include(s => s.CourseOffering)
                     .ThenInclude(co => co.Course)
                 .Include(s => s.Instructor)
-                    .ThenInclude(i => i.User)
                 .AsNoTracking()
                 .ToListAsync();
         }

@@ -30,7 +30,8 @@ namespace HUP.Application.Services.Implementations
         public async Task<IEnumerable<CourseOfferingDto>> GetAllAsync(string lang)
         {
             var entities = await _repository.GetAllWithDetailsAsync();
-            return CourseOfferingMapper.ToDto(entities, lang);
+            var dtos = entities.Select(o => CourseOfferingMapper.ToDto(o, lang)).ToList();
+            return dtos;
         }
 
         public async Task<bool> Exists(CreateCourseOfferingDto dto)

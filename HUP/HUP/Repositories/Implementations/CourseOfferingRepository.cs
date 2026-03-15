@@ -77,7 +77,6 @@ namespace HUP.Repositories.Implementations
             var co = await _context.CourseOfferings
                 .Include(co => co.Course)
                 .Include(co => co.Semester)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(co => co.Id == id && !co.IsDeleted);
             return co;
         }
