@@ -13,7 +13,7 @@ public interface IUserService
     // This method gets the overall profile status including missing fields and password expiration
     public Task<ProfileStatus> GetProfileStatus(Guid userId, bool isPasswordExpired);
 
-    public Task<IEnumerable<UsersListResponse>> GetAllUsers();
+    public Task<IEnumerable<UsersListResponse>> GetAllUsers(string lang);
     public Task<ProfileInfoDto> GetUserById(Guid userId, string lang);
     public Task<bool> InsertMissingData(Guid userId, UpdateInfoDto dto);
     public Task AddAsync(CreateUserDto dto);

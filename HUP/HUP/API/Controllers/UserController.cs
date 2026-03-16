@@ -23,9 +23,9 @@ public class UserController : ControllerBase
     // (ADD PAGINATION + FILTERS)
     [HttpGet]
     //[Authorize(Policy = AppPermissions.VIEW_USERS)]
-    public async Task<ActionResult<IEnumerable<UsersListResponse>>> GetAll()
+    public async Task<ActionResult<IEnumerable<UsersListResponse>>> GetAll([FromHeader(Name = "Accept-Language")] string lang = "ar")
     {
-        var users = await _userService.GetAllUsers();
+        var users = await _userService.GetAllUsers(lang);
         return Ok(users);
     }
     //Get : api/User/{id}

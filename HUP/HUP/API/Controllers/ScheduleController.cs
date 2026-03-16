@@ -27,7 +27,7 @@ public class ScheduleController : ControllerBase
     }
     
     [HttpGet]
-    [Authorize(Policy = AppPermissions.VIEW_COURSE_OFFERING)]
+    //[Authorize(Policy = AppPermissions.VIEW_COURSE_OFFERING)]
     public async Task<ActionResult<IEnumerable<ScheduleSlotDto>>> GetRegisteredSchedule([FromHeader(Name = "Accept-Language")] string lang = "ar")
     {
         var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -36,7 +36,7 @@ public class ScheduleController : ControllerBase
     }
     
     [HttpGet("Register/")]
-    [Authorize(Policy = AppPermissions.VIEW_COURSE_OFFERING)]
+    //[Authorize(Policy = AppPermissions.VIEW_COURSE_OFFERING)]
     public async Task<ActionResult<IEnumerable<ScheduleSlotDto>>> GetAvailableToRegister([FromHeader(Name = "Accept-Language")] string lang = "ar")
     {
         var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
