@@ -74,13 +74,14 @@ namespace HUP.Application.Services.Implementations
             Guid semesterId, string lang)
         {
             var entities = await _repository.GetActiveCourseOfferingAsync(departmentId, semesterId);
-            return CourseOfferingMapper.ToDto(entities, lang);
+            var dtos = entities.Select(o => CourseOfferingMapper.ToDto(o, lang)).ToList();
+            return dtos;
         }
 
         public async Task<IEnumerable<CourseOfferingDto>> GetAvailableToRegisterAsync(Guid studentId, string lang)
         {
             var courses = await _repository.GetAvailableToRegisterAsync(studentId);
-            var dtos = CourseOfferingMapper.ToDto(courses, lang);
+            var dtos = courses.Select(o => CourseOfferingMapper.ToDto(o, lang)).ToList();
             return dtos;
         }
     }
