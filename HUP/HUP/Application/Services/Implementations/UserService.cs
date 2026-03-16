@@ -76,10 +76,10 @@ public class UserService : IUserService
         return status;
     }
 
-    public async Task<IEnumerable<UsersListResponse>> GetAllUsers()
+    public async Task<IEnumerable<UsersListResponse>> GetAllUsers(string lang)
     {
         var users = await _repository.GetUserList();
-        var usersList = users.Select(u => UserMapper.ToListDto(u));
+        var usersList = users.Select(u => UserMapper.ToListDto(u, lang));
         return usersList;
     }
 
