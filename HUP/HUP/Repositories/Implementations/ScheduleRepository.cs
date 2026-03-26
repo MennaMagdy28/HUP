@@ -17,7 +17,7 @@ namespace HUP.Repositories.Implementations
                 .Where(s => s.Id == id)
                 .Include(s => s.CourseOffering)
                     .ThenInclude(co => co.Course)
-                .Include(s => s.Instructor)
+                .Include(s => s.Staff)
                 .AsNoTracking().FirstOrDefaultAsync();
             return s;
         }
@@ -30,7 +30,7 @@ namespace HUP.Repositories.Implementations
                 .SelectMany(e => e.CourseOffering.Schedules)
                 .Include(s => s.CourseOffering)
                     .ThenInclude(co => co.Course)
-                .Include(s => s.Instructor)
+                .Include(s => s.Staff)
                     .ThenInclude(i => i.User)
                 .AsNoTracking()
                 .ToListAsync();
@@ -43,7 +43,7 @@ namespace HUP.Repositories.Implementations
                 .Where(s => s.CourseOffering.Semester.IsActive) // Filter by active semester
                 .Include(s => s.CourseOffering)
                     .ThenInclude(co => co.Course)
-                .Include(s => s.Instructor)
+                .Include(s => s.Staff)
                 .AsNoTracking()
                 .ToListAsync();
         }

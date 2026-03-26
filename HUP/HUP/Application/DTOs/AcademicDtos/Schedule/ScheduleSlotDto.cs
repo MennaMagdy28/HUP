@@ -7,7 +7,7 @@ public class ScheduleSlotDto
     public string DayOfWeek { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
-    public string InstructorName { get; set; }
+    public string StaffName { get; set; }
     public string Hall { get; set; }
     public string Group { get; set; }
 }
