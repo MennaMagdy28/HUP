@@ -69,10 +69,22 @@
     }
     
 
-    public enum AcademicTitle
+    public enum StaffTitle
     {
+        Instructor,
         Professor,
-        AssistantProfessor
+        AssistantProfessor,
+        TeachingAssistant,
+        AdminStaff,
+        HR
+    }
+
+    [Flags]
+    public enum StaffCategory
+    {
+        None = 0,
+        Academic = 1,
+        Administrative = 2
     }
     //TODO
     //search : تربية رياضية 

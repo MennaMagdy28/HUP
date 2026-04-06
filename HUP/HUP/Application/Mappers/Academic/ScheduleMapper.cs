@@ -27,9 +27,9 @@ namespace HUP.Application.Mappers.Academic
             slot.StartTime = entity.StartTime;
             slot.EndTime = entity.EndTime;
             slot.Group = entity.Group;
-            if (entity.Instructor != null)
+            if (entity.Staff != null)
             {
-                slot.InstructorName = LocalizationHelper.Get<string>(entity.Instructor.User?.FullName, lang) ?? "Unknow";
+                slot.StaffName = LocalizationHelper.Get<string>(entity.Staff.User?.FullName, lang) ?? "Unknown";
             }
             slot.Hall = LocalizationHelper.Get<string>(entity.Hall, lang);
             return slot;
