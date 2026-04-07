@@ -64,7 +64,7 @@ namespace HUP.Tests
             var faculty = new Faculty { Id = Guid.NewGuid(), Name = FacultyTitle.FacultyOfScience, DisplayName = "Engineering", DeanName = "Dean Smith", ContactInfo = "contact@eng.com", Dean = adminUser, DeanId = adminUser.Id, Departments = new List<Department>() };
             db.Faculties.Add(faculty);
 
-            var department = new Department { Id = Guid.NewGuid(), DepartmentName = "{\"en\": \"Computer Science\"}", DepartmentCode = "CS", FacultyId = faculty.Id, Faculty = faculty, CourseOfferings = new List<CourseOffering>(), Instructors = new List<Instructor>(), Programs = new List<ProgramPlan>() };
+            var department = new Department { Id = Guid.NewGuid(), DepartmentName = "{\"en\": \"Computer Science\"}", DepartmentCode = "CS", FacultyId = faculty.Id, Faculty = faculty, CourseOfferings = new List<CourseOffering>(), StaffMembers = new List<Staff>(), Programs = new List<ProgramPlan>() };
             db.Departments.Add(department);
 
             var program = new ProgramPlan { CourseId = Guid.NewGuid(), DepartmentId = department.Id, Department = department, Course = new Course{ CourseCode="1", CourseName="1", Enrollments=new List<Enrollment>(), CourseOfferings=new List<CourseOffering>(), Programs=new List<ProgramPlan>()} };
