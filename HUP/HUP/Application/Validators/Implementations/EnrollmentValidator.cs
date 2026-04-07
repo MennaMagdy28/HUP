@@ -28,75 +28,122 @@ namespace HUP.Application.Validators.Implementations
             _scheduleRepo = scheduleRepo;
         }
 
-        public async Task ValidateEnrollmentAsync(CreateEnrollmentDto dto)
+        public async Task ValidateEnrollmentAsync(List<CreateEnrollmentDto> dtos)
         {
-            // 1. GPA Window Check
-            if (!await CanStudentEnroll(dto.StudentId))
+            if (dtos == null || !dtos.Any())
+                throw new InvalidOperationException("No enrollments to validate.");
+
+            var studentId = dtos.First().StudentId;
+
+            // 1. Check if batch contains duplicates
+            var duplicateCourses = dtos.GroupBy(d => d.CourseOfferingId).Where(g => g.Count() > 1).ToList();
+            if (duplicateCourses.Any())
+            {
+                throw new InvalidOperationException("Batch contains duplicate course offerings.");
+            }
+
+            // 2. GPA Window Check
+            if (!await CanStudentEnroll(studentId))
             {
                 throw new InvalidOperationException("Enrollment is not yet open for your GPA tier.");
             }
 
-            // 2. Duplicate Check
-            var existingEnrollment = await _enrollmentRepo.GetExistingAsync(dto.StudentId, dto.CourseOfferingId);
-            if (existingEnrollment != null)
-            {
-                throw new InvalidOperationException("Student is already enrolled in this course.");
-            }
-
-            // Retrieve with Schedules
-            var courseOffering = await _offeringRepo.GetWithSchedulesAsync(dto.CourseOfferingId);
-            if (courseOffering == null)
-                throw new InvalidOperationException("Course offering not found.");
-
-            // 3. Prerequisite Check
-            if (courseOffering.Course != null && courseOffering.Course.PrerequisiteId != null)
-            {
-                var hasPassed = await _enrollmentRepo.HasPassedPrerequisiteAsync(dto.StudentId, courseOffering.Course.PrerequisiteId.Value);
-                if (!hasPassed)
-                {
-                    throw new InvalidOperationException($"Prerequisite not met for course {courseOffering.Course.CourseCode}.");
-                }
-            }
-
-            // 4. Capacity & Conflict Check
-            var student = await _studentRepo.GetByIdReadOnly(dto.StudentId);
+            var student = await _studentRepo.GetByIdReadOnly(studentId);
             var studentGroup = student.Group;
 
-            // Filter schedules by student group
-            var offeringSchedules = courseOffering.Schedules?.Where(s => s.Group == studentGroup).ToList();
+            // Prepare list of target schedules to check for conflicts within the batch
+            var batchSchedules = new List<Schedule>();
 
-            if (offeringSchedules != null && offeringSchedules.Any())
+            foreach (var dto in dtos)
             {
-                // Fetch existing enrollments for conflict check
-                var currentEnrollments = await _enrollmentRepo.GetByStudentAndSemesterAsync(dto.StudentId, courseOffering.Semester.SemesterName);
-
-                foreach (var slot in offeringSchedules)
+                // 3. Duplicate Check against DB
+                var existingEnrollment = await _enrollmentRepo.GetExistingAsync(studentId, dto.CourseOfferingId);
+                if (existingEnrollment != null)
                 {
-                    // Conflict Check
-                    foreach (var enrolled in currentEnrollments)
+                    throw new InvalidOperationException($"Student is already enrolled in course offering {dto.CourseOfferingId}.");
+                }
+
+                // Retrieve with Schedules
+                var courseOffering = await _offeringRepo.GetWithSchedulesAsync(dto.CourseOfferingId);
+                if (courseOffering == null)
+                    throw new InvalidOperationException($"Course offering {dto.CourseOfferingId} not found.");
+
+                // Check Schedule Exists
+                var targetSchedule = courseOffering.Schedules?.FirstOrDefault(s => s.Id == dto.ScheduleId);
+                if (targetSchedule == null)
+                    throw new InvalidOperationException($"Schedule {dto.ScheduleId} not found or does not belong to course offering {dto.CourseOfferingId}.");
+
+                // 4. Prerequisite Check
+                if (courseOffering.Course != null && courseOffering.Course.PrerequisiteId != null)
+                {
+                    var hasPassed = await _enrollmentRepo.HasPassedPrerequisiteAsync(studentId, courseOffering.Course.PrerequisiteId.Value);
+                    if (!hasPassed)
                     {
+                        throw new InvalidOperationException($"Prerequisite not met for course {courseOffering.Course.CourseCode}.");
+                    }
+                }
+
+                // 5. Capacity Check
+                if (targetSchedule.AvailableSeats <= 0)
+                {
+                    throw new InvalidOperationException($"Seat unavailable for schedule {targetSchedule.DayOfWeek} {targetSchedule.StartTime}.");
+                }
+
+                // Collect schedules for conflict check
+                batchSchedules.Add(targetSchedule);
+
+                // Check conflicts within the DB existing enrollments
+                var currentEnrollments = await _enrollmentRepo.GetByStudentAndSemesterAsync(studentId, courseOffering.Semester.SemesterName);
+
+                foreach (var enrolled in currentEnrollments)
+                {
+                    // For existing enrollments we check against their Schedule
+                    if (enrolled.Schedule != null)
+                    {
+                        var existingSlot = enrolled.Schedule;
+                        if (targetSchedule.DayOfWeek == existingSlot.DayOfWeek)
+                        {
+                            if (targetSchedule.StartTime < existingSlot.EndTime && targetSchedule.EndTime > existingSlot.StartTime)
+                            {
+                                throw new InvalidOperationException($"Time conflict with course {enrolled.CourseOffering.Course.CourseCode} on {targetSchedule.DayOfWeek}.");
+                            }
+                        }
+                    }
+                    else
+                    {
+                         // Fallback to older matching by group if ScheduleId is null (e.g. older data)
                          var enrolledSchedules = enrolled.CourseOffering.Schedules?.Where(s => s.Group == studentGroup);
                          if (enrolledSchedules != null)
                          {
                              foreach (var existingSlot in enrolledSchedules)
                              {
-                                 if (slot.DayOfWeek == existingSlot.DayOfWeek)
+                                 if (targetSchedule.DayOfWeek == existingSlot.DayOfWeek)
                                  {
-                                     if (slot.StartTime < existingSlot.EndTime && slot.EndTime > existingSlot.StartTime)
+                                     if (targetSchedule.StartTime < existingSlot.EndTime && targetSchedule.EndTime > existingSlot.StartTime)
                                      {
-                                         throw new InvalidOperationException($"Time conflict with course {enrolled.CourseOffering.Course.CourseCode} on {slot.DayOfWeek}.");
+                                         throw new InvalidOperationException($"Time conflict with course {enrolled.CourseOffering.Course.CourseCode} on {targetSchedule.DayOfWeek}.");
                                      }
                                  }
                              }
                          }
                     }
+                }
+            }
 
-                    // Capacity Check
-                    // Note: We only CHECK here. The Service performs the ATOMIC decrement.
-                    // However, to be safe, we check available seats > 0.
-                    if (slot.AvailableSeats <= 0)
+            // 6. Conflict Check within the batch itself
+            for (int i = 0; i < batchSchedules.Count; i++)
+            {
+                for (int j = i + 1; j < batchSchedules.Count; j++)
+                {
+                    var s1 = batchSchedules[i];
+                    var s2 = batchSchedules[j];
+
+                    if (s1.DayOfWeek == s2.DayOfWeek)
                     {
-                         throw new InvalidOperationException($"Seat unavailable for schedule {slot.DayOfWeek} {slot.StartTime}.");
+                        if (s1.StartTime < s2.EndTime && s1.EndTime > s2.StartTime)
+                        {
+                            throw new InvalidOperationException($"Time conflict between batch items on {s1.DayOfWeek}.");
+                        }
                     }
                 }
             }

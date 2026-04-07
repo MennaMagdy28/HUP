@@ -43,39 +43,33 @@ namespace HUP.Application.Services.Implementations
             _semesterRepo = semesterRepo;
         }
 
-        public async Task AddAsync(CreateEnrollmentDto dto)
+        public async Task AddAsync(List<CreateEnrollmentDto> dtos)
         {
             await _transactionService.ExecuteInTransactionAsync(async () =>
             {
-                // Validate Business Rules
-                await _validator.ValidateEnrollmentAsync(dto);
+                // Validate Business Rules for the whole batch
+                await _validator.ValidateEnrollmentAsync(dtos);
 
-                // Perform Atomic Seat Booking
-                var courseOffering = await _offeringRepo.GetWithSchedulesAsync(dto.CourseOfferingId);
-                var student = await _studentRepo.GetByIdWithDetailsAsync(dto.StudentId);
-                var studentGroup = student.Group;
-                var offeringSchedules = courseOffering.Schedules?.Where(s => s.Group == studentGroup).ToList();
-
-                if (offeringSchedules != null && offeringSchedules.Any())
+                foreach (var dto in dtos)
                 {
-                    foreach (var slot in offeringSchedules)
+                    // Perform Atomic Seat Booking
+                    var booked = await _scheduleRepo.TryBookSeatAsync(dto.ScheduleId);
+                    if (!booked)
                     {
-                        var booked = await _scheduleRepo.TryBookSeatAsync(slot.Id);
-                        if (!booked)
-                        {
-                             throw new InvalidOperationException($"Seat unavailable for schedule {slot.DayOfWeek} {slot.StartTime}.");
-                        }
+                        throw new InvalidOperationException($"Seat unavailable for schedule {dto.ScheduleId}.");
                     }
+
+                    // Create Enrollment Record
+                    var enrollment = EnrollmentMapper.ToEntityFromCreateDto(dto);
+                    enrollment.Id = Guid.NewGuid();
+                    enrollment.ScheduleId = dto.ScheduleId;
+                    enrollment.EnrollmentDate = DateTime.Now;
+                    enrollment.CreatedAt = DateTime.Now;
+                    enrollment.Status = EnrollmentStatus.Registered;
+
+                    await _repository.AddAsync(enrollment);
                 }
 
-                // Create Enrollment Record
-                var enrollment = EnrollmentMapper.ToEntityFromCreateDto(dto);
-                enrollment.Id = Guid.NewGuid();
-                enrollment.EnrollmentDate = DateTime.Now;
-                enrollment.CreatedAt = DateTime.Now;
-                enrollment.Status = EnrollmentStatus.Registered;
-
-                await _repository.AddAsync(enrollment);
                 await _repository.SaveChangesAsync();
             });
         }
