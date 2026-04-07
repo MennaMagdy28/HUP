@@ -164,6 +164,52 @@ namespace HUP.Data.Seeders
             };
             await _context.Semesters.AddAsync(currentSemester);
 
+            // Create Instructor Role
+            var instRoleId = Guid.NewGuid();
+            var instRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "Instructor");
+            if (instRole == null)
+            {
+                instRole = new Role { Id = instRoleId, Name = "Instructor", DisplayName = "Instructor", Description = "Instructor Role" };
+                await _context.Roles.AddAsync(instRole);
+            }
+            else
+            {
+                instRoleId = instRole.Id;
+            }
+
+            // Create Instructor User
+            var instructorUser = new User
+            {
+                Id = Guid.NewGuid(),
+                FullName = faker.Name.FullName(),
+                Email = faker.Internet.Email(provider: "fakecs.hup.edu.eg"),
+                NationalId = faker.Random.Replace("#############"),
+                PasswordExpiryDate = now.AddYears(1),
+                IsActive = true,
+                RoleId = instRoleId,
+                PersonalInfo = new UserPersonalInfo
+                {
+                    BirthDate = faker.Date.Past(40, now.AddYears(-30)),
+                    Gender = faker.PickRandom<HUP.Core.Enums.AcademicEnums.Gender>()
+                },
+                ContactInfo = new UserContact
+                {
+                    PhoneNumber = faker.Phone.PhoneNumber("010########"),
+                    Address = faker.Address.FullAddress()
+                }
+            };
+            instructorUser.PasswordHash = _passwordHasher.HashPassword(instructorUser, "Instructor@123");
+            await _context.Users.AddAsync(instructorUser);
+
+            var instructor = new Instructor
+            {
+                Id = Guid.NewGuid(),
+                UserId = instructorUser.Id,
+                DepartmentId = department.Id,
+                AcademicTitle = AcademicTitle.Professor
+            };
+            await _context.Instructors.AddAsync(instructor);
+
             // 5. Create Course Offerings
             var courseOfferings = new List<CourseOffering>();
 
@@ -187,6 +233,20 @@ namespace HUP.Data.Seeders
 
             // Offerings for current semester (12 courses available for 3rd year)
             // They belong to Year 3, which are index 24 to 35
+            var daySlots = new (HUP.Core.Enums.AcademicEnums.DayOfWeek Day, TimeSpan Start, TimeSpan End)[]
+            {
+                (HUP.Core.Enums.AcademicEnums.DayOfWeek.Sunday, new TimeSpan(8, 0, 0), new TimeSpan(10, 0, 0)),
+                (HUP.Core.Enums.AcademicEnums.DayOfWeek.Sunday, new TimeSpan(10, 0, 0), new TimeSpan(12, 0, 0)),
+                (HUP.Core.Enums.AcademicEnums.DayOfWeek.Monday, new TimeSpan(8, 0, 0), new TimeSpan(10, 0, 0)),
+                (HUP.Core.Enums.AcademicEnums.DayOfWeek.Monday, new TimeSpan(12, 0, 0), new TimeSpan(14, 0, 0)),
+                (HUP.Core.Enums.AcademicEnums.DayOfWeek.Tuesday, new TimeSpan(10, 0, 0), new TimeSpan(12, 0, 0)),
+                (HUP.Core.Enums.AcademicEnums.DayOfWeek.Tuesday, new TimeSpan(14, 0, 0), new TimeSpan(16, 0, 0)),
+                (HUP.Core.Enums.AcademicEnums.DayOfWeek.Wednesday, new TimeSpan(8, 0, 0), new TimeSpan(10, 0, 0)),
+                (HUP.Core.Enums.AcademicEnums.DayOfWeek.Wednesday, new TimeSpan(12, 0, 0), new TimeSpan(14, 0, 0)),
+                (HUP.Core.Enums.AcademicEnums.DayOfWeek.Thursday, new TimeSpan(10, 0, 0), new TimeSpan(12, 0, 0)),
+                (HUP.Core.Enums.AcademicEnums.DayOfWeek.Thursday, new TimeSpan(14, 0, 0), new TimeSpan(16, 0, 0))
+            };
+
             for (int i = 24; i < 36; i++)
             {
                 var offering = new CourseOffering
@@ -197,6 +257,28 @@ namespace HUP.Data.Seeders
                     DepartmentId = department.Id
                 };
                 await _context.CourseOfferings.AddAsync(offering);
+
+                // Add 2 schedule options per offering
+                for (int s = 0; s < 2; s++)
+                {
+                    // Randomize a bit to ensure overlaps, but give them Group A and Group B
+                    var slot = faker.PickRandom(daySlots);
+                    var schedule = new Schedule
+                    {
+                        Id = Guid.NewGuid(),
+                        CourseOfferingId = offering.Id,
+                        InstructorId = instructor.Id,
+                        InstructorName = instructorUser.FullName,
+                        Group = s == 0 ? "A" : "B",
+                        DayOfWeek = (System.DayOfWeek)(int)slot.Day,
+                        StartTime = slot.Start,
+                        EndTime = slot.End,
+                        Hall = faker.PickRandom(new[] { "Hall 1", "Hall 2", "Lab 3", "Lab 4", "Hall 5" }),
+                        TotalSeats = 50,
+                        AvailableSeats = 50
+                    };
+                    await _context.Schedules.AddAsync(schedule);
+                }
             }
 
             // 6. Create Student User Role if not exists
