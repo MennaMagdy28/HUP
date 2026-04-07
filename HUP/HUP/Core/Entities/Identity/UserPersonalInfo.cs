@@ -1,5 +1,5 @@
-using HUP.Core.Enums.IdentityEnums;
-using Gender = HUP.Core.Enums.AcademicEnums.Gender;
+using HUP.Core.Enums;
+using Gender = HUP.Core.Enums.Gender;
 
 namespace HUP.Core.Entities.Identity
 {

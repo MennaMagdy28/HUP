@@ -13,10 +13,10 @@ namespace HUP.Core.Entities.Academics
         public int CompulsoryHours { get; set; }
         public int ElectiveHours { get; set; }
 
-        public Instructor HeadOfDepartment;
+        public Staff HeadOfDepartment;
         public ICollection<CourseOffering> CourseOfferings { get; set; }
         public Faculty Faculty { get; set; }
-        public ICollection<Instructor> Instructors { get; set; }
+        public ICollection<Staff> StaffMembers { get; set; }
         public ICollection<ProgramPlan> Programs { get; set; }
     }
 }

@@ -1,5 +1,5 @@
-using HUP.Core.Enums.AcademicEnums;
 using HUP.Core.Entities.Shared;
+using HUP.Core.Enums;
 
 namespace HUP.Core.Entities.Academics
 {

@@ -1,4 +1,4 @@
-﻿namespace HUP.Core.Enums.AcademicEnums
+﻿namespace HUP.Core.Enums
 {
     public enum AcademicStatus
     {
@@ -7,14 +7,7 @@
         [Localized("Graduated", "خريج")]
         Graduated
     }
-
-    public enum Gender
-    {
-        [Localized("Male", "ذكر")]
-        Male,
-        [Localized("Female", "أنثى")]
-        Female
-    }
+    
     //TODO
     //Add localized attributes
 
@@ -69,10 +62,22 @@
     }
     
 
-    public enum AcademicTitle
+    public enum StaffTitle
     {
+        Instructor,
         Professor,
-        AssistantProfessor
+        AssistantProfessor,
+        TeachingAssistant,
+        AdminStaff,
+        HR
+    }
+
+    [Flags]
+    public enum StaffCategory
+    {
+        None = 0,
+        Academic = 1,
+        Administrative = 2
     }
     //TODO
     //search : تربية رياضية 

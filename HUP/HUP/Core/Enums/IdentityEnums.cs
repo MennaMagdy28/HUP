@@ -1,4 +1,4 @@
-﻿namespace HUP.Core.Enums.IdentityEnums
+﻿namespace HUP.Core.Enums
 {
     public enum Gender
     {

@@ -1,4 +1,4 @@
-using HUP.Core.Enums.AcademicEnums;
+using HUP.Core.Enums;
 
 public class EnrollmentFilterDto
 {

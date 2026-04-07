@@ -1,6 +1,4 @@
-﻿using HUP.Core.Enums.IdentityEnums;
-
-namespace HUP.Application.DTOs.IdentityDtos.UserDtos;
+﻿namespace HUP.Application.DTOs.IdentityDtos.UserDtos;
 
 public class PersonalInfoDto
 {

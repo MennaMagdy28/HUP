@@ -3,6 +3,7 @@ using HUP.Application.DTOs.AcademicDtos.Schedule;
 using HUP.Common.Helpers;
 using Riok.Mapperly.Abstractions;
 using HUP.Core.Entities.Academics;
+using HUP.Core.Models;
 
 namespace HUP.Application.Mappers.Academic
 {
@@ -15,23 +16,18 @@ namespace HUP.Application.Mappers.Academic
 
         private static TimeSpan MapDateTimeToTimeSpan(DateTime dateTime) => dateTime.TimeOfDay;
 
-        public static ScheduleSlotDto ToDto(Schedule entity, string lang)
+        public static ScheduleSlotDto ToDto(ScheduleSlot entity, string lang)
         {
             var slot = new ScheduleSlotDto();
-            if (entity.CourseOffering?.Course != null)
-            {
-                slot.CourseCode = LocalizationHelper.Get<string>(entity.CourseOffering.Course.CourseCode, lang);
-                slot.CourseName = LocalizationHelper.Get<string>(entity.CourseOffering.Course.CourseName, lang);
-            }
+            slot.CourseName = LocalizationHelper.Get<string>(entity.CourseName, lang);
+            slot.StaffName = LocalizationHelper.Get<string>(entity.StaffName, lang);
+            slot.CourseCode = LocalizationHelper.Get<string>(entity.CourseCode, lang);
             slot.DayOfWeek = LocalizationHelper.Get(entity.DayOfWeek, lang);
             slot.StartTime = entity.StartTime;
             slot.EndTime = entity.EndTime;
             slot.Group = entity.Group;
-            if (entity.Instructor != null)
-            {
-                slot.InstructorName = LocalizationHelper.Get<string>(entity.Instructor.User?.FullName, lang) ?? "Unknow";
-            }
             slot.Hall = LocalizationHelper.Get<string>(entity.Hall, lang);
+            slot.SlotId = entity.SlotId;
             return slot;
         }
     }

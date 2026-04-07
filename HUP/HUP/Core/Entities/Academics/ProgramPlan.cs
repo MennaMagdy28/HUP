@@ -1,5 +1,6 @@
-using HUP.Core.Enums.AcademicEnums;
 using System.ComponentModel.DataAnnotations.Schema;
+using HUP.Core.Enums;
+
 namespace HUP.Core.Entities.Academics
 {
     // Represents the program plan for a specific department, detailing required courses and their types

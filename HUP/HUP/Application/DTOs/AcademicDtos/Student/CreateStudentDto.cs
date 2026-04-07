@@ -1,5 +1,5 @@
 ﻿using HUP.Application.DTOs.IdentityDtos.UserDtos;
-using HUP.Core.Enums.AcademicEnums;
+using HUP.Core.Enums;
 
 namespace HUP.Application.DTOs.AcademicDtos.Student
 {
