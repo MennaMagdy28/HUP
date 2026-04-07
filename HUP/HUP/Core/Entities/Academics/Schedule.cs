@@ -17,6 +17,5 @@ namespace HUP.Core.Entities.Academics
 
         public CourseOffering CourseOffering { get; set; }
         public Instructor Instructor { get; set; }
-        public ICollection<Enrollment> Enrollments { get; set; }
     }
 }
