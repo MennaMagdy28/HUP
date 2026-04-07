@@ -1,7 +1,6 @@
 using HUP.Application.DTOs.AcademicDtos.Enrollment;
 using HUP.Application.Validators.Interfaces;
 using HUP.Core.Entities.Academics;
-using HUP.Core.Enums.AcademicEnums;
 using HUP.Repositories.Interfaces;
 
 namespace HUP.Application.Validators.Implementations

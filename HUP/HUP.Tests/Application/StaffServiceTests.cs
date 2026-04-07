@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using HUP.Core.Entities.Academics;
-using HUP.Core.Enums.AcademicEnums;
+using HUP.Core.Enums;
 
 namespace HUP.Tests.Application
 {

@@ -2,7 +2,6 @@ using HUP.Core.Enums;
 using HUP.Core.Entities.Identity;
 using HUP.Core.Entities.Shared;
 using System.ComponentModel.DataAnnotations.Schema;
-using HUP.Core.Enums.AcademicEnums;
 
 
 namespace HUP.Core.Entities.Academics

@@ -1,4 +1,5 @@
 using HUP.Core.Entities.Shared;
+using DayOfWeek = HUP.Core.Enums.DayOfWeek;
 
 namespace HUP.Core.Entities.Academics
 {
@@ -14,7 +15,7 @@ namespace HUP.Core.Entities.Academics
         public string StaffName { get; set; } // Can keep for snapshot or remove if now redundant
         public int TotalSeats { get; set; }
         public int AvailableSeats { get; set; }
-
+        public ICollection<Enrollment> Enrollments { get; set; }
         public CourseOffering CourseOffering { get; set; }
         public Staff Staff { get; set; }
     }

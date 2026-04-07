@@ -6,8 +6,8 @@ using HUP.Repositories.Interfaces;
 using System.Threading.Tasks;
 using HUP.Application.DTOs.AcademicDtos;
 using HUP.Common.Helpers;
-using HUP.Core.Enums.AcademicEnums;
 using HUP.Application.Validators.Interfaces;
+using HUP.Core.Enums;
 using HUP.Core.Interfaces;
 
 namespace HUP.Application.Services.Implementations

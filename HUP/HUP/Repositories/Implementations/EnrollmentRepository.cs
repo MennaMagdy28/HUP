@@ -1,9 +1,9 @@
 using HUP.Repositories.Interfaces;
 using HUP.Core.Entities.Academics;
+using HUP.Core.Enums;
 using HUP.Data;
 using Microsoft.EntityFrameworkCore;
 using HUP.Core.Models;
-using HUP.Core.Enums.AcademicEnums;
 
 namespace HUP.Repositories.Implementations
 {

@@ -1,14 +1,14 @@
 using HUP.Core.Entities.Academics;
 using HUP.Core.Entities.Identity;
 using HUP.Core.Entities.Permissions;
-using HUP.Core.Enums.AcademicEnums;
-using HUP.Core.Enums.IdentityEnums;
 using HUP.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HUP.Core.Enums;
+using Gender = HUP.Core.Enums.Gender;
 
 namespace HUP.Tests
 {
@@ -49,12 +49,12 @@ namespace HUP.Tests
             }
 
             adminUser.RoleId = superAdminRole.Id;
-            adminUser.PersonalInfo = new UserPersonalInfo { Gender = HUP.Core.Enums.AcademicEnums.Gender.Male, BirthDate = new DateTime(1980, 1, 1), Nationality = Nationality.Egyptian };
+            adminUser.PersonalInfo = new UserPersonalInfo { Gender = Gender.Male, BirthDate = new DateTime(1980, 1, 1), Nationality = Nationality.Egyptian };
             adminUser.ContactInfo = new UserContact { AltEmail = "admin@system.com", PhoneNumber = "123456789" };
             adminUser.UserRole = superAdminRole;
 
             studentUser.RoleId = studentRole.Id;
-            studentUser.PersonalInfo = new UserPersonalInfo { Gender = HUP.Core.Enums.AcademicEnums.Gender.Female, BirthDate = new DateTime(2000, 1, 1), Nationality = Nationality.Egyptian };
+            studentUser.PersonalInfo = new UserPersonalInfo { Gender = Gender.Female, BirthDate = new DateTime(2000, 1, 1), Nationality = Nationality.Egyptian };
             studentUser.ContactInfo = new UserContact { AltEmail = "student@system.com", PhoneNumber = "987654321" };
             studentUser.UserRole = studentRole;
 

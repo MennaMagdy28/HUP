@@ -194,7 +194,7 @@ namespace HUP.Data
             // Schedule ↔ Enrollment (One-to-Many)
             modelBuilder.Entity<Enrollment>()
                 .HasOne(e => e.Schedule)
-                .WithMany(s => s.Enrollments)
+                .WithMany()
                 .HasForeignKey(e => e.ScheduleId)
                 .OnDelete(DeleteBehavior.Restrict);
 

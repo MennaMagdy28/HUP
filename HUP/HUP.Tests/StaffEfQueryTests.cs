@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Xunit;
 using HUP.Core.Entities.Academics;
 using HUP.Core.Entities.Identity;
-using HUP.Core.Enums.AcademicEnums;
+using HUP.Core.Enums;
 using HUP.Data;
 
 namespace HUP.Tests

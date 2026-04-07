@@ -1,4 +1,4 @@
-﻿namespace HUP.Core.Enums.AcademicEnums
+﻿namespace HUP.Core.Enums
 {
     public enum AcademicStatus
     {
@@ -7,14 +7,7 @@
         [Localized("Graduated", "خريج")]
         Graduated
     }
-
-    public enum Gender
-    {
-        [Localized("Male", "ذكر")]
-        Male,
-        [Localized("Female", "أنثى")]
-        Female
-    }
+    
     //TODO
     //Add localized attributes
 
