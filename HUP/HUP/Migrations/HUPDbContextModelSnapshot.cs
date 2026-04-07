@@ -271,40 +271,6 @@ namespace HUP.Migrations
                     b.ToTable("Faculties");
                 });
 
-            modelBuilder.Entity("HUP.Core.Entities.Academics.Instructor", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("AcademicTitle")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Instructors");
-                });
-
             modelBuilder.Entity("HUP.Core.Entities.Academics.ProgramPlan", b =>
                 {
                     b.Property<Guid>("DepartmentId")
@@ -358,15 +324,15 @@ namespace HUP.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("InstructorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("InstructorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<Guid>("StaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("StaffName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time");
@@ -381,7 +347,7 @@ namespace HUP.Migrations
 
                     b.HasIndex("CourseOfferingId");
 
-                    b.HasIndex("InstructorId");
+                    b.HasIndex("StaffId");
 
                     b.ToTable("Schedules");
                 });
@@ -423,6 +389,32 @@ namespace HUP.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Semesters");
+                });
+
+            modelBuilder.Entity("HUP.Core.Entities.Academics.Staff", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("DepartmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("FacultyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Title")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("FacultyId");
+
+                    b.ToTable("Staff");
                 });
 
             modelBuilder.Entity("HUP.Core.Entities.Academics.Student", b =>
@@ -759,7 +751,7 @@ namespace HUP.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("HUP.Core.Entities.Academics.Instructor", "HeadOfDepartment")
+                    b.HasOne("HUP.Core.Entities.Academics.Staff", "HeadOfDepartment")
                         .WithOne("DepartmentHeaded")
                         .HasForeignKey("HUP.Core.Entities.Academics.Department", "HeadOfDepartmentId")
                         .OnDelete(DeleteBehavior.NoAction);
@@ -814,25 +806,6 @@ namespace HUP.Migrations
                     b.Navigation("Dean");
                 });
 
-            modelBuilder.Entity("HUP.Core.Entities.Academics.Instructor", b =>
-                {
-                    b.HasOne("HUP.Core.Entities.Academics.Department", "Department")
-                        .WithMany("Instructors")
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("HUP.Core.Entities.Identity.User", "User")
-                        .WithOne()
-                        .HasForeignKey("HUP.Core.Entities.Academics.Instructor", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Department");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("HUP.Core.Entities.Academics.ProgramPlan", b =>
                 {
                     b.HasOne("HUP.Core.Entities.Academics.Course", "Course")
@@ -860,15 +833,40 @@ namespace HUP.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("HUP.Core.Entities.Academics.Instructor", "Instructor")
+                    b.HasOne("HUP.Core.Entities.Academics.Staff", "Staff")
                         .WithMany("Schedules")
-                        .HasForeignKey("InstructorId")
+                        .HasForeignKey("StaffId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CourseOffering");
 
-                    b.Navigation("Instructor");
+                    b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("HUP.Core.Entities.Academics.Staff", b =>
+                {
+                    b.HasOne("HUP.Core.Entities.Academics.Department", "Department")
+                        .WithMany("StaffMembers")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("HUP.Core.Entities.Academics.Faculty", "Faculty")
+                        .WithMany()
+                        .HasForeignKey("FacultyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("HUP.Core.Entities.Identity.User", "User")
+                        .WithOne()
+                        .HasForeignKey("HUP.Core.Entities.Academics.Staff", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+
+                    b.Navigation("Faculty");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HUP.Core.Entities.Academics.Student", b =>
@@ -1052,9 +1050,9 @@ namespace HUP.Migrations
                 {
                     b.Navigation("CourseOfferings");
 
-                    b.Navigation("Instructors");
-
                     b.Navigation("Programs");
+
+                    b.Navigation("StaffMembers");
                 });
 
             modelBuilder.Entity("HUP.Core.Entities.Academics.Faculty", b =>
@@ -1062,7 +1060,7 @@ namespace HUP.Migrations
                     b.Navigation("Departments");
                 });
 
-            modelBuilder.Entity("HUP.Core.Entities.Academics.Instructor", b =>
+            modelBuilder.Entity("HUP.Core.Entities.Academics.Staff", b =>
                 {
                     b.Navigation("DepartmentHeaded")
                         .IsRequired();
