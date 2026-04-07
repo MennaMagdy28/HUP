@@ -14,10 +14,12 @@ namespace HUP.Data.Seeders
     public class DataSeeder
     {
         private readonly HupDbContext _context;
+        private readonly Microsoft.AspNetCore.Identity.IPasswordHasher<User> _passwordHasher;
 
-        public DataSeeder(HupDbContext context)
+        public DataSeeder(HupDbContext context, Microsoft.AspNetCore.Identity.IPasswordHasher<User> passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task SeedAsync()
@@ -217,7 +219,6 @@ namespace HUP.Data.Seeders
                 FullName = faker.Name.FullName(),
                 Email = faker.Internet.Email(provider: "fakecs.hup.edu.eg"),
                 NationalId = faker.Random.Replace("#############"), // 14 digits typical for Egypt
-                PasswordHash = "fakehash", // Just dummy hash since it's seeder
                 PasswordExpiryDate = now.AddYears(1),
                 IsActive = true,
                 RoleId = roleId,
@@ -232,6 +233,7 @@ namespace HUP.Data.Seeders
                     Address = faker.Address.FullAddress()
                 }
             };
+            studentUser.PasswordHash = _passwordHasher.HashPassword(studentUser, "Student@123");
             await _context.Users.AddAsync(studentUser);
 
             var student = new Student
