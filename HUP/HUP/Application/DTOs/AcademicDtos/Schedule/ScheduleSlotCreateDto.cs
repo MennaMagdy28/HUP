@@ -1,3 +1,4 @@
+using DayOfWeek = HUP.Core.Enums.DayOfWeek;
 namespace HUP.Application.DTOs.AcademicDtos.Schedule;
 
 public class ScheduleSlotCreateDto
