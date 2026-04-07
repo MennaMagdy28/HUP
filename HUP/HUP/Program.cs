@@ -27,17 +27,11 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
 
-if (!string.IsNullOrEmpty(connectionString))
-{
-    builder.Services.AddDbContext<HupDbContext>(options =>
-        options.UseSqlServer(connectionString)
-    );
-}
+builder.Services.AddDbContext<HupDbContext>(options =>
+    options.UseSqlServer(connectionString)
+);
 // redis connection
-if (!string.IsNullOrEmpty(redisConnectionString))
-{
-    builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
-}
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
 //cache service (singleton)
 builder.Services.AddSingleton<ICacheService, CacheService>();
 
@@ -154,5 +148,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-public partial class Program { }

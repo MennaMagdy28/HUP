@@ -6,8 +6,8 @@ using HUP.Repositories.Interfaces;
 using System.Threading.Tasks;
 using HUP.Application.DTOs.AcademicDtos;
 using HUP.Common.Helpers;
+using HUP.Core.Enums.AcademicEnums;
 using HUP.Application.Validators.Interfaces;
-using HUP.Core.Enums;
 using HUP.Core.Interfaces;
 
 namespace HUP.Application.Services.Implementations
@@ -43,33 +43,39 @@ namespace HUP.Application.Services.Implementations
             _semesterRepo = semesterRepo;
         }
 
-        public async Task AddAsync(List<CreateEnrollmentDto> dtos)
+        public async Task AddAsync(CreateEnrollmentDto dto)
         {
             await _transactionService.ExecuteInTransactionAsync(async () =>
             {
-                // Validate Business Rules for the whole batch
-                await _validator.ValidateEnrollmentAsync(dtos);
+                // Validate Business Rules
+                await _validator.ValidateEnrollmentAsync(dto);
 
-                foreach (var dto in dtos)
+                // Perform Atomic Seat Booking
+                var courseOffering = await _offeringRepo.GetWithSchedulesAsync(dto.CourseOfferingId);
+                var student = await _studentRepo.GetByIdWithDetailsAsync(dto.StudentId);
+                var studentGroup = student.Group;
+                var offeringSchedules = courseOffering.Schedules?.Where(s => s.Group == studentGroup).ToList();
+
+                if (offeringSchedules != null && offeringSchedules.Any())
                 {
-                    // Perform Atomic Seat Booking
-                    var booked = await _scheduleRepo.TryBookSeatAsync(dto.ScheduleId);
-                    if (!booked)
+                    foreach (var slot in offeringSchedules)
                     {
-                        throw new InvalidOperationException($"Seat unavailable for schedule {dto.ScheduleId}.");
+                        var booked = await _scheduleRepo.TryBookSeatAsync(slot.Id);
+                        if (!booked)
+                        {
+                             throw new InvalidOperationException($"Seat unavailable for schedule {slot.DayOfWeek} {slot.StartTime}.");
+                        }
                     }
-
-                    // Create Enrollment Record
-                    var enrollment = EnrollmentMapper.ToEntityFromCreateDto(dto);
-                    enrollment.Id = Guid.NewGuid();
-                    enrollment.ScheduleId = dto.ScheduleId;
-                    enrollment.EnrollmentDate = DateTime.Now;
-                    enrollment.CreatedAt = DateTime.Now;
-                    enrollment.Status = EnrollmentStatus.Registered;
-
-                    await _repository.AddAsync(enrollment);
                 }
 
+                // Create Enrollment Record
+                var enrollment = EnrollmentMapper.ToEntityFromCreateDto(dto);
+                enrollment.Id = Guid.NewGuid();
+                enrollment.EnrollmentDate = DateTime.Now;
+                enrollment.CreatedAt = DateTime.Now;
+                enrollment.Status = EnrollmentStatus.Registered;
+
+                await _repository.AddAsync(enrollment);
                 await _repository.SaveChangesAsync();
             });
         }

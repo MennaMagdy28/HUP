@@ -1,9 +1,9 @@
 using HUP.Repositories.Interfaces;
 using HUP.Core.Entities.Academics;
-using HUP.Core.Enums;
 using HUP.Data;
 using Microsoft.EntityFrameworkCore;
 using HUP.Core.Models;
+using HUP.Core.Enums.AcademicEnums;
 
 namespace HUP.Repositories.Implementations
 {
@@ -71,7 +71,6 @@ namespace HUP.Repositories.Implementations
                     .ThenInclude(co => co.Course)
                 .Include(e => e.CourseOffering)
                     .ThenInclude(co => co.Schedules) // Needed for conflict check in Service
-                .Include(e => e.Schedule)
                 .Where(e => e.StudentId == studentId && e.CourseOffering.Semester.SemesterName == semester)
                 .ToListAsync();
         }

@@ -1,5 +1,5 @@
 using HUP.Core.Entities.Shared;
-using HUP.Core.Enums;
+using HUP.Core.Enums.AcademicEnums;
 
 namespace HUP.Core.Entities.Academics
 {
@@ -14,10 +14,7 @@ namespace HUP.Core.Entities.Academics
         public decimal finalGrade {get; set; }
         public EnrollmentStatus Status { get; set; }
 
-        public Guid ScheduleId { get; set; }
-
         public Student Student { get; set; }
         public CourseOffering CourseOffering { get; set; }
-        public Schedule Schedule { get; set; }
     }
 }

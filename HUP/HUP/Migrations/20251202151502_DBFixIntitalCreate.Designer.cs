@@ -4,6 +4,7 @@ using HUP.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HUP.Migrations
 {
     [DbContext(typeof(HupDbContext))]
-    partial class HupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251202151502_DBFixIntitalCreate")]
+    partial class DBFixIntitalCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,6 +94,78 @@ namespace HUP.Migrations
                     b.HasIndex("SemesterId");
 
                     b.ToTable("CourseOfferings");
+                });
+
+            modelBuilder.Entity("HUP.Core.Entities.Academics.CourseOfferingInstructor", b =>
+                {
+                    b.Property<Guid>("CourseOfferingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("InstructorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("CourseOfferingId", "InstructorId");
+
+                    b.HasIndex("InstructorId");
+
+                    b.ToTable("CourseOfferingInstructors");
+                });
+
+            modelBuilder.Entity("HUP.Core.Entities.Academics.CourseSchedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CourseID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CourseOfferingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("InstructorID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Room")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Semester")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseOfferingId");
+
+                    b.HasIndex("InstructorID");
+
+                    b.ToTable("CourseSchedules");
                 });
 
             modelBuilder.Entity("HUP.Core.Entities.Academics.Department", b =>
@@ -335,9 +410,6 @@ namespace HUP.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("AvailableSeats")
-                        .HasColumnType("int");
-
                     b.Property<Guid>("CourseOfferingId")
                         .HasColumnType("uniqueidentifier");
 
@@ -354,25 +426,11 @@ namespace HUP.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Hall")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("InstructorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("InstructorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time");
-
-                    b.Property<int>("TotalSeats")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -380,8 +438,6 @@ namespace HUP.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CourseOfferingId");
-
-                    b.HasIndex("InstructorId");
 
                     b.ToTable("Schedules");
                 });
@@ -393,9 +449,6 @@ namespace HUP.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DropDeadline")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("EndDate")
@@ -462,128 +515,6 @@ namespace HUP.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.ToTable("Students");
-                });
-
-            modelBuilder.Entity("HUP.Core.Entities.Financial.Fee", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPerCredit")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("SemesterId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SemesterId");
-
-                    b.ToTable("Fees");
-                });
-
-            modelBuilder.Entity("HUP.Core.Entities.Financial.Payment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Method")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ReferenceNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("StudentFeeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudentFeeId");
-
-                    b.ToTable("Payments");
-                });
-
-            modelBuilder.Entity("HUP.Core.Entities.Financial.StudentFee", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("FeeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("PaidAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FeeId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("StudentFees");
                 });
 
             modelBuilder.Entity("HUP.Core.Entities.Identity.Role", b =>
@@ -751,6 +682,44 @@ namespace HUP.Migrations
                     b.Navigation("Semester");
                 });
 
+            modelBuilder.Entity("HUP.Core.Entities.Academics.CourseOfferingInstructor", b =>
+                {
+                    b.HasOne("HUP.Core.Entities.Academics.CourseOffering", "CourseOffering")
+                        .WithMany("Instructors")
+                        .HasForeignKey("CourseOfferingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HUP.Core.Entities.Academics.Instructor", "Instructor")
+                        .WithMany("CourseOfferings")
+                        .HasForeignKey("InstructorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CourseOffering");
+
+                    b.Navigation("Instructor");
+                });
+
+            modelBuilder.Entity("HUP.Core.Entities.Academics.CourseSchedule", b =>
+                {
+                    b.HasOne("HUP.Core.Entities.Academics.CourseOffering", "CourseOffering")
+                        .WithMany()
+                        .HasForeignKey("CourseOfferingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HUP.Core.Entities.Academics.Instructor", "Instructor")
+                        .WithMany()
+                        .HasForeignKey("InstructorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CourseOffering");
+
+                    b.Navigation("Instructor");
+                });
+
             modelBuilder.Entity("HUP.Core.Entities.Academics.Department", b =>
                 {
                     b.HasOne("HUP.Core.Entities.Academics.Faculty", "Faculty")
@@ -860,15 +829,7 @@ namespace HUP.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("HUP.Core.Entities.Academics.Instructor", "Instructor")
-                        .WithMany("Schedules")
-                        .HasForeignKey("InstructorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("CourseOffering");
-
-                    b.Navigation("Instructor");
                 });
 
             modelBuilder.Entity("HUP.Core.Entities.Academics.Student", b =>
@@ -888,47 +849,6 @@ namespace HUP.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("HUP.Core.Entities.Financial.Fee", b =>
-                {
-                    b.HasOne("HUP.Core.Entities.Academics.Semester", "Semester")
-                        .WithMany()
-                        .HasForeignKey("SemesterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Semester");
-                });
-
-            modelBuilder.Entity("HUP.Core.Entities.Financial.Payment", b =>
-                {
-                    b.HasOne("HUP.Core.Entities.Financial.StudentFee", "StudentFee")
-                        .WithMany("Payments")
-                        .HasForeignKey("StudentFeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("StudentFee");
-                });
-
-            modelBuilder.Entity("HUP.Core.Entities.Financial.StudentFee", b =>
-                {
-                    b.HasOne("HUP.Core.Entities.Financial.Fee", "Fee")
-                        .WithMany()
-                        .HasForeignKey("FeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("HUP.Core.Entities.Academics.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Fee");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("HUP.Core.Entities.Identity.Role", b =>
@@ -960,8 +880,8 @@ namespace HUP.Migrations
                             b1.Property<string>("AltEmail")
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<int?>("City")
-                                .HasColumnType("int");
+                            b1.Property<string>("City")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("PhoneNumber")
                                 .HasColumnType("nvarchar(max)");
@@ -982,17 +902,23 @@ namespace HUP.Migrations
                             b1.Property<DateTime>("BirthDate")
                                 .HasColumnType("datetime2");
 
-                            b1.Property<int>("BirthPlace")
-                                .HasColumnType("int");
+                            b1.Property<string>("BirthPlace")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("FullEnglishName")
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<int>("Gender")
                                 .HasColumnType("int");
 
-                            b1.Property<int>("Nationality")
-                                .HasColumnType("int");
+                            b1.Property<string>("Nationality")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
 
-                            b1.Property<int>("Religion")
-                                .HasColumnType("int");
+                            b1.Property<string>("Religion")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
 
                             b1.HasKey("UserId");
 
@@ -1045,6 +971,8 @@ namespace HUP.Migrations
 
                     b.Navigation("Exams");
 
+                    b.Navigation("Instructors");
+
                     b.Navigation("Schedules");
                 });
 
@@ -1064,20 +992,15 @@ namespace HUP.Migrations
 
             modelBuilder.Entity("HUP.Core.Entities.Academics.Instructor", b =>
                 {
+                    b.Navigation("CourseOfferings");
+
                     b.Navigation("DepartmentHeaded")
                         .IsRequired();
-
-                    b.Navigation("Schedules");
                 });
 
             modelBuilder.Entity("HUP.Core.Entities.Academics.Student", b =>
                 {
                     b.Navigation("Enrollments");
-                });
-
-            modelBuilder.Entity("HUP.Core.Entities.Financial.StudentFee", b =>
-                {
-                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("HUP.Core.Entities.Identity.Role", b =>

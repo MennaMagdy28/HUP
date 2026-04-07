@@ -5,7 +5,7 @@ namespace HUP.Application.Services.Interfaces;
 
 public interface IEnrollmentService
 {
-    Task AddAsync(List<CreateEnrollmentDto> dtos);
+    Task AddAsync(CreateEnrollmentDto dto);
     Task<IEnumerable<EnrollmentResponseDto>> GetAllAsync(string lang);
     Task<EnrollmentResponseDto> GetByIdAsync(Guid id, string lang);
     Task<bool> Exists(CreateEnrollmentDto dto);

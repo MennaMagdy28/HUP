@@ -22,7 +22,7 @@ namespace HUP.Repositories.Implementations
         {
             var exam = _context.Exams.Include(e => e.CourseOffering)
                 .ThenInclude(c => c.Department)
-                .ThenInclude(d => d.StaffMembers)
+                .ThenInclude(d => d.Instructors)
                 .ThenInclude(i => i.User)
                 .AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
             return exam;
@@ -31,7 +31,7 @@ namespace HUP.Repositories.Implementations
         {
             var exam = _context.Exams.Include(e => e.CourseOffering)
                 .ThenInclude(c => c.Department)
-                .ThenInclude(d => d.StaffMembers)
+                .ThenInclude(d => d.Instructors)
                 .ThenInclude(i => i.User)
                 .AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
             return exam;
@@ -45,7 +45,7 @@ namespace HUP.Repositories.Implementations
             return await _context.Exams
                 .Include(e => e.CourseOffering)
                 .ThenInclude(c => c.Department)
-                .ThenInclude(d => d.StaffMembers)
+                .ThenInclude(d => d.Instructors)
                 .ThenInclude(i => i.User)
                 .Where(e => courseIds.Contains(e.CourseOffering.CourseId))
                 .OrderBy(e => e.ExamDate)
@@ -58,7 +58,7 @@ namespace HUP.Repositories.Implementations
             return await _context.Exams
                 .Include(e => e.CourseOffering)
                 .ThenInclude(c => c.Department)
-                .ThenInclude(d => d.StaffMembers)
+                .ThenInclude(d => d.Instructors)
                 .ThenInclude(i => i.User)
                 .OrderBy(e => e.ExamDate)
                 .ThenBy(e => e.ExamTime)

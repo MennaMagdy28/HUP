@@ -1,4 +1,4 @@
-using HUP.Core.Enums;
+using HUP.Core.Enums.IdentityEnums;
 
 namespace HUP.Core.Entities.Identity
 {
