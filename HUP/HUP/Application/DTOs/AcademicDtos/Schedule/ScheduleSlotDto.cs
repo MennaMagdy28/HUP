@@ -2,6 +2,7 @@ namespace HUP.Application.DTOs.AcademicDtos.Schedule;
 
 public class ScheduleSlotDto
 {
+    public Guid SlotId { get; set; }
     public string CourseName { get; set; }
     public string CourseCode { get; set; }
     public string DayOfWeek { get; set; }

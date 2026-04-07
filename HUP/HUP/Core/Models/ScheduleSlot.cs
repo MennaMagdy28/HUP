@@ -3,7 +3,8 @@
 namespace HUP.Core.Models;
 public class ScheduleSlot
 {
-    public Guid CourseOfferingId { get; set; }
+    public Guid SlotId { get; set; }
+    public Guid CourseOfferingId { get; set; } 
     public string CourseName { get; set; }
     public string CourseCode { get; set; }
     public DayOfWeek DayOfWeek { get; set; }

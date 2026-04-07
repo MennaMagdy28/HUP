@@ -27,6 +27,7 @@ namespace HUP.Application.Mappers.Academic
             slot.EndTime = entity.EndTime;
             slot.Group = entity.Group;
             slot.Hall = LocalizationHelper.Get<string>(entity.Hall, lang);
+            slot.SlotId = entity.SlotId;
             return slot;
         }
     }

@@ -29,6 +29,7 @@ namespace HUP.Repositories.Implementations
                 .Where(e => e.StudentId == studentId && !e.IsDeleted)
                 .Select(e => new ScheduleSlot
                 {
+                    SlotId = e.ScheduleId,
                     CourseOfferingId = e.CourseOfferingId ,
                     StaffName = e.Schedule.Staff.User.FullName,
                     CourseName = e.CourseOffering.Course.CourseName,
@@ -52,6 +53,7 @@ namespace HUP.Repositories.Implementations
                 .Where(s => s.CourseOffering.Semester.IsActive) // Filter by active semester
                 .Select(s => new ScheduleSlot
                 {
+                    SlotId = s.Id,
                     CourseOfferingId = s.CourseOfferingId,
                     StaffName = s.Staff.User.FullName,
                     CourseName = s.CourseOffering.Course.CourseName,
