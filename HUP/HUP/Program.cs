@@ -116,7 +116,15 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddScoped<HUP.Data.Seeders.DataSeeder>();
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<HUP.Data.Seeders.DataSeeder>();
+    await seeder.SeedAsync();
+}
 
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
