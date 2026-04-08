@@ -48,6 +48,9 @@ namespace HUP.Application.Validators.Implementations
             }
 
             var student = await _studentRepo.GetByIdReadOnly(studentId);
+            if (student == null)
+                throw new InvalidOperationException($"Student {studentId} not found.");
+
             var studentGroup = student.Group;
 
             // Prepare list of target schedules to check for conflicts within the batch
@@ -67,8 +70,14 @@ namespace HUP.Application.Validators.Implementations
                 if (courseOffering == null)
                     throw new InvalidOperationException($"Course offering {dto.CourseOfferingId} not found.");
 
+                if (courseOffering.Semester == null)
+                    throw new InvalidOperationException($"Course offering {dto.CourseOfferingId} does not have a semester associated.");
+
                 // Check Schedule Exists
-                var targetSchedule = courseOffering.Schedules?.FirstOrDefault(s => s.Id == dto.ScheduleId);
+                if (courseOffering.Schedules == null || !courseOffering.Schedules.Any())
+                    throw new InvalidOperationException($"Course offering {dto.CourseOfferingId} does not have any schedules.");
+
+                var targetSchedule = courseOffering.Schedules.FirstOrDefault(s => s.Id == dto.ScheduleId);
                 if (targetSchedule == null)
                     throw new InvalidOperationException($"Schedule {dto.ScheduleId} not found or does not belong to course offering {dto.CourseOfferingId}.");
 
@@ -104,14 +113,14 @@ namespace HUP.Application.Validators.Implementations
                         {
                             if (targetSchedule.StartTime < existingSlot.EndTime && targetSchedule.EndTime > existingSlot.StartTime)
                             {
-                                throw new InvalidOperationException($"Time conflict with course {enrolled.CourseOffering.Course.CourseCode} on {targetSchedule.DayOfWeek}.");
+                                throw new InvalidOperationException($"Time conflict with course {enrolled.CourseOffering?.Course?.CourseCode} on {targetSchedule.DayOfWeek}.");
                             }
                         }
                     }
                     else
                     {
                          // Fallback to older matching by group if ScheduleId is null (e.g. older data)
-                         var enrolledSchedules = enrolled.CourseOffering.Schedules?.Where(s => s.Group == studentGroup);
+                         var enrolledSchedules = enrolled.CourseOffering?.Schedules?.Where(s => s.Group == studentGroup);
                          if (enrolledSchedules != null)
                          {
                              foreach (var existingSlot in enrolledSchedules)
@@ -120,7 +129,7 @@ namespace HUP.Application.Validators.Implementations
                                  {
                                      if (targetSchedule.StartTime < existingSlot.EndTime && targetSchedule.EndTime > existingSlot.StartTime)
                                      {
-                                         throw new InvalidOperationException($"Time conflict with course {enrolled.CourseOffering.Course.CourseCode} on {targetSchedule.DayOfWeek}.");
+                                         throw new InvalidOperationException($"Time conflict with course {enrolled.CourseOffering?.Course?.CourseCode} on {targetSchedule.DayOfWeek}.");
                                      }
                                  }
                              }

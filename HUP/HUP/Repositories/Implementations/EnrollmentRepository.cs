@@ -53,13 +53,22 @@ namespace HUP.Repositories.Implementations
 
         public async Task<Enrollment> GetByIdWithDetailsAsync(Guid id)
         {
-            var enrollment = await _context.Enrollments.AsNoTracking()
+            var enrollment = await _context.Enrollments
+                .Include(e => e.CourseOffering)
+                    .ThenInclude(co => co.Course)
+                .Include(e => e.Schedule)
+                .Include(e => e.Student)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
             return enrollment;
         }
         public async Task<Enrollment> GetByIdTrackingAsync(Guid id)
         {
             var enrollment = await _context.Enrollments
+                .Include(e => e.CourseOffering)
+                    .ThenInclude(co => co.Course)
+                .Include(e => e.Schedule)
+                .Include(e => e.Student)
                 .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
             return enrollment;
         }
