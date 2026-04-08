@@ -73,12 +73,11 @@ namespace HUP.Application.Validators.Implementations
                 if (courseOffering.Semester == null)
                     throw new InvalidOperationException($"Course offering {dto.CourseOfferingId} does not have a semester associated.");
 
-                // Check Schedule Exists
-                if (courseOffering.Schedules == null || !courseOffering.Schedules.Any())
-                    throw new InvalidOperationException($"Course offering {dto.CourseOfferingId} does not have any schedules.");
+                // Use IScheduleRepository to fetch schedule directly if not found in CourseOffering.Schedules
+                // This bypasses any potential EF Core filtering issues on collections if they exist
+                var targetSchedule = await _scheduleRepo.GetByIdReadOnly(dto.ScheduleId);
 
-                var targetSchedule = courseOffering.Schedules.FirstOrDefault(s => s.Id == dto.ScheduleId);
-                if (targetSchedule == null)
+                if (targetSchedule == null || targetSchedule.CourseOfferingId != dto.CourseOfferingId)
                     throw new InvalidOperationException($"Schedule {dto.ScheduleId} not found or does not belong to course offering {dto.CourseOfferingId}.");
 
                 // 4. Prerequisite Check
