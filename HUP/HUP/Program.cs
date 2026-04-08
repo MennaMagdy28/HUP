@@ -143,6 +143,7 @@ app.UseCors("AllowReactApp");
 app.UseStaticFiles();
 
 //app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
