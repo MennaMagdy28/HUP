@@ -44,9 +44,6 @@ namespace HUP.Repositories.Implementations
 
             return await _context.Exams
                 .Include(e => e.CourseOffering)
-                .ThenInclude(c => c.Department)
-                .ThenInclude(d => d.StaffMembers)
-                .ThenInclude(i => i.User)
                 .Where(e => courseIds.Contains(e.CourseOffering.CourseId))
                 .OrderBy(e => e.ExamDate)
                 .ThenBy(e => e.ExamTime)
