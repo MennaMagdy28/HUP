@@ -21,7 +21,7 @@ namespace HUP.Data
         public DbSet<Course> Courses { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<Department> Departments { get; set; }
-        public DbSet<Staff> Staff { get; set; }
+        public DbSet<Instructor> Instructors { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Exam> Exams { get; set; }
         public DbSet<Faculty> Faculties { get; set; }
@@ -43,17 +43,17 @@ namespace HUP.Data
                 .HasKey(rp => new { rp.RoleId, rp.PermissionId });
             modelBuilder.Entity<RolePermission>()
                 .HasOne(rp => rp.Role)
-                .WithMany()
+                .WithMany(r => r.RolePermissions)
                 .HasForeignKey(rp => rp.RoleId);
             modelBuilder.Entity<RolePermission>()
                 .HasOne(rp => rp.Permission)
-                .WithMany()
+                .WithMany(p => p.RolePermissions)
                 .HasForeignKey(rp => rp.PermissionId);
 
             // User ↔ Role (Many-to-One)
             modelBuilder.Entity<User>()
                 .HasOne(u => u.UserRole)
-                .WithMany()
+                .WithMany(r => r.Users)
                 .HasForeignKey(u => u.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -73,21 +73,12 @@ namespace HUP.Data
                 .HasForeignKey<Student>(s => s.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // User ↔ Staff (One-to-One)
-            modelBuilder.Entity<Staff>()
-                .HasKey(s => s.UserId);
-            modelBuilder.Entity<Staff>()
-                .HasOne(s => s.User)
+            // User ↔ Instructor (One-to-One)
+            modelBuilder.Entity<Instructor>()
+                .HasOne(i => i.User)
                 .WithOne()
-                .HasForeignKey<Staff>(s => s.UserId)
+                .HasForeignKey<Instructor>(i => i.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            // Staff ↔ Faculty (Many-to-One)
-            modelBuilder.Entity<Staff>()
-                .HasOne(s => s.Faculty)
-                .WithMany()
-                .HasForeignKey(s => s.FacultyId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             // User ↔ Faculty (One-to-One - Dean)
             modelBuilder.Entity<Faculty>()
@@ -99,28 +90,28 @@ namespace HUP.Data
             // Role ↔ User (CreatedBy)
             modelBuilder.Entity<Role>()
                 .HasOne(r => r.CreatedByUser)
-                .WithMany()
+                .WithMany(u => u.CreatedRoles)
                 .HasForeignKey(r => r.CreatedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Faculty ↔ Department (One-to-Many)
             modelBuilder.Entity<Department>()
                 .HasOne(d => d.Faculty)
-                .WithMany()
+                .WithMany(f => f.Departments)
                 .HasForeignKey(d => d.FacultyId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Department ↔ Staff (One-to-Many)
-            modelBuilder.Entity<Staff>()
-                .HasOne(s => s.Department)
-                .WithMany()
-                .HasForeignKey(s => s.DepartmentId)
+            // Department ↔ Instructor (One-to-Many)
+            modelBuilder.Entity<Instructor>()
+                .HasOne(i => i.Department)
+                .WithMany(d => d.Instructors)
+                .HasForeignKey(i => i.DepartmentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Department ↔ Staff (One-to-One)
+            // Department ↔ Instructor (One-to-One)
             modelBuilder.Entity<Department>()
                 .HasOne(d => d.HeadOfDepartment)
-                .WithOne()
+                .WithOne(i => i.DepartmentHeaded)
                 .HasForeignKey<Department>(d => d.HeadOfDepartmentId)
                 .OnDelete(DeleteBehavior.NoAction);
             
@@ -131,14 +122,14 @@ namespace HUP.Data
             // Department ↔ ProgramPlan (One-to-Many)
             modelBuilder.Entity<ProgramPlan>()
                 .HasOne(p => p.Department)
-                .WithMany()
+                .WithMany(d => d.Programs)
                 .HasForeignKey(p => p.DepartmentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Course ↔ ProgramPlan (One-to-Many)
             modelBuilder.Entity<ProgramPlan>()
                 .HasOne(p => p.Course)
-                .WithMany()
+                .WithMany(c=>c.Programs)
                 .HasForeignKey(p => p.CourseId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -152,7 +143,7 @@ namespace HUP.Data
             // Course ↔ CourseOffering (One-to-Many)
             modelBuilder.Entity<CourseOffering>()
                 .HasOne(co => co.Course)
-                .WithMany()
+                .WithMany(c => c.CourseOfferings)
                 .HasForeignKey(co => co.CourseId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -166,7 +157,7 @@ namespace HUP.Data
             // CourseOffering ↔ Department (Many-to-One)
             modelBuilder.Entity<CourseOffering>()
                 .HasOne(co => co.Department)
-                .WithMany()
+                .WithMany(d => d.CourseOfferings)
                 .HasForeignKey(co => co.DepartmentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -180,43 +171,36 @@ namespace HUP.Data
             // Student ↔ Enrollment (One-to-Many)
             modelBuilder.Entity<Enrollment>()
                 .HasOne(e => e.Student)
-                .WithMany()
+                .WithMany(s => s.Enrollments)
                 .HasForeignKey(e => e.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // CourseOffering ↔ Enrollment (One-to-Many)
             modelBuilder.Entity<Enrollment>()
                 .HasOne(e => e.CourseOffering)
-                .WithMany()
+                .WithMany(co => co.Enrollments)
                 .HasForeignKey(e => e.CourseOfferingId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Schedule ↔ Enrollment (One-to-Many)
-            modelBuilder.Entity<Enrollment>()
-                .HasOne(e => e.Schedule)
-                .WithMany()
-                .HasForeignKey(e => e.ScheduleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // CourseOffering ↔ Exam (One-to-Many)
             modelBuilder.Entity<Exam>()
                 .HasOne(e => e.CourseOffering)
-                .WithMany()
+                .WithMany(co => co.Exams)
                 .HasForeignKey(e => e.CourseOfferingId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // CourseOffering ↔ Schedule (One-to-Many)
             modelBuilder.Entity<Schedule>()
                 .HasOne(s => s.CourseOffering)
-                .WithMany()
+                .WithMany(co => co.Schedules)
                 .HasForeignKey(s => s.CourseOfferingId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Staff ↔ Schedule (One-to-Many)
+            // Instructor ↔ Schedule (One-to-Many)
             modelBuilder.Entity<Schedule>()
-                .HasOne(s => s.Staff)
-                .WithMany()
-                .HasForeignKey(s => s.StaffId)
+                .HasOne(s => s.Instructor)
+                .WithMany(i => i.Schedules)
+                .HasForeignKey(s => s.InstructorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Financial Relationships
@@ -234,7 +218,7 @@ namespace HUP.Data
 
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.StudentFee)
-                .WithMany()
+                .WithMany(sf => sf.Payments)
                 .HasForeignKey(p => p.StudentFeeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
