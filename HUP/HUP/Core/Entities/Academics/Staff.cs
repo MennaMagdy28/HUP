@@ -12,14 +12,14 @@ namespace HUP.Core.Entities.Academics
 
         public Guid? DepartmentId { get; set; }
         public Guid? FacultyId { get; set; }
-
+        public Guid? DepartmentHeadedId { get; set; }
         public StaffTitle Title { get; set; }
         public StaffCategory Category { get; set; }
 
         public User User { get; set; }
         public Department Department { get; set; }
         public Faculty Faculty { get; set; }
-        public Department DepartmentHeaded { get; set; }
+        public Department? DepartmentHeaded { get; set; }
         public ICollection<Schedule> Schedules { get; set; }
     }
 }

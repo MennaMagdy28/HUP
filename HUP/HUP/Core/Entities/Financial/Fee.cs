@@ -10,8 +10,10 @@ namespace HUP.Core.Entities.Financial
         public string Description { get; set; }
         public decimal Amount { get; set; }
         public bool IsPerCredit { get; set; } // If true, Amount is per credit hour
+        public Guid DepartmentId { get; set; }
         public FeeType Type { get; set; }
         public Guid SemesterId { get; set; }
+        public Department Department { get; set; }
         public Semester Semester { get; set; }
     }
 }

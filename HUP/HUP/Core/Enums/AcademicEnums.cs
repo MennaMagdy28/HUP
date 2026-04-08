@@ -51,15 +51,6 @@
         [Localized("Sunday", "الأحد")]
         Sunday
     }
-
-    public enum UserRoles
-    {
-        Admin,
-        Student,
-        Instructor,
-        DepartmentHead,
-        FacultyDean
-    }
     
 
     public enum StaffTitle
@@ -78,6 +69,11 @@
         None = 0,
         Academic = 1,
         Administrative = 2
+    }
+
+    public enum FormType
+    {
+        
     }
     //TODO
     //search : تربية رياضية 

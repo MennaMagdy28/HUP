@@ -1,3 +1,4 @@
+using HUP.Core.Entities.Financial;
 using HUP.Core.Entities.Identity;
 using HUP.Core.Entities.Shared;
 
@@ -14,6 +15,7 @@ namespace HUP.Core.Entities.Academics
         public int ElectiveHours { get; set; }
 
         public Staff HeadOfDepartment;
+        public ICollection<Fee> Fees { get; set; }
         public ICollection<CourseOffering> CourseOfferings { get; set; }
         public Faculty Faculty { get; set; }
         public ICollection<Staff> StaffMembers { get; set; }

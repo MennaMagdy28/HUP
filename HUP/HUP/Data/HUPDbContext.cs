@@ -118,11 +118,23 @@ namespace HUP.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Department ↔ Staff (One-to-One)
+            modelBuilder.Entity<Staff>()
+                .HasOne(s => s.DepartmentHeaded)
+                .WithOne()
+                .HasForeignKey<Staff>(s => s.DepartmentHeadedId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Staff>()
+                .HasOne(s => s.Department)
+                .WithMany()
+                .HasForeignKey(s => s.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Department>()
                 .HasOne(d => d.HeadOfDepartment)
                 .WithOne()
                 .HasForeignKey<Department>(d => d.HeadOfDepartmentId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
             
             
             modelBuilder.Entity<ProgramPlan>()
@@ -224,6 +236,18 @@ namespace HUP.Data
                 .HasOne(sf => sf.Student)
                 .WithMany()
                 .HasForeignKey(sf => sf.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            modelBuilder.Entity<Fee>()
+                .HasOne(f => f.Department)
+                .WithMany()
+                .HasForeignKey(f => f.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Fee>()
+                .HasOne(f => f.Semester)
+                .WithMany()
+                .HasForeignKey(f => f.SemesterId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<StudentFee>()
