@@ -93,6 +93,7 @@ namespace HUP.Application.Services.Implementations
             //update password
             user.PasswordHash = hashed;
             user.UpdatedAt = DateTime.Now;
+            user.PasswordExpiryDate = DateTime.Now.AddDays(60);
 
             await _repository.SaveChangesAsync();
             return true;
