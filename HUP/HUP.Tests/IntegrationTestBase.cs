@@ -24,6 +24,7 @@ namespace HUP.Tests
             {
                 services.RemoveAll(typeof(DbContextOptions<HupDbContext>));
                 services.RemoveAll(typeof(DbContextOptions));
+                services.RemoveAll(typeof(HupDbContext));
 
                 services.AddDbContext<HupDbContext>(options =>
                 {
