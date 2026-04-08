@@ -49,7 +49,6 @@ namespace HUP.Data.Seeders
                 await SeedSemestersAsync(_context);
                 await SeedStudentsAsync(_context);
                 await SeedCourseOfferingsAsync(_context);
-                // ClassGroup does not exist -> mapping directly to Schedules
                 await SeedSchedulesAsync(_context);
                 await SeedExamsAsync(_context);
                 await SeedEnrollmentsAsync(_context);
@@ -114,11 +113,11 @@ namespace HUP.Data.Seeders
             {
                 var roles = new List<Role>
                 {
-                    new Role { Id = Guid.NewGuid(), Name = "Admin", DisplayName = "مدير النظام", Description = "مدير النظام الكامل", CreatedAt = DateTime.UtcNow },
-                    new Role { Id = Guid.NewGuid(), Name = "Student", DisplayName = "طالب", Description = "طالب في الجامعة", CreatedAt = DateTime.UtcNow },
-                    new Role { Id = Guid.NewGuid(), Name = "Instructor", DisplayName = "أستاذ", Description = "أستاذ جامعي", CreatedAt = DateTime.UtcNow },
-                    new Role { Id = Guid.NewGuid(), Name = "DepartmentHead", DisplayName = "رئيس قسم", Description = "رئيس قسم أكاديمي", CreatedAt = DateTime.UtcNow },
-                    new Role { Id = Guid.NewGuid(), Name = "FacultyDean", DisplayName = "عميد كلية", Description = "عميد كلية", CreatedAt = DateTime.UtcNow }
+                    new Role { Id = Guid.NewGuid(), Name = "Admin", DisplayName = "{\"en\":\"System Admin\",\"ar\":\"مدير النظام\"}", Description = "مدير النظام الكامل", CreatedAt = DateTime.UtcNow },
+                    new Role { Id = Guid.NewGuid(), Name = "Student", DisplayName = "{\"en\":\"Student\",\"ar\":\"طالب\"}", Description = "طالب في الجامعة", CreatedAt = DateTime.UtcNow },
+                    new Role { Id = Guid.NewGuid(), Name = "Instructor", DisplayName = "{\"en\":\"Instructor\",\"ar\":\"أستاذ\"}", Description = "أستاذ جامعي", CreatedAt = DateTime.UtcNow },
+                    new Role { Id = Guid.NewGuid(), Name = "DepartmentHead", DisplayName = "{\"en\":\"Department Head\",\"ar\":\"رئيس قسم\"}", Description = "رئيس قسم أكاديمي", CreatedAt = DateTime.UtcNow },
+                    new Role { Id = Guid.NewGuid(), Name = "FacultyDean", DisplayName = "{\"en\":\"Faculty Dean\",\"ar\":\"عميد كلية\"}", Description = "عميد كلية", CreatedAt = DateTime.UtcNow }
                 };
 
                 await context.Roles.AddRangeAsync(roles);
@@ -173,7 +172,7 @@ namespace HUP.Data.Seeders
                 var adminUser = new User
                 {
                     Id = Guid.NewGuid(), NationalId = "1234567890", Email = "admin@university.edu",
-                    PasswordExpiryDate = DateTime.Now.AddMonths(6), FullName = "أحمد محمد علي",
+                    PasswordExpiryDate = DateTime.Now.AddMonths(6), FullName = "{\"en\":\"Ahmed Mohamed Ali\",\"ar\":\"أحمد محمد علي\"}",
                     RoleId = adminRole.Id, IsActive = true, CreatedAt = DateTime.Now.AddDays(-365),
                     PersonalInfo = new UserPersonalInfo { Gender = Gender.Male, BirthDate = new DateTime(1980, 5, 15), Religion = Religion.Muslim, Nationality = Nationality.Egyptian },
                     ContactInfo = new UserContact { Address = "شارع الجامعة، القاهرة", PhoneNumber = "01012345678", AltEmail = "ahmed.ali@email.com" }
@@ -185,7 +184,7 @@ namespace HUP.Data.Seeders
                 var student1User = new User
                 {
                     Id = Guid.NewGuid(), NationalId = "2233445566", Email = "student1@university.edu",
-                    PasswordExpiryDate = DateTime.Now.AddMonths(6), FullName = "محمد خالد سعيد",
+                    PasswordExpiryDate = DateTime.Now.AddMonths(6), FullName = "{\"en\":\"Mohamed Khaled Saeed\",\"ar\":\"محمد خالد سعيد\"}",
                     RoleId = studentRole.Id, IsActive = true, CreatedAt = DateTime.Now.AddDays(-200),
                     PersonalInfo = new UserPersonalInfo { Gender = Gender.Male, BirthDate = new DateTime(2002, 8, 20), Religion = Religion.Muslim, Nationality = Nationality.Egyptian },
                     ContactInfo = new UserContact { Address = "حي سموحة، الإسكندرية", PhoneNumber = "01098765432", AltEmail = "mohamed.khaled@email.com" }
@@ -197,7 +196,7 @@ namespace HUP.Data.Seeders
                 {
                     Id = Guid.NewGuid(), NationalId = "3344556677", Email = "student2@university.edu",
                     PasswordExpiryDate = DateTime.Now.AddMonths(-1), // ⭐ Expired Password
-                    FullName = "فاطمة علي حسن", RoleId = studentRole.Id, IsActive = true, CreatedAt = DateTime.Now.AddDays(-190),
+                    FullName = "{\"en\":\"Fatma Ali Hassan\",\"ar\":\"فاطمة علي حسن\"}", RoleId = studentRole.Id, IsActive = true, CreatedAt = DateTime.Now.AddDays(-190),
                     PersonalInfo = new UserPersonalInfo { Gender = Gender.Female, BirthDate = new DateTime(2003, 3, 12), Religion = Religion.Muslim, Nationality = Nationality.Egyptian },
                     ContactInfo = new UserContact { Address = "الدقي، الجيزة", PhoneNumber = "01122334455", AltEmail = "fatma.ali@email.com" }
                 };
@@ -208,7 +207,7 @@ namespace HUP.Data.Seeders
                 var profUser = new User
                 {
                     Id = Guid.NewGuid(), NationalId = "4455667788", Email = "prof.ahmed@university.edu",
-                    PasswordExpiryDate = DateTime.Now.AddMonths(6), FullName = "د. أحمد محمود عبد الله",
+                    PasswordExpiryDate = DateTime.Now.AddMonths(6), FullName = "{\"en\":\"Dr. Ahmed Mahmoud Abdullah\",\"ar\":\"د. أحمد محمود عبد الله\"}",
                     RoleId = instructorRole.Id, IsActive = true, CreatedAt = DateTime.Now.AddDays(-400),
                     PersonalInfo = new UserPersonalInfo { Gender = Gender.Male, BirthDate = new DateTime(1975, 11, 5), Religion = Religion.Muslim, Nationality = Nationality.Egyptian },
                     ContactInfo = new UserContact { Address = "المهندسين، الجيزة", PhoneNumber = "01233445566", AltEmail = "ahmed.mahmoud@email.com" }
@@ -219,7 +218,7 @@ namespace HUP.Data.Seeders
                 var drSaraUser = new User
                 {
                     Id = Guid.NewGuid(), NationalId = "5566778899", Email = "dr.sara@university.edu",
-                    PasswordExpiryDate = DateTime.Now.AddMonths(6), FullName = "د. سارة محمد فؤاد",
+                    PasswordExpiryDate = DateTime.Now.AddMonths(6), FullName = "{\"en\":\"Dr. Sara Mohamed Fouad\",\"ar\":\"د. سارة محمد فؤاد\"}",
                     RoleId = instructorRole.Id, IsActive = true, CreatedAt = DateTime.Now.AddDays(-350),
                     PersonalInfo = new UserPersonalInfo { Gender = Gender.Female, BirthDate = new DateTime(1985, 7, 25), Religion = Religion.Muslim, Nationality = Nationality.Egyptian },
                     ContactInfo = new UserContact { Address = "المنصورة الجديدة", PhoneNumber = "01055667788", AltEmail = "sara.mohamed@email.com" }
@@ -231,7 +230,7 @@ namespace HUP.Data.Seeders
                 var hodUser = new User
                 {
                     Id = Guid.NewGuid(), NationalId = "6677889900", Email = "head.cs@university.edu",
-                    PasswordExpiryDate = DateTime.Now.AddMonths(6), FullName = "د. محمد إبراهيم حسين",
+                    PasswordExpiryDate = DateTime.Now.AddMonths(6), FullName = "{\"en\":\"Dr. Mohamed Ibrahim Hussein\",\"ar\":\"د. محمد إبراهيم حسين\"}",
                     RoleId = deptHeadRole.Id, IsActive = true, CreatedAt = DateTime.Now.AddDays(-500),
                     PersonalInfo = new UserPersonalInfo { Gender = Gender.Male, BirthDate = new DateTime(1970, 2, 18), Religion = Religion.Muslim, Nationality = Nationality.Egyptian },
                     ContactInfo = new UserContact { Address = "مدينة نصر، القاهرة", PhoneNumber = "01066778899", AltEmail = "mohamed.ibrahim@email.com" }
@@ -243,7 +242,7 @@ namespace HUP.Data.Seeders
                 var deanUser = new User
                 {
                     Id = Guid.NewGuid(), NationalId = "7788990011", Email = "dean.cs@university.edu",
-                    PasswordExpiryDate = DateTime.Now.AddMonths(6), FullName = "د. علي سليمان محمد",
+                    PasswordExpiryDate = DateTime.Now.AddMonths(6), FullName = "{\"en\":\"Dr. Ali Suleiman Mohamed\",\"ar\":\"د. علي سليمان محمد\"}",
                     RoleId = deanRole.Id, IsActive = true, CreatedAt = DateTime.Now.AddDays(-600),
                     PersonalInfo = new UserPersonalInfo { Gender = Gender.Male, BirthDate = new DateTime(1965, 12, 8), Religion = Religion.Muslim, Nationality = Nationality.Egyptian },
                     ContactInfo = new UserContact { Address = "الزمالك، القاهرة", PhoneNumber = "01077889900", AltEmail = "ali.suleiman@email.com" }
@@ -269,18 +268,18 @@ namespace HUP.Data.Seeders
                 {
                     new Faculty
                     {
-                        Id = Guid.NewGuid(), Name = FacultyTitle.FacultyOfComputingAndAI, DisplayName = "كلية الحاسبات والذكاء الاصطناعي",
-                        DeanId = dean.Id, DeanName = "د. علي سليمان محمد", ContactInfo = "هاتف: 02-12345678", CreatedAt = DateTime.Now.AddDays(-700)
+                        Id = Guid.NewGuid(), Name = FacultyTitle.FacultyOfComputingAndAI, DisplayName = "{\"en\":\"Faculty of Computing and AI\",\"ar\":\"كلية الحاسبات والذكاء الاصطناعي\"}",
+                        DeanId = dean.Id, DeanName = "{\"en\":\"Dr. Ali Suleiman Mohamed\",\"ar\":\"د. علي سليمان محمد\"}", ContactInfo = "هاتف: 02-12345678", CreatedAt = DateTime.Now.AddDays(-700)
                     },
                     new Faculty
                     {
-                        Id = Guid.NewGuid(), Name = FacultyTitle.FacultyOfEngineering, DisplayName = "كلية الهندسة",
-                        DeanId = dean.Id, DeanName = "د. علي سليمان محمد", ContactInfo = "هاتف: 02-23456789", CreatedAt = DateTime.Now.AddDays(-680)
+                        Id = Guid.NewGuid(), Name = FacultyTitle.FacultyOfEngineering, DisplayName = "{\"en\":\"Faculty of Engineering\",\"ar\":\"كلية الهندسة\"}",
+                        DeanId = dean.Id, DeanName = "{\"en\":\"Dr. Ali Suleiman Mohamed\",\"ar\":\"د. علي سليمان محمد\"}", ContactInfo = "هاتف: 02-23456789", CreatedAt = DateTime.Now.AddDays(-680)
                     },
                     new Faculty
                     {
-                        Id = Guid.NewGuid(), Name = FacultyTitle.FacultyOfCommerceAndBusinessAdministration, DisplayName = "كلية التجارة وإدارة الأعمال",
-                        DeanId = dean.Id, DeanName = "د. علي سليمان محمد", ContactInfo = "هاتف: 02-34567890", CreatedAt = DateTime.Now.AddDays(-660)
+                        Id = Guid.NewGuid(), Name = FacultyTitle.FacultyOfCommerceAndBusinessAdministration, DisplayName = "{\"en\":\"Faculty of Commerce and Business Admin\",\"ar\":\"كلية التجارة وإدارة الأعمال\"}",
+                        DeanId = dean.Id, DeanName = "{\"en\":\"Dr. Ali Suleiman Mohamed\",\"ar\":\"د. علي سليمان محمد\"}", ContactInfo = "هاتف: 02-34567890", CreatedAt = DateTime.Now.AddDays(-660)
                     }
                 };
 
@@ -299,9 +298,9 @@ namespace HUP.Data.Seeders
                 var departments = new List<Department>
                 {
                     // General Department for unassigned students (requirement: "doesn't have a department")
-                    new Department { Id = Guid.NewGuid(), FacultyId = csFaculty.Id, DepartmentName = "General", DepartmentCode = "GEN", DurationInYears = 4, CompulsoryHours = 120, ElectiveHours = 20, CreatedAt = DateTime.Now.AddDays(-650) },
-                    new Department { Id = Guid.NewGuid(), FacultyId = csFaculty.Id, DepartmentName = "علوم الحاسب", DepartmentCode = "CS", DurationInYears = 4, CompulsoryHours = 120, ElectiveHours = 20, CreatedAt = DateTime.Now.AddDays(-650) },
-                    new Department { Id = Guid.NewGuid(), FacultyId = csFaculty.Id, DepartmentName = "نظم المعلومات", DepartmentCode = "IS", DurationInYears = 4, CompulsoryHours = 115, ElectiveHours = 25, CreatedAt = DateTime.Now.AddDays(-640) }
+                    new Department { Id = Guid.NewGuid(), FacultyId = csFaculty.Id, DepartmentName = "{\"en\":\"General\",\"ar\":\"عام\"}", DepartmentCode = "GEN", DurationInYears = 4, CompulsoryHours = 120, ElectiveHours = 20, CreatedAt = DateTime.Now.AddDays(-650) },
+                    new Department { Id = Guid.NewGuid(), FacultyId = csFaculty.Id, DepartmentName = "{\"en\":\"Computer Science\",\"ar\":\"علوم الحاسب\"}", DepartmentCode = "CS", DurationInYears = 4, CompulsoryHours = 120, ElectiveHours = 20, CreatedAt = DateTime.Now.AddDays(-650) },
+                    new Department { Id = Guid.NewGuid(), FacultyId = csFaculty.Id, DepartmentName = "{\"en\":\"Information Systems\",\"ar\":\"نظم المعلومات\"}", DepartmentCode = "IS", DurationInYears = 4, CompulsoryHours = 115, ElectiveHours = 25, CreatedAt = DateTime.Now.AddDays(-640) }
                 };
 
                 await context.Departments.AddRangeAsync(departments);
@@ -347,7 +346,7 @@ namespace HUP.Data.Seeders
             {
                 var courses = new List<Course>();
                 // We need 14 history subjects (6 Y1S1 + 6 Y1S2 + 2 Y1Sum) and 6 Y2S1 subjects and ~10 Y2S2 subjects. Total = 30 courses minimum.
-                string[] subjects = {
+                string[] englishNames = {
                     "Prog 1", "Math 1", "Physics 1", "English 1", "Human Rights", "Discrete Math", // Y1S1
                     "OOP", "Math 2", "Physics 2", "Electronics", "English 2", "Tech Writing", // Y1S2
                     "Logic Design", "Probability", // Y1Summer
@@ -355,9 +354,23 @@ namespace HUP.Data.Seeders
                     "DB Systems", "Software Eng", "OS", "Networks", "AI", "Graphics", "Security", "Web Dev", "Machine Learning", "Cloud" // Y2S2
                 };
 
-                for (int i = 0; i < subjects.Length; i++)
+                string[] arabicNames = {
+                    "برمجة 1", "رياضيات 1", "فيزياء 1", "انجليزي 1", "حقوق انسان", "رياضيات متقطعة", // Y1S1
+                    "برمجة كينونية", "رياضيات 2", "فيزياء 2", "الكترونيات", "انجليزي 2", "كتابة تقنية", // Y1S2
+                    "تصميم منطقي", "احتمالات", // Y1Summer
+                    "هياكل بيانات", "معمارية حاسب", "خوارزميات", "تحليل نظم", "جبر خطي", "بحوث عمليات", // Y2S1
+                    "نظم قواعد بيانات", "هندسة برمجيات", "نظم تشغيل", "شبكات", "ذكاء اصطناعي", "رسوميات حاسب", "أمن معلومات", "تطوير ويب", "تعلم آلة", "حوسبة سحابية" // Y2S2
+                };
+
+                for (int i = 0; i < englishNames.Length; i++)
                 {
-                    courses.Add(new Course { Id = Guid.NewGuid(), CourseCode = $"CS{100 + i}", CourseName = subjects[i], Credits = 3, CreatedAt = DateTime.Now.AddDays(-300) });
+                    courses.Add(new Course {
+                        Id = Guid.NewGuid(),
+                        CourseCode = $"CS{100 + i}",
+                        CourseName = $"{{\"en\":\"{englishNames[i]}\",\"ar\":\"{arabicNames[i]}\"}}",
+                        Credits = 3,
+                        CreatedAt = DateTime.Now.AddDays(-300)
+                    });
                 }
 
                 await context.Courses.AddRangeAsync(courses);
@@ -385,12 +398,12 @@ namespace HUP.Data.Seeders
                 var now = DateTime.UtcNow;
                 var semesters = new List<Semester>
                 {
-                    new Semester { Id = Guid.NewGuid(), SemesterName = "Y1-S1", StartDate = now.AddMonths(-18), EndDate = now.AddMonths(-15), RegistrationDeadline = now.AddMonths(-18).AddDays(14), DropDeadline = now.AddMonths(-18).AddDays(30), IsActive = false, CreatedAt = now },
-                    new Semester { Id = Guid.NewGuid(), SemesterName = "Y1-S2", StartDate = now.AddMonths(-12), EndDate = now.AddMonths(-9), RegistrationDeadline = now.AddMonths(-12).AddDays(14), DropDeadline = now.AddMonths(-12).AddDays(30), IsActive = false, CreatedAt = now },
-                    new Semester { Id = Guid.NewGuid(), SemesterName = "Y1-Sum", StartDate = now.AddMonths(-8), EndDate = now.AddMonths(-6), RegistrationDeadline = now.AddMonths(-8).AddDays(14), DropDeadline = now.AddMonths(-8).AddDays(30), IsActive = false, CreatedAt = now },
-                    new Semester { Id = Guid.NewGuid(), SemesterName = "Y2-S1", StartDate = now.AddMonths(-6), EndDate = now.AddMonths(-3), RegistrationDeadline = now.AddMonths(-6).AddDays(14), DropDeadline = now.AddMonths(-6).AddDays(30), IsActive = false, CreatedAt = now },
+                    new Semester { Id = Guid.NewGuid(), SemesterName = "{\"en\":\"Y1-Fall\",\"ar\":\"سنة 1 - خريف\"}", StartDate = now.AddMonths(-18), EndDate = now.AddMonths(-15), RegistrationDeadline = now.AddMonths(-18).AddDays(14), DropDeadline = now.AddMonths(-18).AddDays(30), IsActive = false, CreatedAt = now },
+                    new Semester { Id = Guid.NewGuid(), SemesterName = "{\"en\":\"Y1-Spring\",\"ar\":\"سنة 1 - ربيع\"}", StartDate = now.AddMonths(-12), EndDate = now.AddMonths(-9), RegistrationDeadline = now.AddMonths(-12).AddDays(14), DropDeadline = now.AddMonths(-12).AddDays(30), IsActive = false, CreatedAt = now },
+                    new Semester { Id = Guid.NewGuid(), SemesterName = "{\"en\":\"Y1-Summer\",\"ar\":\"سنة 1 - صيف\"}", StartDate = now.AddMonths(-8), EndDate = now.AddMonths(-6), RegistrationDeadline = now.AddMonths(-8).AddDays(14), DropDeadline = now.AddMonths(-8).AddDays(30), IsActive = false, CreatedAt = now },
+                    new Semester { Id = Guid.NewGuid(), SemesterName = "{\"en\":\"Y2-Fall\",\"ar\":\"سنة 2 - خريف\"}", StartDate = now.AddMonths(-6), EndDate = now.AddMonths(-3), RegistrationDeadline = now.AddMonths(-6).AddDays(14), DropDeadline = now.AddMonths(-6).AddDays(30), IsActive = false, CreatedAt = now },
                     // Active semester! Ensure StartDate is well in the past so GPA check passes!
-                    new Semester { Id = Guid.NewGuid(), SemesterName = "Y2-S2 (Current)", StartDate = now.AddDays(-2), EndDate = now.AddMonths(3), RegistrationDeadline = now.AddDays(14), DropDeadline = now.AddDays(30), IsActive = true, CreatedAt = now }
+                    new Semester { Id = Guid.NewGuid(), SemesterName = "{\"en\":\"Y2-Spring (Current)\",\"ar\":\"سنة 2 - ربيع (الحالي)\"}", StartDate = now.AddDays(-2), EndDate = now.AddMonths(3), RegistrationDeadline = now.AddDays(14), DropDeadline = now.AddDays(30), IsActive = true, CreatedAt = now }
                 };
                 await context.Semesters.AddRangeAsync(semesters);
                 await context.SaveChangesAsync();
@@ -475,7 +488,7 @@ namespace HUP.Data.Seeders
                         {
                             Id = Guid.NewGuid(), CourseOfferingId = offering.Id, InstructorId = profAhmed.Id,
                             Group = $"G{g}", DayOfWeek = (System.DayOfWeek)(int)slot.Day, StartTime = slot.Start, EndTime = slot.End,
-                            Hall = $"Hall {(g)}", InstructorName = profAhmed.User.FullName, TotalSeats = 50, AvailableSeats = 50
+                            Hall = $"{{\"en\":\"Hall {g}\",\"ar\":\"قاعة {g}\"}}", InstructorName = profAhmed.User.FullName, TotalSeats = 50, AvailableSeats = 50
                         });
                         slotIdx++;
                     }
@@ -496,7 +509,7 @@ namespace HUP.Data.Seeders
 
                 foreach (var offering in activeOfferings.Take(3)) // Just seed a few
                 {
-                    exams.Add(new Exam { Id = Guid.NewGuid(), CourseOfferingId = offering.Id, ExamType = ExamType.Midterm, ExamDate = new DateOnly(2025, 4, 15), ExamTime = new TimeOnly(9, 0), Location = "Exam Hall" });
+                    exams.Add(new Exam { Id = Guid.NewGuid(), CourseOfferingId = offering.Id, ExamType = ExamType.Midterm, ExamDate = new DateOnly(2025, 4, 15), ExamTime = new TimeOnly(9, 0), Location = "{\"en\":\"Exam Hall 1\",\"ar\":\"قاعة امتحانات 1\"}" });
                 }
 
                 await context.Exams.AddRangeAsync(exams);
