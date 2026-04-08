@@ -124,6 +124,18 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<HupDbContext>();
+    // Apply pending migrations if any
+    if (context.Database.IsRelational())
+    {
+        context.Database.Migrate();
+    }
+    // Seed the comprehensive test data
+    HUP.Data.DatabaseSeeder.Initialize(context);
+}
+
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 if (app.Environment.IsDevelopment())

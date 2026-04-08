@@ -37,7 +37,7 @@ namespace HUP.Tests
                 {
                     var db = scope.ServiceProvider.GetRequiredService<HupDbContext>();
                     db.Database.EnsureCreated(); // Ensure DB is clean
-                    DatabaseSeeder.Initialize(db);
+                    HUP.Data.DatabaseSeeder.Initialize(db);
                 }
             });
 

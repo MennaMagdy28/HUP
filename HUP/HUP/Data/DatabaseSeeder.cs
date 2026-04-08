@@ -13,7 +13,7 @@ using Gender = HUP.Core.Enums.Gender;
 using DayOfWeek = HUP.Core.Enums.DayOfWeek;
 using HUP.Core.Enums.Financial;
 
-namespace HUP.Tests
+namespace HUP.Data
 {
     public static class DatabaseSeeder
     {
