@@ -1,9 +1,9 @@
 using HUP.Repositories.Interfaces;
 using HUP.Core.Entities.Academics;
-using HUP.Core.Enums;
 using HUP.Data;
 using Microsoft.EntityFrameworkCore;
 using HUP.Core.Models;
+using HUP.Core.Enums.AcademicEnums;
 
 namespace HUP.Repositories.Implementations
 {
@@ -53,22 +53,13 @@ namespace HUP.Repositories.Implementations
 
         public async Task<Enrollment> GetByIdWithDetailsAsync(Guid id)
         {
-            var enrollment = await _context.Enrollments
-                .Include(e => e.CourseOffering)
-                    .ThenInclude(co => co.Course)
-                .Include(e => e.Schedule)
-                .Include(e => e.Student)
-                .AsNoTracking()
+            var enrollment = await _context.Enrollments.AsNoTracking()
                 .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
             return enrollment;
         }
         public async Task<Enrollment> GetByIdTrackingAsync(Guid id)
         {
             var enrollment = await _context.Enrollments
-                .Include(e => e.CourseOffering)
-                    .ThenInclude(co => co.Course)
-                .Include(e => e.Schedule)
-                .Include(e => e.Student)
                 .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
             return enrollment;
         }
@@ -80,7 +71,6 @@ namespace HUP.Repositories.Implementations
                     .ThenInclude(co => co.Course)
                 .Include(e => e.CourseOffering)
                     .ThenInclude(co => co.Schedules) // Needed for conflict check in Service
-                .Include(e => e.Schedule)
                 .Where(e => e.StudentId == studentId && e.CourseOffering.Semester.SemesterName == semester)
                 .ToListAsync();
         }

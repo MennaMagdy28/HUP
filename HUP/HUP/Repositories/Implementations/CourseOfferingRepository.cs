@@ -1,5 +1,5 @@
 using HUP.Core.Entities.Academics;
-using HUP.Core.Enums;
+using HUP.Core.Enums.AcademicEnums;
 using HUP.Data;
 using HUP.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -46,11 +46,7 @@ namespace HUP.Repositories.Implementations
 
         public async Task<CourseOffering?> GetExistingAsync(Guid courseId, Guid deptId, Guid semesterId)
         {
-            var entity = await _context.CourseOfferings
-                .Include(co => co.Course)
-                .Include(co => co.Semester)
-                .Include(co => co.Schedules)
-                .Where(co => co.CourseId == courseId
+            var entity = await _context.CourseOfferings.Where(co => co.CourseId == courseId
                                                                     && co.DepartmentId == deptId
                                                                     && co.SemesterId == semesterId
                                                                     && !co.IsDeleted).AsNoTracking().FirstOrDefaultAsync();
@@ -62,7 +58,6 @@ namespace HUP.Repositories.Implementations
             return await _context.CourseOfferings
                 .Include(co => co.Course)
                 .Include(co => co.Semester)
-                .Include(co => co.Schedules)
                 .Where(co => !co.IsDeleted)
                 .AsNoTracking()
                 .ToListAsync();
@@ -73,7 +68,6 @@ namespace HUP.Repositories.Implementations
             var co = await _context.CourseOfferings
                 .Include(co => co.Course)
                 .Include(co => co.Semester)
-                .Include(co => co.Schedules)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(co => co.Id == id && !co.IsDeleted);
             return co;
@@ -83,7 +77,6 @@ namespace HUP.Repositories.Implementations
             var co = await _context.CourseOfferings
                 .Include(co => co.Course)
                 .Include(co => co.Semester)
-                .Include(co => co.Schedules)
                 .FirstOrDefaultAsync(co => co.Id == id && !co.IsDeleted);
             return co;
         }

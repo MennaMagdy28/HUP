@@ -42,15 +42,13 @@ namespace HUP.API.Controllers
         // POST: api/Enrollment
         [HttpPost]
         //[Authorize(Policy = AppPermissions.CREATE_ENROLLMENT)]
-        public async Task<IActionResult> Create([FromBody] List<CreateEnrollmentDto> createDtos)
+        public async Task<IActionResult> Create([FromBody] CreateEnrollmentDto createDto)
         {
-            var studentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            foreach (var dto in createDtos)
-            {
-                dto.StudentId = studentId;
-            }
-
-            await _service.AddAsync(createDtos);
+            createDto.StudentId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var exist = await _service.Exists(createDto);
+            if (exist)
+                return BadRequest("The Course is registered");
+            await _service.AddAsync(createDto);
             return StatusCode(StatusCodes.Status201Created);
         }
 

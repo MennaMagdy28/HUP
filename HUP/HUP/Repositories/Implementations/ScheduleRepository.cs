@@ -1,5 +1,4 @@
 using HUP.Core.Entities.Academics;
-using HUP.Core.Models;
 using HUP.Data;
 using HUP.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -18,52 +17,33 @@ namespace HUP.Repositories.Implementations
                 .Where(s => s.Id == id)
                 .Include(s => s.CourseOffering)
                     .ThenInclude(co => co.Course)
-                .Include(s => s.Staff)
+                .Include(s => s.Instructor)
                 .AsNoTracking().FirstOrDefaultAsync();
             return s;
         }
 
-        public async Task<IEnumerable<ScheduleSlot>> GetByStudentEnrollmentsAsync(Guid studentId)
+        public async Task<IEnumerable<Schedule>> GetByStudentEnrollmentsAsync(Guid studentId)
         {
-            var schedules = await _context.Enrollments
+            return await _context.Enrollments
                 .Where(e => e.StudentId == studentId && !e.IsDeleted)
-                .Select(e => new ScheduleSlot
-                {
-                    SlotId = e.ScheduleId,
-                    CourseOfferingId = e.CourseOfferingId ,
-                    StaffName = e.Schedule.Staff.User.FullName,
-                    CourseName = e.CourseOffering.Course.CourseName,
-                    CourseCode = e.CourseOffering.Course.CourseCode,
-                    Hall = e.Schedule.Hall,
-                    StartTime = e.Schedule.StartTime,
-                    EndTime = e.Schedule.EndTime,
-                    Group = e.Schedule.Group,
-                    DayOfWeek = e.Schedule.DayOfWeek
-                })
+                .Where(e => e.CourseOffering.Semester.IsActive) // Filter by active semester
+                .SelectMany(e => e.CourseOffering.Schedules)
+                .Include(s => s.CourseOffering)
+                    .ThenInclude(co => co.Course)
+                .Include(s => s.Instructor)
+                    .ThenInclude(i => i.User)
                 .AsNoTracking()
                 .ToListAsync();
-
-            return schedules;
         }
 
-        public async Task<IEnumerable<ScheduleSlot>> GetAvailableSlotsAsync()
+        public async Task<IEnumerable<Schedule>> GetAvailableSlotsAsync()
         {
             return await _context.Schedules
                 .Where(s => s.AvailableSeats > 0 && !s.IsDeleted)
                 .Where(s => s.CourseOffering.Semester.IsActive) // Filter by active semester
-                .Select(s => new ScheduleSlot
-                {
-                    SlotId = s.Id,
-                    CourseOfferingId = s.CourseOfferingId,
-                    StaffName = s.Staff.User.FullName,
-                    CourseName = s.CourseOffering.Course.CourseName,
-                    CourseCode = s.CourseOffering.Course.CourseCode,
-                    Hall = s.Hall,
-                    StartTime = s.StartTime,
-                    EndTime = s.EndTime,
-                    Group = s.Group,
-                    DayOfWeek = s.DayOfWeek
-                })
+                .Include(s => s.CourseOffering)
+                    .ThenInclude(co => co.Course)
+                .Include(s => s.Instructor)
                 .AsNoTracking()
                 .ToListAsync();
         }

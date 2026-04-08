@@ -6,6 +6,5 @@ namespace HUP.Application.DTOs.AcademicDtos.Enrollment
     {
         public Guid StudentId { get; set; }
         public Guid CourseOfferingId { get; set; }
-        public Guid ScheduleId { get; set; }
     }
 }

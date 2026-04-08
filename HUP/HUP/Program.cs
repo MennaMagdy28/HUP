@@ -27,17 +27,11 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
 
-if (!string.IsNullOrEmpty(connectionString))
-{
-    builder.Services.AddDbContext<HupDbContext>(options =>
-        options.UseSqlServer(connectionString)
-    );
-}
+builder.Services.AddDbContext<HupDbContext>(options =>
+    options.UseSqlServer(connectionString)
+);
 // redis connection
-if (!string.IsNullOrEmpty(redisConnectionString))
-{
-    builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
-}
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
 //cache service (singleton)
 builder.Services.AddSingleton<ICacheService, CacheService>();
 
@@ -68,9 +62,14 @@ builder.Services.AddAuthentication(options =>
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
+            RoleClaimType = "roleId",
+            NameClaimType = "NationalId"
         };
     });
+
+// Map inbound claims to support both standard string mappings and direct URIs
+System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 builder.Services.AddAuthorization(options =>
 {
@@ -122,7 +121,15 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddScoped<HUP.Data.Seeders.DataSeeder>();
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<HUP.Data.Seeders.DataSeeder>();
+    await seeder.SeedAsync();
+}
 
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
@@ -136,10 +143,9 @@ app.UseCors("AllowReactApp");
 app.UseStaticFiles();
 
 //app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
-
-public partial class Program { }
