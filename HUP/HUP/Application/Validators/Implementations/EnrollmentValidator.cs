@@ -69,14 +69,14 @@ namespace HUP.Application.Validators.Implementations
                 var courseOffering = await _offeringRepo.GetWithSchedulesAsync(dto.CourseOfferingId);
                 if (courseOffering == null)
                     throw new InvalidOperationException($"Course offering {dto.CourseOfferingId} not found.");
-                
+
                 if (courseOffering.Semester == null)
                     throw new InvalidOperationException($"Course offering {dto.CourseOfferingId} does not have a semester associated.");
 
                 // Use IScheduleRepository to fetch schedule directly if not found in CourseOffering.Schedules
                 // This bypasses any potential EF Core filtering issues on collections if they exist
                 var targetSchedule = await _scheduleRepo.GetByIdReadOnly(dto.ScheduleId);
-                
+
                 if (targetSchedule == null || targetSchedule.CourseOfferingId != dto.CourseOfferingId)
                     throw new InvalidOperationException($"Schedule {dto.ScheduleId} not found or does not belong to course offering {dto.CourseOfferingId}.");
 
