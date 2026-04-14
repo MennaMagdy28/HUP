@@ -1,16 +1,19 @@
 using HUP.Core.Entities.Shared;
 using HUP.Core.Enums.Financial;
+using System;
+using System.Collections.Generic;
 
 namespace HUP.Core.Entities.Financial
 {
     public class Payment : BaseEntity
     {
-        public Guid StudentFeeId { get; set; }
-        public decimal Amount { get; set; }
+        public Guid InvoiceId { get; set; }
+        public decimal AmountPaid { get; set; }
         public DateTime PaymentDate { get; set; }
-        public PaymentMethod Method { get; set; } // Online, Cash, BankTransfer
-        public string ReferenceNumber { get; set; } // Transaction ID
+        public PaymentMethod Method { get; set; }
+        public string ReferenceNumber { get; set; }
 
-        public StudentFee StudentFee { get; set; }
+        public Invoice Invoice { get; set; }
+        public ICollection<PaymentHistory> History { get; set; }
     }
 }

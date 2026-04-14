@@ -5,7 +5,7 @@ using HUP.Core.Entities.Academics;
 using HUP.Core.Entities.Identity;
 using HUP.Core.Entities.Permissions;
 using HUP.Core.Entities.Financial;
-
+using HUP.Core.Entities.Administrative;
 
 namespace HUP.Data
 {
@@ -32,7 +32,14 @@ namespace HUP.Data
         public DbSet<Fee> Fees { get; set; }
         public DbSet<StudentFee> StudentFees { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        
+        public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<InvoiceItem> InvoiceItems { get; set; }
+        public DbSet<PaymentHistory> PaymentHistories { get; set; }
+        public DbSet<StudentRequest> StudentRequests { get; set; }
+        public DbSet<RequestType> RequestTypes { get; set; }
+        public DbSet<RequestTypeScope> RequestTypeScopes { get; set; }
+        public DbSet<RequestMessage> RequestMessages { get; set; }
+        public DbSet<RequestDocument> RequestDocuments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -256,10 +263,79 @@ namespace HUP.Data
                 .HasForeignKey(sf => sf.FeeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Payment relation changed to Invoice
             modelBuilder.Entity<Payment>()
-                .HasOne(p => p.StudentFee)
+                .HasOne(p => p.Invoice)
+                .WithMany(i => i.Payments)
+                .HasForeignKey(p => p.InvoiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // New Financial Relationships
+            modelBuilder.Entity<Invoice>()
+                .HasOne(i => i.Student)
                 .WithMany()
-                .HasForeignKey(p => p.StudentFeeId)
+                .HasForeignKey(i => i.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Invoice>()
+                .HasOne(i => i.Semester)
+                .WithMany()
+                .HasForeignKey(i => i.SemesterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<InvoiceItem>()
+                .HasOne(ii => ii.Invoice)
+                .WithMany(i => i.Items)
+                .HasForeignKey(ii => ii.InvoiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PaymentHistory>()
+                .HasOne(ph => ph.Payment)
+                .WithMany(p => p.History)
+                .HasForeignKey(ph => ph.PaymentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Administrative Relationships (Requests)
+            modelBuilder.Entity<StudentRequest>()
+                .HasOne(sr => sr.Student)
+                .WithMany()
+                .HasForeignKey(sr => sr.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StudentRequest>()
+                .HasOne(sr => sr.RequestType)
+                .WithMany(rt => rt.Requests)
+                .HasForeignKey(sr => sr.RequestTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RequestMessage>()
+                .HasOne(rm => rm.Request)
+                .WithMany(sr => sr.Messages)
+                .HasForeignKey(rm => rm.RequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RequestDocument>()
+                .HasOne(rd => rd.Request)
+                .WithMany(sr => sr.Documents)
+                .HasForeignKey(rd => rd.RequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RequestTypeScope>()
+                .HasOne(rts => rts.RequestType)
+                .WithMany(rt => rt.Scopes)
+                .HasForeignKey(rts => rts.RequestTypeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RequestTypeScope>()
+                .HasOne(rts => rts.Faculty)
+                .WithMany()
+                .HasForeignKey(rts => rts.FacultyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RequestTypeScope>()
+                .HasOne(rts => rts.Department)
+                .WithMany()
+                .HasForeignKey(rts => rts.DepartmentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Apply Global Query Filter for BaseEntity
