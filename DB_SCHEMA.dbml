@@ -1,0 +1,398 @@
+// Enum definitions
+
+Enum AcademicStatus {
+  Active
+  Graduated
+}
+
+Enum ExamType {
+  Midterm
+  Final
+}
+
+Enum EnrollmentStatus {
+  Registered
+  InProgress
+  Completed
+  Incomplete
+  Failed
+  Dropped
+}
+
+Enum RequirementType {
+  University
+  Faculty
+  Department
+}
+
+Enum DayOfWeek {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+}
+
+Enum StaffTitle {
+  Instructor
+  Professor
+  AssistantProfessor
+  TeachingAssistant
+  AdminStaff
+  HR
+}
+
+Enum StaffCategory {
+  None
+  Academic
+  Administrative
+}
+
+Enum FacultyTitle {
+  FacultyOfArts
+  FacultyOfHomeEconomics
+  FacultyOfEducation
+  FacultyOfNursing
+  FacultyOfComputingAndAI
+  FacultyOfSocialWork
+  FacultyOfPharmacy
+  FacultyOfMedicine
+  FacultyOfScience
+  FacultyOfAppliedArts
+  FacultyOfFineArts
+  FacultyOfSportsScienceBoys
+  FacultyOfSportsScienceGirls
+  FacultyOfEngineeringMataria
+  FacultyOfEngineering
+  FacultyOfCommerceAndBusinessAdministration
+  FacultyOfArtEducation
+  TechnicalInstituteOfNursing
+  FacultyOfTechnologyAndEducation
+  FacultyOfLaw
+  FacultyOfMusicEducation
+  FacultyOfTourismAndHotels
+  FacultyOfNutritionScience
+}
+
+Enum Gender {
+  Male
+  Female
+}
+
+Enum Religion {
+  Muslim
+  Christian
+}
+
+Enum Nationality {
+  Egyptian
+}
+
+Enum BirthPlace {
+}
+
+Enum City {
+}
+
+Enum FeeStatus {
+  Pending
+  PartiallyPaid
+  Paid
+  Overdue
+  Waived
+}
+
+Enum PaymentMethod {
+  Cash
+  Online
+  BankTransfer
+  Cheque
+}
+
+Enum FeeType {
+  Tuition
+  Book
+  Lab
+  Bus
+  Activity
+  Other
+}
+
+
+// Table Definitions
+
+Table Users {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  NationalId string
+  Email string [null]
+  PasswordHash string
+  PasswordExpiryDate DateTime
+  FullName string
+  IsActive bool [default: true]
+  RoleId Guid
+
+  // UserPersonalInfo (Owned Entity)
+  PersonalInfo_Gender Gender
+  PersonalInfo_BirthDate DateTime
+  PersonalInfo_Religion Religion
+  PersonalInfo_Nationality Nationality
+  PersonalInfo_BirthPlace BirthPlace
+
+  // UserContact (Owned Entity)
+  ContactInfo_Address string [null]
+  ContactInfo_City City [null]
+  ContactInfo_PhoneNumber string [null]
+  ContactInfo_AltEmail string [null]
+}
+
+Table Roles {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  Name string
+  DisplayName string
+  Description string [null]
+  CreatedBy Guid [null]
+}
+
+Table Permissions {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  Name string
+  DisplayName string
+  Description string [null]
+}
+
+Table RolePermissions {
+  RoleId Guid [pk]
+  PermissionId Guid [pk]
+}
+
+Table Students {
+  UserId Guid [pk]
+  UniversityCode string
+  UniversityEmail string
+  ProfileImage string [null]
+  AcademicStatus AcademicStatus
+  DepartmentId Guid
+  Level int
+  Cgpa decimal
+  Group string
+}
+
+Table Staff {
+  UserId Guid [pk]
+  DepartmentId Guid [null]
+  FacultyId Guid [null]
+  DepartmentHeadedId Guid [null]
+  Title StaffTitle
+  Category StaffCategory
+}
+
+Table Faculties {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  Name FacultyTitle
+  DisplayName string
+  DeanId Guid
+  DeanName string
+  ContactInfo string
+}
+
+Table Departments {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  DepartmentName string
+  DepartmentCode string
+  FacultyId Guid
+  HeadOfDepartmentId Guid [null]
+  DurationInYears int
+  CompulsoryHours int
+  ElectiveHours int
+}
+
+Table Courses {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  CourseCode string
+  CourseName string
+  Credits int
+  PrerequisiteId Guid [null]
+}
+
+Table Semesters {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  SemesterName string
+  StartDate DateTime
+  EndDate DateTime
+  RegistrationDeadline DateTime
+  DropDeadline DateTime
+  IsActive bool
+}
+
+Table CourseOfferings {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  CourseId Guid
+  SemesterId Guid
+  DepartmentId Guid
+}
+
+Table ProgramPlan {
+  DepartmentId Guid [pk]
+  CourseId Guid [pk]
+  RequirementType RequirementType
+  IsCompulsory bool
+  FinalGrade decimal
+}
+
+Table Enrollments {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  StudentId Guid
+  CourseOfferingId Guid
+  EnrollmentDate DateTime
+  ClassGrade decimal
+  MidtermGrade decimal
+  finalGrade decimal
+  Status EnrollmentStatus
+  ScheduleId Guid
+}
+
+Table Schedules {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  CourseOfferingId Guid
+  StaffId Guid
+  Group string
+  DayOfWeek DayOfWeek
+  StartTime TimeSpan
+  EndTime TimeSpan
+  Hall string
+  StaffName string
+  TotalSeats int
+  AvailableSeats int
+}
+
+Table Exams {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  CourseOfferingId Guid
+  ExamType ExamType
+  ExamDate DateOnly
+  ExamTime TimeOnly
+  Location string
+}
+
+Table Fees {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  Name string
+  Description string
+  Amount decimal
+  IsPerCredit bool
+  DepartmentId Guid
+  Type FeeType
+  SemesterId Guid
+}
+
+Table StudentFees {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  StudentId Guid
+  FeeId Guid
+  Amount decimal
+  PaidAmount decimal
+  Status FeeStatus
+  DueDate DateTime
+}
+
+Table Payments {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  StudentFeeId Guid
+  Amount decimal
+  PaymentDate DateTime
+  Method PaymentMethod
+  ReferenceNumber string
+}
+
+
+// Relationships
+
+Ref: Users.RoleId > Roles.Id [delete: Restrict]
+Ref: Roles.CreatedBy > Users.Id [delete: Restrict]
+
+Ref: RolePermissions.RoleId > Roles.Id
+Ref: RolePermissions.PermissionId > Permissions.Id
+
+Ref: Students.UserId - Users.Id [delete: Cascade]
+Ref: Staff.UserId - Users.Id [delete: Cascade]
+
+Ref: Staff.FacultyId > Faculties.Id [delete: Restrict]
+Ref: Staff.DepartmentId > Departments.Id [delete: Restrict]
+Ref: Staff.DepartmentHeadedId - Departments.Id [delete: No Action]
+
+Ref: Faculties.DeanId - Users.Id [delete: Restrict]
+
+Ref: Departments.FacultyId > Faculties.Id [delete: Restrict]
+Ref: Departments.HeadOfDepartmentId - Staff.UserId [delete: Restrict]
+
+Ref: Courses.PrerequisiteId - Courses.Id [delete: Restrict]
+
+Ref: CourseOfferings.CourseId > Courses.Id [delete: Restrict]
+Ref: CourseOfferings.SemesterId > Semesters.Id [delete: Restrict]
+Ref: CourseOfferings.DepartmentId > Departments.Id [delete: Restrict]
+
+Ref: ProgramPlan.DepartmentId > Departments.Id [delete: Restrict]
+Ref: ProgramPlan.CourseId > Courses.Id [delete: Restrict]
+
+Ref: Students.DepartmentId > Departments.Id [delete: Restrict]
+
+Ref: Enrollments.StudentId > Students.UserId [delete: Restrict]
+Ref: Enrollments.CourseOfferingId > CourseOfferings.Id [delete: Restrict]
+Ref: Enrollments.ScheduleId > Schedules.Id [delete: Restrict]
+
+Ref: Schedules.CourseOfferingId > CourseOfferings.Id [delete: Restrict]
+Ref: Schedules.StaffId > Staff.UserId [delete: Restrict]
+
+Ref: Exams.CourseOfferingId > CourseOfferings.Id [delete: Restrict]
+
+Ref: Fees.DepartmentId > Departments.Id [delete: Restrict]
+Ref: Fees.SemesterId > Semesters.Id [delete: Restrict]
+
+Ref: StudentFees.StudentId > Students.UserId [delete: Restrict]
+Ref: StudentFees.FeeId > Fees.Id [delete: Restrict]
+
+Ref: Payments.StudentFeeId > StudentFees.Id [delete: Restrict]
