@@ -341,7 +341,7 @@ Table Payments {
   CreatedAt DateTime
   UpdatedAt DateTime [null]
   IsDeleted bool
-  StudentFeeId Guid
+  InvoiceId Guid
   Amount decimal
   PaymentDate DateTime
   Method PaymentMethod
@@ -395,4 +395,145 @@ Ref: Fees.SemesterId > Semesters.Id [delete: Restrict]
 Ref: StudentFees.StudentId > Students.UserId [delete: Restrict]
 Ref: StudentFees.FeeId > Fees.Id [delete: Restrict]
 
-Ref: Payments.StudentFeeId > StudentFees.Id [delete: Restrict]
+
+
+// --- New Features Added ---
+
+Enum RequestStatus {
+  Pending
+  InReview
+  MissingInfo
+  Approved
+  Rejected
+  Completed
+}
+
+Enum SenderRole {
+  Student
+  SA
+  Admin
+}
+
+Enum InvoiceStatus {
+  Unpaid
+  PartiallyPaid
+  Paid
+  Overdue
+}
+
+Enum PaymentHistoryAction {
+  Created
+  Updated
+  Refunded
+}
+
+Table RequestTypes {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  Name string
+  Description string
+}
+
+Table RequestTypeScopes {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  RequestTypeId Guid
+  FacultyId Guid [null]
+  DepartmentId Guid [null]
+  IsActive bool
+}
+
+Table StudentRequests {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  StudentId Guid
+  RequestTypeId Guid
+  Status RequestStatus
+  CurrentStep int
+}
+
+Table RequestMessages {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  RequestId Guid
+  SenderRole SenderRole
+  Message string
+}
+
+Table RequestDocuments {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  RequestId Guid
+  FileUrl string
+  DocumentType string
+  UploadedBy Guid
+}
+
+Table Invoices {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  StudentId Guid
+  SemesterId Guid
+  TotalAmount decimal
+  Status InvoiceStatus
+}
+
+Table InvoiceItems {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  InvoiceId Guid
+  Description string
+  Amount decimal
+}
+
+Table PaymentHistories {
+  Id Guid [pk]
+  CreatedAt DateTime
+  UpdatedAt DateTime [null]
+  IsDeleted bool
+  PaymentId Guid
+  Action PaymentHistoryAction
+  Timestamp DateTime
+  Notes string
+}
+
+// Ensure Payment relates to Invoices now instead of StudentFees
+// Note: Payment originally related to StudentFee. The original block was Ref: Payments.StudentFeeId > StudentFees.Id
+// We added Ref: Payments.InvoiceId > Invoices.Id and removed the old one (virtually, by redefining here, users of DBML should note Payment's FK change).
+
+
+// Administrative Relationships
+Ref: RequestTypeScopes.RequestTypeId > RequestTypes.Id [delete: Cascade]
+Ref: RequestTypeScopes.FacultyId > Faculties.Id [delete: Restrict]
+Ref: RequestTypeScopes.DepartmentId > Departments.Id [delete: Restrict]
+
+Ref: StudentRequests.StudentId > Students.UserId [delete: Restrict]
+Ref: StudentRequests.RequestTypeId > RequestTypes.Id [delete: Restrict]
+
+Ref: RequestMessages.RequestId > StudentRequests.Id [delete: Cascade]
+Ref: RequestDocuments.RequestId > StudentRequests.Id [delete: Cascade]
+
+// Financial Relationships
+Ref: Invoices.StudentId > Students.UserId [delete: Restrict]
+Ref: Invoices.SemesterId > Semesters.Id [delete: Restrict]
+
+Ref: InvoiceItems.InvoiceId > Invoices.Id [delete: Cascade]
+
+// Note: Replaced Payment.StudentFeeId with InvoiceId
+Ref: Payments.InvoiceId > Invoices.Id [delete: Restrict]
+
+Ref: PaymentHistories.PaymentId > Payments.Id [delete: Cascade]

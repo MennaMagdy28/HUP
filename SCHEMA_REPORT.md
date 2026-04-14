@@ -12,3 +12,13 @@ The system consists of interconnected modules dealing with Identity, Academics, 
 - `Faculty` has a `DeanId` to `User` instead of `Staff`, which is logically odd since deans are typically staff members. It may have been a design decision to bypass staff specifics for top level admins, but normally Dean is a specific Staff assignment.
 - `Enrollment.finalGrade` (camelCase) has non-standard casing compared to `MidtermGrade` and `ClassGrade`.
 - The EF Core setup configures `User.PersonalInfo` and `User.ContactInfo` as Owned Entities (`OwnsOne`), meaning these typically end up as columns in the `Users` table itself rather than separate tables, though they are modeled as separate C# classes. The DBML treats them as columns on `Users`.
+
+## Update: Student Requests & Invoicing System Extensions
+### Student Requests System
+A robust scoped request system was added. `RequestType` defines available requests, while `RequestTypeScope` bounds these types to either Global (both `FacultyId` and `DepartmentId` are null), Faculty-wide, or Department-specific. Department scope is the most specific. `StudentRequest` tracks the active workflow steps, while `RequestMessage` and `RequestDocument` track comments and requirements related to the request.
+
+### Fees / Finance Module
+The previous simple `Fee`/`StudentFee` model has been expanded to a robust `Invoice` system. `Invoice` bridges `Student` and `Semester`, aggregating totals. `InvoiceItem` lists individual charges (which may still tie back to `Fees` conceptually, but decouple the exact lines). `Payment` was updated to fulfill an `InvoiceId` instead of `StudentFeeId`, and `PaymentHistory` allows tracking life cycles (Creation, Updates, Refunds) per payment, ensuring traceability.
+
+### Scoping Conflict/Consideration
+`StudentFee` is still present. To maintain backward compatibility while fully satisfying the new `Invoice` logic, `Payment` was repointed. In a true migration, `StudentFee` might either be deprecated in favor of `InvoiceItem`, or serve as an intermediate ledger that generates `Invoices`. For now, `Invoice` correctly handles all semester billing grouping per the new requirement.
