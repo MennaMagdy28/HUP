@@ -1,0 +1,1 @@
+using HUP.BuildingBlocks.Application; namespace HUP.Modules.AcademicStructure.Application.Features.GetDepartments { public class GetDepartmentsHandler { public async Task<Result<List<DepartmentDto>>> HandleAsync(GetDepartmentsQuery request, CancellationToken token) { return Result<List<DepartmentDto>>.Success(new List<DepartmentDto>()); } } }

@@ -1,0 +1,1 @@
+using HUP.BuildingBlocks.Application; namespace HUP.Modules.Privileges.Application.Features.AssignPermissionToRole { public class AssignPermissionHandler { public async Task<Result> HandleAsync(AssignPermissionCommand request, CancellationToken cancellationToken) { return Result.Success(); } } }

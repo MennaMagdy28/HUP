@@ -1,0 +1,1 @@
+using HUP.BuildingBlocks.Domain; namespace HUP.Modules.AcademicStructure.Domain { public class TermBasedTrack : BaseEntity { public Guid DepartmentId { get; set; } public Department Department { get; set; } } }

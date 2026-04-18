@@ -1,0 +1,1 @@
+using Riok.Mapperly.Abstractions; using HUP.Modules.Students.Application.Features.GetStudentById; namespace HUP.Modules.Students.Application { [Mapper] public partial class StudentMapper { public partial StudentDto StudentToStudentDto(Domain.Student student); } }

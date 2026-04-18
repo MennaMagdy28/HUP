@@ -1,0 +1,1 @@
+using HUP.BuildingBlocks.Application; namespace HUP.Modules.Students.Application.Features.CreateStudent { public class CreateStudentHandler { public async Task<Result<Guid>> HandleAsync(CreateStudentQuery request, CancellationToken cancellationToken) { return Result<Guid>.Success(Guid.NewGuid()); } } }

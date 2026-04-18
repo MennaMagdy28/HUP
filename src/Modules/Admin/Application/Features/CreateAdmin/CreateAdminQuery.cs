@@ -1,0 +1,1 @@
+namespace HUP.Modules.Admin.Application.Features.CreateAdmin { public class CreateAdminQuery { public string Email { get; set; } public string Password { get; set; } public string FullName { get; set; } public Domain.AdminRole Role { get; set; } public Guid? FacultyId { get; set; } public Guid? DepartmentId { get; set; } } }
