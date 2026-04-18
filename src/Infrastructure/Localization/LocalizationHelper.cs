@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.Json;
-using BuildingBlocks.Domain.Attributes;
+using Infrastructure.Localization;
 
-namespace BuildingBlocks.Application.Helpers
+namespace Infrastructure.Localization
 {
     public static class LocalizationHelper
     {

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BuildingBlocks.Application.Extensions
+namespace Infrastructure.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {

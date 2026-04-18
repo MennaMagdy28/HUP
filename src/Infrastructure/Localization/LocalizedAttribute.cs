@@ -1,6 +1,6 @@
 using System;
 
-namespace BuildingBlocks.Domain.Attributes
+namespace Infrastructure.Localization
 {
     [AttributeUsage(AttributeTargets.Field)]
     public class LocalizedAttribute : Attribute

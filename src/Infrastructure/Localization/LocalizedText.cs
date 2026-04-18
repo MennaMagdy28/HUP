@@ -1,4 +1,4 @@
-namespace BuildingBlocks.Domain.Models
+namespace Infrastructure.Localization
 {
     public class LocalizedText
     {
