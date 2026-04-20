@@ -1,1 +1,12 @@
-using HUP.BuildingBlocks.Application; using HUP.Modules.Admin.Domain; namespace HUP.Modules.Admin.Application.Features.GetAdmins { public class GetAdminsHandler { public async Task<Result<List<AdminDto>>> HandleAsync(GetAdminsQuery request, CancellationToken cancellationToken) { return Result<List<AdminDto>>.Success(new List<AdminDto>()); } } }
+using HUP.BuildingBlocks.Application;
+using HUP.Modules.Admin.Domain;
+namespace HUP.Modules.Admin.Application.Features.GetAdmins
+{
+    public class GetAdminsHandler
+    {
+        public async Task<Result<List<AdminDto>>> HandleAsync(GetAdminsQuery request, CancellationToken cancellationToken)
+        {
+            return Result<List<AdminDto>>.Success(new List<AdminDto>());
+        }
+    }
+}

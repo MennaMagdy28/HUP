@@ -1,1 +1,6 @@
-namespace HUP.Infrastructure.Auth { public class JwtService { } }
+namespace HUP.Infrastructure.Auth
+{
+    public class JwtService
+    {
+    }
+}

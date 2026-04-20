@@ -1,1 +1,15 @@
-using Microsoft.EntityFrameworkCore; using HUP.BuildingBlocks.Application; namespace HUP.BuildingBlocks.Infrastructure { public abstract class BaseDbContext : DbContext, IUnitOfWork { protected BaseDbContext(DbContextOptions options) : base(options) { } public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) { return await base.SaveChangesAsync(cancellationToken); } } }
+using Microsoft.EntityFrameworkCore;
+using HUP.BuildingBlocks.Application;
+namespace HUP.BuildingBlocks.Infrastructure
+{
+    public abstract class BaseDbContext : DbContext, IUnitOfWork
+    {
+        protected BaseDbContext(DbContextOptions options) : base(options)
+        {
+        }
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+    }
+}

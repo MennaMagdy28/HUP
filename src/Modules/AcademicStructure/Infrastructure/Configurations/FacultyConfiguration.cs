@@ -1,1 +1,15 @@
-using Microsoft.EntityFrameworkCore; using Microsoft.EntityFrameworkCore.Metadata.Builders; using HUP.Modules.AcademicStructure.Domain; namespace HUP.Modules.AcademicStructure.Infrastructure.Configurations { public class FacultyConfiguration : IEntityTypeConfiguration<Faculty> { public void Configure(EntityTypeBuilder<Faculty> builder) { builder.HasKey(x => x.Id); builder.Property(x => x.Name).IsRequired().HasMaxLength(255); builder.HasMany(x => x.Departments).WithOne(x => x.Faculty).HasForeignKey(x => x.FacultyId); } } }
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using HUP.Modules.AcademicStructure.Domain;
+namespace HUP.Modules.AcademicStructure.Infrastructure.Configurations
+{
+    public class FacultyConfiguration : IEntityTypeConfiguration<Faculty>
+    {
+        public void Configure(EntityTypeBuilder<Faculty> builder)
+        {
+            builder.HasKey(x => x.Id);
+            builder.Property(x => x.Name).IsRequired().HasMaxLength(255);
+            builder.HasMany(x => x.Departments).WithOne(x => x.Faculty).HasForeignKey(x => x.FacultyId);
+        }
+    }
+}

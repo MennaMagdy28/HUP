@@ -1,1 +1,3 @@
-namespace HUP.Modules.AcademicStructure.Enums { }
+namespace HUP.Modules.AcademicStructure.Enums
+{
+}

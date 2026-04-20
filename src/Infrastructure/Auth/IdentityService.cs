@@ -1,1 +1,6 @@
-namespace HUP.Infrastructure.Auth { public class IdentityService { } }
+namespace HUP.Infrastructure.Auth
+{
+    public class IdentityService
+    {
+    }
+}

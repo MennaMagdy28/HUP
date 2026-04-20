@@ -1,1 +1,6 @@
-namespace HUP.Infrastructure.Caching { public class CacheKeys { } }
+namespace HUP.Infrastructure.Caching
+{
+    public class CacheKeys
+    {
+    }
+}

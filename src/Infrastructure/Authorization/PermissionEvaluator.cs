@@ -1,1 +1,6 @@
-namespace HUP.Infrastructure.Authorization { public class PermissionEvaluator { } }
+namespace HUP.Infrastructure.Authorization
+{
+    public class PermissionEvaluator
+    {
+    }
+}

@@ -1,1 +1,17 @@
-using HUP.BuildingBlocks.Domain; namespace HUP.Modules.Students.Domain { public class Student : BaseEntity { public string Email { get; set; } public string PasswordHash { get; set; } public string FullName { get; set; } public string UniversityCode { get; set; } public string UniversityEmail { get; set; } public string? ProfileImage { get; set; } public decimal Cgpa { get; set; } public int Level { get; set; } public string Group { get; set; } public Guid DepartmentId { get; set; } } }
+using HUP.BuildingBlocks.Domain;
+namespace HUP.Modules.Students.Domain
+{
+    public class Student : BaseEntity
+    {
+        public string Email { get; set; }
+        public string PasswordHash { get; set; }
+        public string FullName { get; set; }
+        public string UniversityCode { get; set; }
+        public string UniversityEmail { get; set; }
+        public string? ProfileImage { get; set; }
+        public decimal Cgpa { get; set; }
+        public int Level { get; set; }
+        public string Group { get; set; }
+        public Guid DepartmentId { get; set; }
+    }
+}

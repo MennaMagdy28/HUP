@@ -1,1 +1,3 @@
-namespace HUP.Modules.Students.Enums { }
+namespace HUP.Modules.Students.Enums
+{
+}

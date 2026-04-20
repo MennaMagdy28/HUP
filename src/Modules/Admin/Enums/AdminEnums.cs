@@ -1,1 +1,3 @@
-namespace HUP.Modules.Admin.Enums { }
+namespace HUP.Modules.Admin.Enums
+{
+}

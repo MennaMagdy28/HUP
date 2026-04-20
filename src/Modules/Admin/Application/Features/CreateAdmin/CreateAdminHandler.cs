@@ -1,1 +1,12 @@
-using HUP.BuildingBlocks.Application; using HUP.Modules.Admin.Domain; namespace HUP.Modules.Admin.Application.Features.CreateAdmin { public class CreateAdminHandler { public async Task<Result<Guid>> HandleAsync(CreateAdminQuery request, CancellationToken cancellationToken) { return Result<Guid>.Success(Guid.NewGuid()); } } }
+using HUP.BuildingBlocks.Application;
+using HUP.Modules.Admin.Domain;
+namespace HUP.Modules.Admin.Application.Features.CreateAdmin
+{
+    public class CreateAdminHandler
+    {
+        public async Task<Result<Guid>> HandleAsync(CreateAdminQuery request, CancellationToken cancellationToken)
+        {
+            return Result<Guid>.Success(Guid.NewGuid());
+        }
+    }
+}

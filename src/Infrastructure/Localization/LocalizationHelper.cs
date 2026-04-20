@@ -1,1 +1,6 @@
-namespace HUP.Infrastructure.Localization { public class LocalizationHelper { } }
+namespace HUP.Infrastructure.Localization
+{
+    public class LocalizationHelper
+    {
+    }
+}

@@ -1,1 +1,6 @@
-namespace HUP.Infrastructure.Authorization { public class PolicyProvider { } }
+namespace HUP.Infrastructure.Authorization
+{
+    public class PolicyProvider
+    {
+    }
+}

@@ -1,1 +1,8 @@
-namespace HUP.Modules.AcademicStructure.Application.Features.AddCreditHours { public class AddCreditHHoursQuery { public int TotalCreditsRequired { get; set; } public Guid DepartmentId { get; set; } } }
+namespace HUP.Modules.AcademicStructure.Application.Features.AddCreditHours
+{
+    public class AddCreditHHoursQuery
+    {
+        public int TotalCreditsRequired { get; set; }
+        public Guid DepartmentId { get; set; }
+    }
+}

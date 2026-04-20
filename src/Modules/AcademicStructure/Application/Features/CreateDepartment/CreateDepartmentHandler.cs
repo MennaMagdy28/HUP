@@ -1,1 +1,11 @@
-using HUP.BuildingBlocks.Application; namespace HUP.Modules.AcademicStructure.Application.Features.CreateDepartment { public class CreateDepartmentHandler { public async Task<Result<Guid>> HandleAsync(CreateDepartmentQuery request, CancellationToken token) { return Result<Guid>.Success(Guid.NewGuid()); } } }
+using HUP.BuildingBlocks.Application;
+namespace HUP.Modules.AcademicStructure.Application.Features.CreateDepartment
+{
+    public class CreateDepartmentHandler
+    {
+        public async Task<Result<Guid>> HandleAsync(CreateDepartmentQuery request, CancellationToken token)
+        {
+            return Result<Guid>.Success(Guid.NewGuid());
+        }
+    }
+}

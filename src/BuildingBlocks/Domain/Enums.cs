@@ -1,1 +1,7 @@
-namespace HUP.BuildingBlocks.Domain { public enum Language { English, Arabic } }
+namespace HUP.BuildingBlocks.Domain
+{
+    public enum Language
+    {
+        English, Arabic
+    }
+}
