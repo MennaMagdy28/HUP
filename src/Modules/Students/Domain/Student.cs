@@ -1,4 +1,5 @@
 using HUP.BuildingBlocks.Domain;
+
 namespace HUP.Modules.Students.Domain
 {
     public class Student : BaseEntity
@@ -6,6 +7,7 @@ namespace HUP.Modules.Students.Domain
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public string FullName { get; set; }
+        public string NationalId {get; set;}
         public string UniversityCode { get; set; }
         public string UniversityEmail { get; set; }
         public string? ProfileImage { get; set; }

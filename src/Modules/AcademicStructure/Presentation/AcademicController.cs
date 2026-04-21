@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+
 namespace HUP.Modules.AcademicStructure.Presentation
 {
     [ApiController]

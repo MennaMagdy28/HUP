@@ -21,4 +21,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
     <PackageReference Include="StackExchange.Redis" Version="2.9.32" />
   </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="HUP\appsettings.Testing.json" />
+    <_ContentIncludedByDefault Remove="HUP\Properties\launchSettings.json" />
+  </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 using HUP.BuildingBlocks.Domain;
+
 namespace HUP.Modules.AcademicStructure.Domain
 {
     public class University : BaseEntity

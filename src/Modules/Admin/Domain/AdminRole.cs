@@ -1,7 +1,12 @@
+using HUP.BuildingBlocks.Domain;
+
 namespace HUP.Modules.Admin.Domain
 {
-    public enum AdminRole
+    public class AdminRole : BaseEntity
     {
-        SuperAdmin, UniversityAdmin, FacultyAdmin, DepartmentAdmin
+        public string Name { get; set; }
+        public string DisplayName { get; set; }
+        public string? Description { get; set; }
+        public Guid? CreatedBy { get; set; }
     }
 }

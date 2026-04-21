@@ -1,4 +1,5 @@
 using HUP.BuildingBlocks.Domain;
+
 namespace HUP.Modules.Privileges.Domain
 {
     public class Role : BaseEntity
