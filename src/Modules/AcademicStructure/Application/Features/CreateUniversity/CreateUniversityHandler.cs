@@ -1,0 +1,11 @@
+using HUP.BuildingBlocks.Application;
+namespace HUP.Modules.AcademicStructure.Application.Features.CreateUniversity
+{
+    public class CreateUniversityHandler
+    {
+        public async Task<Result<Guid>> HandleAsync(CreateUniversityQuery request, CancellationToken token)
+        {
+            return Result<Guid>.Success(Guid.NewGuid());
+        }
+    }
+}

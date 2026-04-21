@@ -1,0 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using HUP.Modules.AcademicStructure.Domain;
+namespace HUP.Modules.AcademicStructure.Infrastructure.Configurations
+{
+    public class CreditHoursConfiguration : IEntityTypeConfiguration<CreditHours>
+    {
+        public void Configure(EntityTypeBuilder<CreditHours> builder)
+        {
+            builder.HasKey(x => x.Id);
+            builder.Property(x => x.TotalCreditsRequired).IsRequired();
+        }
+    }
+}

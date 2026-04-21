@@ -1,0 +1,11 @@
+using HUP.BuildingBlocks.Application;
+namespace HUP.Modules.Students.Application.Features.GetStudentById
+{
+    public class GetStudentByIdHandler
+    {
+        public async Task<Result<StudentDto>> HandleAsync(GetStudentByIdQuery request, CancellationToken cancellationToken)
+        {
+            return Result<StudentDto>.Success(new StudentDto());
+        }
+    }
+}

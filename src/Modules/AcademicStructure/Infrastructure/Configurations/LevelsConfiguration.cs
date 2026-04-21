@@ -1,0 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using HUP.Modules.AcademicStructure.Domain;
+namespace HUP.Modules.AcademicStructure.Infrastructure.Configurations
+{
+    public class LevelsConfiguration : IEntityTypeConfiguration<Levels>
+    {
+        public void Configure(EntityTypeBuilder<Levels> builder)
+        {
+            builder.HasKey(x => x.Id);
+            builder.Property(x => x.Name).IsRequired().HasMaxLength(255);
+            builder.Property(x => x.AcademicYear).IsRequired();
+        }
+    }
+}

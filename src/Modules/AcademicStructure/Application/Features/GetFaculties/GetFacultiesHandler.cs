@@ -1,0 +1,11 @@
+using HUP.BuildingBlocks.Application;
+namespace HUP.Modules.AcademicStructure.Application.Features.GetFaculties
+{
+    public class GetFacultiesHandler
+    {
+        public async Task<Result<List<FacultyDto>>> HandleAsync(GetFacultiesQuery request, CancellationToken token)
+        {
+            return Result<List<FacultyDto>>.Success(new List<FacultyDto>());
+        }
+    }
+}

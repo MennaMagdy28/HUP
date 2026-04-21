@@ -1,0 +1,13 @@
+namespace HUP.Modules.Students.Application.Features.GetStudentById
+{
+    public class StudentDto
+    {
+        public Guid Id { get; set; }
+        public string FullName { get; set; }
+        public string UniversityCode { get; set; }
+        public string UniversityEmail { get; set; }
+        public decimal Cgpa { get; set; }
+        public int Level { get; set; }
+        public Guid DepartmentId { get; set; }
+    }
+}

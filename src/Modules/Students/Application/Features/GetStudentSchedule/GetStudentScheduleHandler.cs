@@ -1,0 +1,11 @@
+using HUP.BuildingBlocks.Application;
+namespace HUP.Modules.Students.Application.Features.GetStudentSchedule
+{
+    public class GetStudentScheduleHandler
+    {
+        public async Task<Result<ScheduleDto>> HandleAsync(GetStudentScheduleQuery request, CancellationToken cancellationToken)
+        {
+            return Result<ScheduleDto>.Success(new ScheduleDto());
+        }
+    }
+}

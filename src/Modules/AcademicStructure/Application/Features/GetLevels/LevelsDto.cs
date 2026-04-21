@@ -1,0 +1,10 @@
+namespace HUP.Modules.AcademicStructure.Application.Features.GetLevels
+{
+    public class LevelsDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public int AcademicYear { get; set; }
+        public Guid DepartmentId { get; set; }
+    }
+}
