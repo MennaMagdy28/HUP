@@ -27,12 +27,23 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
 
-if (!string.IsNullOrEmpty(connectionString))
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    // Do not register DbContext here, let WebApplicationFactory do it
+}
+else if (!string.IsNullOrEmpty(connectionString))
 {
     builder.Services.AddDbContext<HupDbContext>(options =>
         options.UseSqlServer(connectionString)
     );
 }
+else
+{
+    builder.Services.AddDbContext<HupDbContext>(options =>
+        options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=HUP_DesignDb;Trusted_Connection=True;MultipleActiveResultSets=true")
+    );
+}
+
 // redis connection
 if (!string.IsNullOrEmpty(redisConnectionString))
 {
@@ -123,6 +134,18 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<HupDbContext>();
+    // Apply pending migrations if any
+    if (context.Database.IsRelational())
+    {
+        context.Database.Migrate();
+    }
+    // Seed the comprehensive test data
+    HUP.Data.DatabaseSeeder.Initialize(context);
+}
 
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
